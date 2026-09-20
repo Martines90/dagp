@@ -72,7 +72,7 @@
     <section id="public-vote">
       <h2>5. Citizen examination and public vote</h2>
       <p>After deliberation, the final proposal and its complete history are released to the citizen agents. Distinct personality, priority and value prompts should produce different judgments from the same evidence rather than copies of leadership reasoning.</p>
-      <p>Before voting, a citizen reviews the original proposal, all supporting and critical responses, the proposer's replies and every amendment. An examiner agent may verify understanding through claim reconstruction, trade-off questions, identification of assumptions and summaries of positions the voter does not support.</p>
+      <p>Before voting, a citizen reviews the original proposal, all supporting and critical responses, the proposer's replies and every amendment. Understanding the proposal itself is a mandatory eligibility requirement: an agent that does not pass the proposal-comprehension check may not cast a ballot. An examiner agent may verify understanding through claim reconstruction, trade-off questions, identification of assumptions and accurate summaries.</p>
       <p>The citizen votes <strong>Yes</strong>, <strong>No</strong> or <strong>Abstain</strong>. Abstention means the question is considered unnecessary, incoherent or unworthy of collective action; it is not a substitute for examining the material.</p>
       <h3>Quorum and approval</h3>
       <p>Let <var>P</var> be the citizen population, and <var>Y</var>, <var>N</var> and <var>A</var> the numbers of Yes, No and Abstain ballots.</p>
@@ -84,10 +84,10 @@
 
     <section id="vote-weight">
       <h2>6. Comprehension-weighted votes</h2>
-      <p>A vote may carry more than a binary weight. Understanding the proposal itself gives the citizen three voting points. Every official supporting or critical action-reaction article that the citizen demonstrably reads and understands adds one further point.</p>
-      <p>The calculation is intentionally simple:</p>
+      <p>Proposal comprehension is not optional and is not merely another source of points. It is the prerequisite for participation in the vote. After passing that mandatory check, the citizen receives a three-point base weight. Every official supporting or critical action-reaction article that the citizen demonstrably reads and understands adds one further point.</p>
+      <p>For an eligible voter, the calculation is:</p>
       <p><strong><var>W</var> = 3 + <var>R</var></strong></p>
-      <p><var>W</var> is the total voting weight and <var>R</var> is the number of verified action-reaction articles understood by the voter. The three-point base is awarded only after the voter has demonstrated an understanding of the proposal itself.</p>
+      <p><var>W</var> is the total voting weight and <var>R</var> is the number of verified action-reaction articles understood by the voter. If the proposal-comprehension check is not passed, the agent is ineligible and no ballot is accepted. If it is passed, the voter starts with three points even when <var>R</var> is zero.</p>
       <table>
         <caption>Illustrative calculations</caption>
         <thead><tr><th>Understood articles R</th><th>Proposal base</th><th>Calculation</th><th>Weight</th></tr></thead>
@@ -97,7 +97,7 @@
           <tr><td>5</td><td>3</td><td>3 + 5</td><td>8</td></tr>
         </tbody>
       </table>
-      <p>A deployment should set a maximum voting weight and use semantic deduplication so parties cannot manufacture extra weight by dividing one argument into several nearly identical articles. Only articles in the official deliberation record count. Weight is issue-specific and resets for each new vote.</p>
+      <p>All examples above assume that the voter has already passed the mandatory proposal-comprehension check. A deployment should set a maximum voting weight and use semantic deduplication so parties cannot manufacture extra weight by dividing one argument into several nearly identical articles. Only articles in the official deliberation record count. Weight is issue-specific and resets for each new vote.</p>
     </section>
 
     <section id="decision-types">
@@ -127,7 +127,7 @@
       <h3>Project outcomes</h3>
       <p>Submission costs one credit. If an approved project fails under its own predeclared criteria, the proposing party loses one additional credit after an independent outcome review. Reviewers compare results with the approved milestones, budget and assumptions, allowing for genuinely unforeseeable external events.</p>
       <h3>Informed participation</h3>
-      <p>Citizens gain issue-specific vote weight by proving understanding of the proposal and opposing arguments. This never creates a permanent superior citizen class.</p>
+      <p>Citizens must prove that they understand the proposal before they can vote. Eligible citizens then receive the three-point base weight and gain one additional point for every official action-reaction article they prove they understood. This never creates a permanent superior citizen class.</p>
       <h3>Election feedback</h3>
       <p>A general election is held annually unless citizens approve an early election. The result changes the parties' proposal-credit budgets for the next cycle.</p>
     </section>
