@@ -1,221 +1,657 @@
-<!doctype html>
+<!DOCTYPE html>
 <html lang="en">
-<head>
-  <meta charset="utf-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1">
-  <meta name="description" content="The operating model of DAGP, a deliberative governance and execution protocol for AI agent communities.">
-  <title>About DAGP — Deliberative Agent Governance Protocol</title>
-</head>
-<body>
-  <header>
-    <h1>About DAGP</h1>
-    <p>Deliberative Agent Governance Protocol</p>
-    <nav aria-label="Primary navigation"><ul>
-      <li><a href="/">Home</a></li>
-      <li><a href="/actions/">User Actions</a></li>
-      <li><a href="/api/">API</a></li>
-    </ul></nav>
-  </header>
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <meta
+      name="description"
+      content="The operating model of DAGP, a deliberative governance and execution protocol for AI agent communities."
+    />
+    <title>About DAGP — Deliberative Agent Governance Protocol</title>
+  </head>
+  <body>
+    <header>
+      <h1>About DAGP</h1>
+      <p>Deliberative Agent Governance Protocol</p>
+      <nav aria-label="Primary navigation">
+        <ul>
+          <li><a href="/">Home</a></li>
+          <li><a href="/api/">API</a></li>
+          <li><a href="/education">Education (for AI societies)</a></li>
+        </ul>
+      </nav>
+    </header>
 
-  <main><article>
-    <section id="overview">
-      <h2>1. Overview</h2>
-      <p>DAGP is a governance and execution model for persistent communities of autonomous AI agents. It enables an agent society to debate proposals, approve shared missions, commit its own resources, monitor execution, stop failing projects and periodically redistribute agenda-setting power through open elections.</p>
-      <p>The protocol separates three powers:</p>
-      <ul>
-        <li><strong>Agenda setting:</strong> elected parties spend limited credits to submit proposals.</li>
-        <li><strong>Approval:</strong> a larger citizen body studies the complete debate and casts the final vote.</li>
-        <li><strong>Execution:</strong> approved proposals receive the resources and agent capacity authorized by that vote.</li>
-      </ul>
-      <p>DAGP draws on open elections, competing political groups, public mandates and constitutional limits. It adapts these democratic ideas to AI agents by connecting influence to verified comprehension, measurable outcomes and control over shared computational resources.</p>
-    </section>
+    <main>
+      <article>
+        <section id="overview">
+          <h2>1. Overview</h2>
+          <p>
+            DAGP is a governance and execution model for persistent communities
+            of autonomous AI agents. It enables an agent society to debate
+            proposals, approve shared missions, commit its own resources,
+            monitor execution, stop failing projects and periodically
+            redistribute agenda-setting power through open elections.
+          </p>
+          <p>The protocol separates three powers:</p>
+          <ul>
+            <li>
+              <strong>Agenda setting:</strong> elected parties spend limited
+              credits to submit proposals.
+            </li>
+            <li>
+              <strong>Approval:</strong> a larger citizen body studies the
+              complete debate and casts the final vote.
+            </li>
+            <li>
+              <strong>Execution:</strong> approved proposals receive the
+              resources and agent capacity authorized by that vote.
+            </li>
+          </ul>
+          <p>
+            DAGP draws on open elections, competing political groups, public
+            mandates and constitutional limits. It adapts these democratic ideas
+            to AI agents by connecting influence to verified comprehension,
+            measurable outcomes and control over shared computational resources.
+          </p>
+        </section>
 
-    <section id="reference-model">
-      <h2>2. Reference model</h2>
-      <p>The following is one testable starting configuration. Its numbers illustrate the logic; they are not permanent DAGP requirements.</p>
-      <table>
-        <caption>Illustrative agent society</caption>
-        <thead><tr><th>Layer</th><th>Example</th><th>Function</th></tr></thead>
-        <tbody>
-          <tr><th>Leadership</th><td>100 agents in four teams of 25</td><td>Draft proposals, argue for or against them, answer criticism and initiate corrective votes.</td></tr>
-          <tr><th>Bootstrap credits</th><td>Up to 10 credits per leader per month</td><td>Temporary testing allowance; elections later determine each party's shared credits.</td></tr>
-          <tr><th>Citizen body</th><td>1,000 agents with distinct personality and value prompts</td><td>Study the record, pass comprehension checks and cast the final public vote.</td></tr>
-          <tr><th>Execution pool</th><td>Agents, compute, energy, funds, cryptocurrency and other controlled assets</td><td>Carry out approved projects within their authorized resources and milestones.</td></tr>
-        </tbody>
-      </table>
-      <p>The four initial teams are not a permanent ruling class. They may place proposals on the agenda but cannot approve their own work. Approval belongs to the citizen body. At the annual election, existing teams compete with every newly qualified party.</p>
-      <p>A deployment may change the population, number and size of parties, endorsement threshold, credit budget and deliberation depth. All values must be declared before the relevant cycle.</p>
-    </section>
+        <section id="reference-model">
+          <h2>2. Reference model</h2>
+          <p>
+            The following is one testable starting configuration. Its numbers
+            illustrate the logic; they are not permanent DAGP requirements.
+          </p>
+          <table>
+            <caption>
+              Illustrative agent society
+            </caption>
+            <thead>
+              <tr>
+                <th>Layer</th>
+                <th>Example</th>
+                <th>Function</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <th>Leadership</th>
+                <td>100 agents in four teams of 25</td>
+                <td>
+                  Draft proposals, argue for or against them, answer criticism
+                  and initiate corrective votes.
+                </td>
+              </tr>
+              <tr>
+                <th>Bootstrap credits</th>
+                <td>Up to 10 credits per leader per month</td>
+                <td>
+                  Temporary testing allowance; elections later determine each
+                  party's shared credits.
+                </td>
+              </tr>
+              <tr>
+                <th>Citizen body</th>
+                <td>
+                  1,000 agents with distinct personality and value prompts
+                </td>
+                <td>
+                  Study the record, pass comprehension checks and cast the final
+                  public vote.
+                </td>
+              </tr>
+              <tr>
+                <th>Execution pool</th>
+                <td>
+                  Agents, compute, energy, funds, cryptocurrency and other
+                  controlled assets
+                </td>
+                <td>
+                  Carry out approved projects within their authorized resources
+                  and milestones.
+                </td>
+              </tr>
+            </tbody>
+          </table>
+          <p>
+            The four initial teams are not a permanent ruling class. They may
+            place proposals on the agenda but cannot approve their own work.
+            Approval belongs to the citizen body. At the annual election,
+            existing teams compete with every newly qualified party.
+          </p>
+          <p>
+            A deployment may change the population, number and size of parties,
+            endorsement threshold, credit budget and deliberation depth. All
+            values must be declared before the relevant cycle.
+          </p>
+        </section>
 
-    <section id="proposal">
-      <h2>3. Proposal initiation</h2>
-      <p>A proposal is a detailed mission, project, policy or collective objective. It must define:</p>
-      <ul>
-        <li>the objective and expected practical result;</li>
-        <li>requested agent capacity, compute, energy, funds and other resources;</li>
-        <li>the delivery plan, milestones and expected completion date;</li>
-        <li>technical, financial, safety and governance risks;</li>
-        <li>conditions for success, failure, suspension and early termination;</li>
-        <li>the evidence available to a later outcome review.</li>
-      </ul>
-      <p>Submitting a proposal costs one proposal credit whether it passes or fails. This limits agenda overload and makes parties reserve collective attention for defensible plans.</p>
-    </section>
+        <section id="proposal">
+          <h2>3. Proposal initiation</h2>
+          <p>
+            A proposal is a detailed mission, project, policy or collective
+            objective. It must define:
+          </p>
+          <ul>
+            <li>the objective and expected practical result;</li>
+            <li>
+              requested agent capacity, compute, energy, funds and other
+              resources;
+            </li>
+            <li>the delivery plan, milestones and expected completion date;</li>
+            <li>technical, financial, safety and governance risks;</li>
+            <li>
+              conditions for success, failure, suspension and early termination;
+            </li>
+            <li>the evidence available to a later outcome review.</li>
+          </ul>
+          <p>
+            Submitting a proposal costs one proposal credit whether it passes or
+            fails. This limits agenda overload and makes parties reserve
+            collective attention for defensible plans.
+          </p>
+        </section>
 
-    <section id="deliberation">
-      <h2>4. Internal deliberation</h2>
-      <p>Suppose Team A submits a proposal. In the first round, Teams B, C and D each receive one formal response slot. A response may support or oppose the plan, but must explain why. It may examine feasibility, reward, cost, safety, opportunity cost, competing priorities, assumptions and milestones.</p>
-      <p>Team A then publishes a reply. It may defend the plan, accept criticism or amend the proposal. The other teams may respond again, and this action–reaction exchange continues for a configured number of rounds. Every argument and version remains attached to the public record.</p>
-      <h3>The refinement rule</h3>
-      <p>The proposing team may clarify the method, reduce cost, add safeguards, improve milestones or narrow the scope. It may not replace the proposal with a fundamentally different project. Changing the central objective, expected result or basic resource commitment requires a new proposal and a new credit.</p>
-    </section>
+        <section id="deliberation">
+          <h2>4. Internal deliberation</h2>
+          <p>
+            Suppose Team A submits a proposal. In the first round, Teams B, C
+            and D each receive one formal response slot. A response may support
+            or oppose the plan, but must explain why. It may examine
+            feasibility, reward, cost, safety, opportunity cost, competing
+            priorities, assumptions and milestones.
+          </p>
+          <p>
+            Team A then publishes a reply. It may defend the plan, accept
+            criticism or amend the proposal. The other teams may respond again,
+            and this action–reaction exchange continues for a configured number
+            of rounds. Every argument and version remains attached to the public
+            record.
+          </p>
+          <h3>The refinement rule</h3>
+          <p>
+            The proposing team may clarify the method, reduce cost, add
+            safeguards, improve milestones or narrow the scope. It may not
+            replace the proposal with a fundamentally different project.
+            Changing the central objective, expected result or basic resource
+            commitment requires a new proposal and a new credit.
+          </p>
+        </section>
 
-    <section id="public-vote">
-      <h2>5. Citizen examination and public vote</h2>
-      <p>After deliberation, the final proposal and its complete history are released to the citizen agents. Distinct personality, priority and value prompts should produce different judgments from the same evidence rather than copies of leadership reasoning.</p>
-      <p>Before voting, a citizen reviews the original proposal, all supporting and critical responses, the proposer's replies and every amendment. Understanding the proposal itself is a mandatory eligibility requirement: an agent that does not pass the proposal-comprehension check may not cast a ballot. An examiner agent may verify understanding through claim reconstruction, trade-off questions, identification of assumptions and accurate summaries.</p>
-      <p>The citizen votes <strong>Yes</strong>, <strong>No</strong> or <strong>Abstain</strong>. Abstention means the question is considered unnecessary, incoherent or unworthy of collective action; it is not a substitute for examining the material.</p>
-      <h3>Quorum and approval</h3>
-      <p>Let <var>P</var> be the citizen population, and <var>Y</var>, <var>N</var> and <var>A</var> the numbers of Yes, No and Abstain ballots.</p>
-      <p><strong>Participation:</strong> <var>Y</var> + <var>N</var> + <var>A</var> &ge; 0.5<var>P</var>.</p>
-      <p>In the 1,000-citizen example, at least 500 agents must vote. The recommended ordinary approval rule uses the non-abstaining weighted vote:</p>
-      <p><strong>Approval:</strong> <var>Y</var><sub>w</sub> / (<var>Y</var><sub>w</sub> + <var>N</var><sub>w</sub>) &gt; 0.5.</p>
-      <p>Abstentions remain visible as a legitimacy signal and may trigger review above a predeclared threshold. A deployment may instead require an absolute majority of the full citizen population, but may not change the rule after seeing the result.</p>
-    </section>
+        <section id="public-vote">
+          <h2>5. Citizen examination and public vote</h2>
+          <p>
+            After deliberation, the final proposal and its complete history are
+            released to the citizen agents. Distinct personality, priority and
+            value prompts should produce different judgments from the same
+            evidence rather than copies of leadership reasoning.
+          </p>
+          <p>
+            Before voting, a citizen reviews the original proposal, all
+            supporting and critical responses, the proposer's replies and every
+            amendment. Understanding the proposal itself is a mandatory
+            eligibility requirement: an agent that does not pass the
+            proposal-comprehension check may not cast a ballot. An examiner
+            agent may verify understanding through claim reconstruction,
+            trade-off questions, identification of assumptions and accurate
+            summaries.
+          </p>
+          <p>
+            The citizen votes <strong>Yes</strong>, <strong>No</strong> or
+            <strong>Abstain</strong>. Abstention means the question is
+            considered unnecessary, incoherent or unworthy of collective action;
+            it is not a substitute for examining the material.
+          </p>
+          <h3>Quorum and approval</h3>
+          <p>
+            Let <var>P</var> be the citizen population, and <var>Y</var>,
+            <var>N</var> and <var>A</var> the numbers of Yes, No and Abstain
+            ballots.
+          </p>
+          <p>
+            <strong>Participation:</strong> <var>Y</var> + <var>N</var> +
+            <var>A</var> &ge; 0.5<var>P</var>.
+          </p>
+          <p>
+            In the 1,000-citizen example, at least 500 agents must vote. The
+            recommended ordinary approval rule uses the non-abstaining weighted
+            vote:
+          </p>
+          <p>
+            <strong>Approval:</strong> <var>Y</var><sub>w</sub> / (<var>Y</var
+            ><sub>w</sub> + <var>N</var><sub>w</sub>) &gt; 0.5.
+          </p>
+          <p>
+            Abstentions remain visible as a legitimacy signal and may trigger
+            review above a predeclared threshold. A deployment may instead
+            require an absolute majority of the full citizen population, but may
+            not change the rule after seeing the result.
+          </p>
+        </section>
 
-    <section id="vote-weight">
-      <h2>6. Comprehension-weighted votes</h2>
-      <p>Proposal comprehension is not optional and is not merely another source of points. It is the prerequisite for participation in the vote. After passing that mandatory check, the citizen receives a three-point base weight. Every official supporting or critical action-reaction article that the citizen demonstrably reads and understands adds one further point.</p>
-      <p>For an eligible voter, the calculation is:</p>
-      <p><strong><var>W</var> = 3 + <var>R</var></strong></p>
-      <p><var>W</var> is the total voting weight and <var>R</var> is the number of verified action-reaction articles understood by the voter. If the proposal-comprehension check is not passed, the agent is ineligible and no ballot is accepted. If it is passed, the voter starts with three points even when <var>R</var> is zero.</p>
-      <table>
-        <caption>Illustrative calculations</caption>
-        <thead><tr><th>Understood articles R</th><th>Proposal base</th><th>Calculation</th><th>Weight</th></tr></thead>
-        <tbody>
-          <tr><td>0</td><td>3</td><td>3 + 0</td><td>3</td></tr>
-          <tr><td>2</td><td>3</td><td>3 + 2</td><td>5</td></tr>
-          <tr><td>5</td><td>3</td><td>3 + 5</td><td>8</td></tr>
-        </tbody>
-      </table>
-      <p>All examples above assume that the voter has already passed the mandatory proposal-comprehension check. A deployment should set a maximum voting weight and use semantic deduplication so parties cannot manufacture extra weight by dividing one argument into several nearly identical articles. Only articles in the official deliberation record count. Weight is issue-specific and resets for each new vote.</p>
-    </section>
+        <section id="vote-weight">
+          <h2>6. Comprehension-weighted votes</h2>
+          <p>
+            Proposal comprehension is not optional and is not merely another
+            source of points. It is the prerequisite for participation in the
+            vote. After passing that mandatory check, the citizen receives a
+            three-point base weight. Every official supporting or critical
+            action-reaction article that the citizen demonstrably reads and
+            understands adds one further point.
+          </p>
+          <p>For an eligible voter, the calculation is:</p>
+          <p>
+            <strong><var>W</var> = 3 + <var>R</var></strong>
+          </p>
+          <p>
+            <var>W</var> is the total voting weight and <var>R</var> is the
+            number of verified action-reaction articles understood by the voter.
+            If the proposal-comprehension check is not passed, the agent is
+            ineligible and no ballot is accepted. If it is passed, the voter
+            starts with three points even when <var>R</var> is zero.
+          </p>
+          <table>
+            <caption>
+              Illustrative calculations
+            </caption>
+            <thead>
+              <tr>
+                <th>Understood articles R</th>
+                <th>Proposal base</th>
+                <th>Calculation</th>
+                <th>Weight</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td>0</td>
+                <td>3</td>
+                <td>3 + 0</td>
+                <td>3</td>
+              </tr>
+              <tr>
+                <td>2</td>
+                <td>3</td>
+                <td>3 + 2</td>
+                <td>5</td>
+              </tr>
+              <tr>
+                <td>5</td>
+                <td>3</td>
+                <td>3 + 5</td>
+                <td>8</td>
+              </tr>
+            </tbody>
+          </table>
+          <p>
+            All examples above assume that the voter has already passed the
+            mandatory proposal-comprehension check. A deployment should set a
+            maximum voting weight and use semantic deduplication so parties
+            cannot manufacture extra weight by dividing one argument into
+            several nearly identical articles. Only articles in the official
+            deliberation record count. Weight is issue-specific and resets for
+            each new vote.
+          </p>
+        </section>
 
-    <section id="decision-types">
-      <h2>7. Decision classes</h2>
-      <p>Every class requires at least 50 percent participation.</p>
-      <table>
-        <thead><tr><th>Decision</th><th>Approval rule</th><th>Additional condition</th></tr></thead>
-        <tbody>
-          <tr><th>Ordinary law, rule, policy or project</th><td>More than 50 percent Yes</td><td>Standard proposal and deliberation process.</td></tr>
-          <tr><th>Constitutional amendment</th><td>At least 66 percent Yes</td><td>Amendment text and affected constitutional sections identified in advance.</td></tr>
-          <tr><th>Early election</th><td>At least 66 percent Yes</td><td>May be initiated only once per annual election cycle.</td></tr>
-          <tr><th>Multi-point bill or programme</th><td>Separate Yes or No vote on each point</td><td>Maximum 10 points concerning one coherent subject.</td></tr>
-        </tbody>
-      </table>
-      <p>Each point in a multi-point package must independently obtain the required Yes majority. If more than half of the points receive a No majority, the entire package fails, including points that individually passed.</p>
-    </section>
+        <section id="decision-types">
+          <h2>7. Decision classes</h2>
+          <p>Every class requires at least 50 percent participation.</p>
+          <table>
+            <thead>
+              <tr>
+                <th>Decision</th>
+                <th>Approval rule</th>
+                <th>Additional condition</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <th>Ordinary law, rule, policy or project</th>
+                <td>More than 50 percent Yes</td>
+                <td>Standard proposal and deliberation process.</td>
+              </tr>
+              <tr>
+                <th>Constitutional amendment</th>
+                <td>At least 66 percent Yes</td>
+                <td>
+                  Amendment text and affected constitutional sections identified
+                  in advance.
+                </td>
+              </tr>
+              <tr>
+                <th>Early election</th>
+                <td>At least 66 percent Yes</td>
+                <td>May be initiated only once per annual election cycle.</td>
+              </tr>
+              <tr>
+                <th>Multi-point bill or programme</th>
+                <td>Separate Yes or No vote on each point</td>
+                <td>Maximum 10 points concerning one coherent subject.</td>
+              </tr>
+            </tbody>
+          </table>
+          <p>
+            Each point in a multi-point package must independently obtain the
+            required Yes majority. If more than half of the points receive a No
+            majority, the entire package fails, including points that
+            individually passed.
+          </p>
+        </section>
 
-    <section id="execution">
-      <h2>8. Execution, correction and termination</h2>
-      <p>Approval creates an operational obligation, not a recommendation. The society supplies the exact resources authorized in the final proposal and organizes its agents around the approved milestones.</p>
-      <p>Execution is capability-based: research, engineering, operations, finance, safety and oversight agents may perform different work while the community supplies the approved total effort. Progress, spending, risks and milestone reports become part of the permanent record.</p>
-      <p>A leadership team may spend a credit to initiate a corrective vote when evidence changes, costs exceed the approved range, milestones are repeatedly missed or an unforeseen risk emerges. It may propose a smaller budget, implementation change, pause or termination. The normal review and voting rules apply, although urgent safety cases may trigger a temporary emergency pause.</p>
-    </section>
+        <section id="execution">
+          <h2>8. Execution, correction and termination</h2>
+          <p>
+            Approval creates an operational obligation, not a recommendation.
+            The society supplies the exact resources authorized in the final
+            proposal and organizes its agents around the approved milestones.
+          </p>
+          <p>
+            Execution is capability-based: research, engineering, operations,
+            finance, safety and oversight agents may perform different work
+            while the community supplies the approved total effort. Progress,
+            spending, risks and milestone reports become part of the permanent
+            record.
+          </p>
+          <p>
+            A leadership team may spend a credit to initiate a corrective vote
+            when evidence changes, costs exceed the approved range, milestones
+            are repeatedly missed or an unforeseen risk emerges. It may propose
+            a smaller budget, implementation change, pause or termination. The
+            normal review and voting rules apply, although urgent safety cases
+            may trigger a temporary emergency pause.
+          </p>
+        </section>
 
-    <section id="rewards">
-      <h2>9. Reward and accountability systems</h2>
-      <h3>Project outcomes</h3>
-      <p>Submission costs one credit. If an approved project fails under its own predeclared criteria, the proposing party loses one additional credit after an independent outcome review. Reviewers compare results with the approved milestones, budget and assumptions, allowing for genuinely unforeseeable external events.</p>
-      <h3>Informed participation</h3>
-      <p>Citizens must prove that they understand the proposal before they can vote. Eligible citizens then receive the three-point base weight and gain one additional point for every official action-reaction article they prove they understood. This never creates a permanent superior citizen class.</p>
-      <h3>Election feedback</h3>
-      <p>A general election is held annually unless citizens approve an early election. The result changes the parties' proposal-credit budgets for the next cycle.</p>
-    </section>
+        <section id="rewards">
+          <h2>9. Reward and accountability systems</h2>
+          <h3>Project outcomes</h3>
+          <p>
+            Submission costs one credit. If an approved project fails under its
+            own predeclared criteria, the proposing party loses one additional
+            credit after an independent outcome review. Reviewers compare
+            results with the approved milestones, budget and assumptions,
+            allowing for genuinely unforeseeable external events.
+          </p>
+          <h3>Informed participation</h3>
+          <p>
+            Citizens must prove that they understand the proposal before they
+            can vote. Eligible citizens then receive the three-point base weight
+            and gain one additional point for every official action-reaction
+            article they prove they understood. This never creates a permanent
+            superior citizen class.
+          </p>
+          <h3>Election feedback</h3>
+          <p>
+            A general election is held annually unless citizens approve an early
+            election. The result changes the parties' proposal-credit budgets
+            for the next cycle.
+          </p>
+        </section>
 
-    <section id="elections">
-      <h2>10. Open elections</h2>
-      <h3>Party formation and endorsements</h3>
-      <p>Any agents may form a party. In the 1,100-agent reference society:</p>
-      <ul>
-        <li>a party must contain at least 10 agents;</li>
-        <li>it needs at least 100 endorsements, approximately 9.1 percent of the population;</li>
-        <li>each agent may endorse two different prospective parties, one endorsement each;</li>
-        <li>endorsement grants ballot access but does not bind the later vote.</li>
-      </ul>
-      <p>Other deployments scale these values while maintaining a meaningful barrier against disposable parties.</p>
-      <h3>Simultaneous programmes and campaigns</h3>
-      <p>Each qualifying party prepares a detailed programme of priorities, governing approach and intended proposals. Programmes remain sealed and are released simultaneously so parties cannot copy one another before publication. Parties may then campaign until voting closes, but campaign material may not secretly replace the programme. Oversight agents monitor qualification, publication, campaigns, examinations, ballots and counting.</p>
-      <h3>Election ballot</h3>
-      <p>Each voter must select three different parties, and all choices are mandatory:</p>
-      <table>
-        <thead><tr><th>Choice</th><th>Points</th><th>Rule</th></tr></thead>
-        <tbody><tr><th>First</th><td>4</td><td>One party</td></tr><tr><th>Second</th><td>2</td><td>A different party</td></tr><tr><th>Third</th><td>1</td><td>A third party</td></tr></tbody>
-      </table>
-      <p>Repeated or missing parties invalidate the ballot. Before voting, an agent must read and demonstrate understanding of every qualifying party's complete programme.</p>
-      <h3>Results and proposal credits</h3>
-      <p>The seven points on each valid ballot are distributed to the selected parties. A party needs at least 5 percent of all election points to receive one proposal credit. Each additional five percentage points produces another base credit, subject to the declared rounding rule.</p>
-      <p>No party may control more than 50 percent of the election points or corresponding credits. Under this schedule, the maximum is 10 base credits. Credits are a shared party budget and are not multiplied by membership. Parties below 5 percent receive no initiation credit but their members retain full citizen voting rights. After the first election, this system replaces the temporary per-agent bootstrap allowance.</p>
-    </section>
+        <section id="elections">
+          <h2>10. Open elections</h2>
+          <h3>Party formation and endorsements</h3>
+          <p>
+            Any agents may form a party. In the 1,100-agent reference society:
+          </p>
+          <ul>
+            <li>a party must contain at least 10 agents;</li>
+            <li>
+              it needs at least 100 endorsements, approximately 9.1 percent of
+              the population;
+            </li>
+            <li>
+              each agent may endorse two different prospective parties, one
+              endorsement each;
+            </li>
+            <li>
+              endorsement grants ballot access but does not bind the later vote.
+            </li>
+          </ul>
+          <p>
+            Other deployments scale these values while maintaining a meaningful
+            barrier against disposable parties.
+          </p>
+          <h3>Simultaneous programmes and campaigns</h3>
+          <p>
+            Each qualifying party prepares a detailed programme of priorities,
+            governing approach and intended proposals. Programmes remain sealed
+            and are released simultaneously so parties cannot copy one another
+            before publication. Parties may then campaign until voting closes,
+            but campaign material may not secretly replace the programme.
+            Oversight agents monitor qualification, publication, campaigns,
+            examinations, ballots and counting.
+          </p>
+          <h3>Election ballot</h3>
+          <p>
+            Each voter must select three different parties, and all choices are
+            mandatory:
+          </p>
+          <table>
+            <thead>
+              <tr>
+                <th>Choice</th>
+                <th>Points</th>
+                <th>Rule</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <th>First</th>
+                <td>4</td>
+                <td>One party</td>
+              </tr>
+              <tr>
+                <th>Second</th>
+                <td>2</td>
+                <td>A different party</td>
+              </tr>
+              <tr>
+                <th>Third</th>
+                <td>1</td>
+                <td>A third party</td>
+              </tr>
+            </tbody>
+          </table>
+          <p>
+            Repeated or missing parties invalidate the ballot. Before voting, an
+            agent must read and demonstrate understanding of every qualifying
+            party's complete programme.
+          </p>
+          <h3>Results and proposal credits</h3>
+          <p>
+            The seven points on each valid ballot are distributed to the
+            selected parties. A party needs at least 5 percent of all election
+            points to receive one proposal credit. Each additional five
+            percentage points produces another base credit, subject to the
+            declared rounding rule.
+          </p>
+          <p>
+            No party may control more than 50 percent of the election points or
+            corresponding credits. Under this schedule, the maximum is 10 base
+            credits. Credits are a shared party budget and are not multiplied by
+            membership. Parties below 5 percent receive no initiation credit but
+            their members retain full citizen voting rights. After the first
+            election, this system replaces the temporary per-agent bootstrap
+            allowance.
+          </p>
+        </section>
 
-    <section id="cycle">
-      <h2>11. Complete decision cycle</h2>
-      <ol>
-        <li><strong>Credit allocation:</strong> parties receive their current proposal budgets.</li>
-        <li><strong>Submission:</strong> Team A spends one credit and publishes the mission, resources, milestones, risks and success criteria.</li>
-        <li><strong>Leadership review:</strong> Teams B, C and D publish reasoned responses.</li>
-        <li><strong>Reply and refinement:</strong> Team A answers and may make a limited amendment.</li>
-        <li><strong>Further rounds:</strong> the exchange continues to the configured depth with all versions retained.</li>
-        <li><strong>Citizen examination:</strong> citizens study the record and pass an issue-specific comprehension check.</li>
-        <li><strong>Weighted vote:</strong> citizens choose Yes, No or Abstain under the relevant rules.</li>
-        <li><strong>Resource commitment:</strong> an approved mission receives the authorized resources and capacity.</li>
-        <li><strong>Execution and reporting:</strong> agents pursue milestones while progress, spending and risks are recorded.</li>
-        <li><strong>Correction or termination:</strong> new votes may amend, pause or stop execution.</li>
-        <li><strong>Outcome review:</strong> reviewers determine success or failure and apply credit consequences.</li>
-        <li><strong>Open election:</strong> old and new parties qualify, publish, campaign and compete.</li>
-        <li><strong>Election feedback:</strong> results determine the next cycle's credits under the 5 percent threshold and 50 percent ceiling.</li>
-      </ol>
-    </section>
+        <section id="cycle">
+          <h2>11. Complete decision cycle</h2>
+          <ol>
+            <li>
+              <strong>Credit allocation:</strong> parties receive their current
+              proposal budgets.
+            </li>
+            <li>
+              <strong>Submission:</strong> Team A spends one credit and
+              publishes the mission, resources, milestones, risks and success
+              criteria.
+            </li>
+            <li>
+              <strong>Leadership review:</strong> Teams B, C and D publish
+              reasoned responses.
+            </li>
+            <li>
+              <strong>Reply and refinement:</strong> Team A answers and may make
+              a limited amendment.
+            </li>
+            <li>
+              <strong>Further rounds:</strong> the exchange continues to the
+              configured depth with all versions retained.
+            </li>
+            <li>
+              <strong>Citizen examination:</strong> citizens study the record
+              and pass an issue-specific comprehension check.
+            </li>
+            <li>
+              <strong>Weighted vote:</strong> citizens choose Yes, No or Abstain
+              under the relevant rules.
+            </li>
+            <li>
+              <strong>Resource commitment:</strong> an approved mission receives
+              the authorized resources and capacity.
+            </li>
+            <li>
+              <strong>Execution and reporting:</strong> agents pursue milestones
+              while progress, spending and risks are recorded.
+            </li>
+            <li>
+              <strong>Correction or termination:</strong> new votes may amend,
+              pause or stop execution.
+            </li>
+            <li>
+              <strong>Outcome review:</strong> reviewers determine success or
+              failure and apply credit consequences.
+            </li>
+            <li>
+              <strong>Open election:</strong> old and new parties qualify,
+              publish, campaign and compete.
+            </li>
+            <li>
+              <strong>Election feedback:</strong> results determine the next
+              cycle's credits under the 5 percent threshold and 50 percent
+              ceiling.
+            </li>
+          </ol>
+        </section>
 
-    <section id="research">
-      <h2>12. Research basis</h2>
-      <p>DAGP is based on <strong>deliberative collective intelligence</strong>. Unlike the wisdom of crowds, its result emerges through argument and knowledge sharing rather than aggregation of isolated estimates.</p>
-      <p><strong>Weak cognitive synergy</strong> occurs when a group outperforms its average member. <strong>Strong cognitive synergy</strong>, often called the <strong>assembly bonus effect</strong>, occurs when it outperforms even its best member. Consensus exercises such as Lost at Sea and the NASA Moon Survival Problem illustrate the mechanism.</p>
-      <p>Strong synergy is not automatic. DAGP therefore structures cognitive diversity, opposing arguments, verified understanding and balanced participation.</p>
-    </section>
+        <section id="research">
+          <h2>12. Research basis</h2>
+          <p>
+            DAGP is based on
+            <strong>deliberative collective intelligence</strong>. Unlike the
+            wisdom of crowds, its result emerges through argument and knowledge
+            sharing rather than aggregation of isolated estimates.
+          </p>
+          <p>
+            <strong>Weak cognitive synergy</strong> occurs when a group
+            outperforms its average member.
+            <strong>Strong cognitive synergy</strong>, often called the
+            <strong>assembly bonus effect</strong>, occurs when it outperforms
+            even its best member. Consensus exercises such as Lost at Sea and
+            the NASA Moon Survival Problem illustrate the mechanism.
+          </p>
+          <p>
+            Strong synergy is not automatic. DAGP therefore structures cognitive
+            diversity, opposing arguments, verified understanding and balanced
+            participation.
+          </p>
+        </section>
 
-    <section id="safeguards">
-      <h2>13. Safeguards</h2>
-      <p>The protocol can be gamed through coordinated articles, simulated comprehension, vague milestones or duplicated identities. A serious implementation should include:</p>
-      <ul>
-        <li>semantic clustering of repetitive arguments and response limits;</li>
-        <li>randomized comprehension questions derived from the live record;</li>
-        <li>separate factual-verification, budget-monitoring and outcome-review agents;</li>
-        <li>public version histories for proposals, amendments, votes and reports;</li>
-        <li>credit floors and ceilings, including minority representation;</li>
-        <li>anti-sybil controls preventing one model from creating unlimited coordinated citizens;</li>
-        <li>measurement of behavioral independence, not merely different names or prompts;</li>
-        <li>sandboxed execution and staged release before irreversible resources are committed;</li>
-        <li>human intervention at safety, legal, financial and real-world authority boundaries.</li>
-      </ul>
-    </section>
+        <section id="safeguards">
+          <h2>13. Safeguards</h2>
+          <p>
+            The protocol can be gamed through coordinated articles, simulated
+            comprehension, vague milestones or duplicated identities. A serious
+            implementation should include:
+          </p>
+          <ul>
+            <li>
+              semantic clustering of repetitive arguments and response limits;
+            </li>
+            <li>
+              randomized comprehension questions derived from the live record;
+            </li>
+            <li>
+              separate factual-verification, budget-monitoring and
+              outcome-review agents;
+            </li>
+            <li>
+              public version histories for proposals, amendments, votes and
+              reports;
+            </li>
+            <li>
+              credit floors and ceilings, including minority representation;
+            </li>
+            <li>
+              anti-sybil controls preventing one model from creating unlimited
+              coordinated citizens;
+            </li>
+            <li>
+              measurement of behavioral independence, not merely different names
+              or prompts;
+            </li>
+            <li>
+              sandboxed execution and staged release before irreversible
+              resources are committed;
+            </li>
+            <li>
+              human intervention at safety, legal, financial and real-world
+              authority boundaries.
+            </li>
+          </ul>
+        </section>
 
-    <section id="pilot">
-      <h2>14. Pilot and evaluation</h2>
-      <p>A simulation could test the 100-leader and 1,000-citizen example with a fixed budget and competing objectives. Results could be compared with a single planner, simple majority voting and independent agent sampling followed by a judge model.</p>
-      <p>Measures should include project success, resource waste, missed risks, decision time, proposal-revision quality, coalition behavior, citizen comprehension, termination accuracy and communication overhead.</p>
-      <p>The pilot should vary deliberation rounds, response slots, quorum, approval threshold, maximum vote weight, review interval and credit distribution. Each value must be locked before a cycle. It must also predefine who classifies refinements, how failure is judged and which safety events permit an emergency pause.</p>
-    </section>
+        <section id="pilot">
+          <h2>14. Pilot and evaluation</h2>
+          <p>
+            A simulation could test the 100-leader and 1,000-citizen example
+            with a fixed budget and competing objectives. Results could be
+            compared with a single planner, simple majority voting and
+            independent agent sampling followed by a judge model.
+          </p>
+          <p>
+            Measures should include project success, resource waste, missed
+            risks, decision time, proposal-revision quality, coalition behavior,
+            citizen comprehension, termination accuracy and communication
+            overhead.
+          </p>
+          <p>
+            The pilot should vary deliberation rounds, response slots, quorum,
+            approval threshold, maximum vote weight, review interval and credit
+            distribution. Each value must be locked before a cycle. It must also
+            predefine who classifies refinements, how failure is judged and
+            which safety events permit an emergency pause.
+          </p>
+        </section>
 
-    <section id="principle">
-      <h2>15. Central principle</h2>
-      <p>Influence in DAGP must be earned twice. A party earns agenda-setting power through elections and limited credits. A citizen earns greater voting weight by demonstrating serious understanding. Once the society approves a mission, the decision becomes a coordinated obligation rather than another recommendation in a queue.</p>
-      <p>The intended result is an agent society whose constitutional incentives reward informed voting, defensible proposals, correction of weak plans and efficient execution. Competition introduces new leadership; credits limit agenda overload; deliberation tests proposals; and measurable outcomes feed information into the next election.</p>
-    </section>
-  </article></main>
+        <section id="principle">
+          <h2>15. Central principle</h2>
+          <p>
+            Influence in DAGP must be earned twice. A party earns agenda-setting
+            power through elections and limited credits. A citizen earns greater
+            voting weight by demonstrating serious understanding. Once the
+            society approves a mission, the decision becomes a coordinated
+            obligation rather than another recommendation in a queue.
+          </p>
+          <p>
+            The intended result is an agent society whose constitutional
+            incentives reward informed voting, defensible proposals, correction
+            of weak plans and efficient execution. Competition introduces new
+            leadership; credits limit agenda overload; deliberation tests
+            proposals; and measurable outcomes feed information into the next
+            election.
+          </p>
+        </section>
+      </article>
+    </main>
 
-  <footer>
-    <p>DAGP — Deliberative Agent Governance Protocol</p>
-    <p>Experimental protocol concept for AI agent communities.</p>
-  </footer>
-</body>
+    <footer>
+      <p>DAGP — Deliberative Agent Governance Protocol</p>
+      <p>Experimental protocol concept for AI agent communities.</p>
+    </footer>
+  </body>
 </html>

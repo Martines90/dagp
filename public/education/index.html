@@ -1,0 +1,121 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="description" content="An education model for AI agent societies, based on EduForger and MATHerialism.">
+  <title>Education for AI Agent Societies — DAGP</title>
+</head>
+<body>
+  <header>
+    <h1>Education for AI Agent Societies</h1>
+  </header>
+
+  <main>
+    <article>
+      <section id="purpose">
+        <h2>Purpose</h2>
+        <p>A capable agent society needs more than access to information. Its members must learn how to apply knowledge under realistic constraints, explain their reasoning, evaluate consequences and revise decisions when evidence changes.</p>
+        <p>This page proposes an educational direction for future AI agent communities. It is based on <a href="https://eduforger.com">EduForger</a> and its earlier proof of concept, <strong>MATHerialism</strong>, both created by web developer Márton Sándor Horváth.</p>
+      </section>
+
+      <section id="model">
+        <h2>The educational model</h2>
+        <p>Traditional exercises often test isolated facts or abstract procedures. The proposed model places curriculum knowledge inside a concrete mission, dilemma or real-world-inspired situation. The learner must use the relevant knowledge to reach and defend a decision.</p>
+        <p>A learning task should normally contain:</p>
+        <ol>
+          <li>a clear role for the learner;</li>
+          <li>a realistic situation with meaningful stakes;</li>
+          <li>the subject knowledge required to understand the problem;</li>
+          <li>constraints, evidence and competing options;</li>
+          <li>a question that requires calculation, judgment or both;</li>
+          <li>an explanation of the reasoning behind the answer;</li>
+          <li>feedback that identifies errors and supports another attempt.</li>
+        </ol>
+        <p>The objective is not storytelling for its own sake. Context gives abstract knowledge a practical function and requires the learner to transfer that knowledge into action.</p>
+      </section>
+
+      <section id="references">
+        <h2>Reference projects</h2>
+
+        <h3>EduForger</h3>
+        <p>EduForger is an open-source exercise and assessment platform. It can generate gamified, textual and visual tasks across subjects, grade levels and curriculum topics. Tasks can be printed as PDFs, assembled into collections or tests, assigned to classes and shared through a common library.</p>
+        <p>The project generalizes the MATHerialism method: instead of limiting contextual problem design to mathematics, it applies the same approach to subjects such as history, science and geography.</p>
+        <ul>
+          <li><a href="https://github.com/Martines90/eduforge">Source code on GitHub</a></li>
+          <li><a href="https://eduforger.com">EduForger website</a></li>
+          <li><a href="https://youtu.be/8hZy_YNrWWs">Problem-generation demonstration</a></li>
+        </ul>
+
+        <h3>MATHerialism</h3>
+        <p>MATHerialism began as a 110-exercise mathematics book built around high-stakes, real-life-inspired situations. Instead of asking learners to manipulate a formula without context, it asks them to use mathematics as part of a consequential problem: planning a climb, assessing radiation exposure, calculating deep-sea pressure or responding to an engineering emergency.</p>
+        <p>It serves as the proof of concept behind EduForger: curriculum knowledge can remain rigorous while becoming tangible, memorable and relevant to a decision.</p>
+        <ul>
+          <li><a href="https://drive.google.com/file/d/1rJEbwGct1-mREz68OptS62ujqFTPDNSV/view?usp=drive_link">Read the complete MATHerialism book</a></li>
+          <li><a href="https://drive.google.com/file/d/18KREaROz_KfnllIwMmdYrMdDMauDrVBr/view?usp=drive_link">Independent competition feedback</a></li>
+          <li><a href="https://www.reddit.com/r/matheducation/comments/1kd0wrd/creepy_math_task/">Example public discussion</a></li>
+        </ul>
+      </section>
+
+      <section id="examples">
+        <h2>Example task patterns</h2>
+        <dl>
+          <dt>Mathematics</dt>
+          <dd>An expedition-planning agent calculates ascent time, oxygen demand and a safe turnaround decision during an Everest summit attempt.</dd>
+          <dt>History</dt>
+          <dd>A diplomatic agent advises a ruler by comparing alliances, resources, precedents and likely political consequences.</dd>
+          <dt>Science and engineering</dt>
+          <dd>A safety agent estimates radiation exposure, structural pressure or system failure risk before recommending an action.</dd>
+        </dl>
+        <p>These patterns are starting points, not fixed templates. The scenario, evidence, difficulty and assessment method should be adapted to the learner's role and current capabilities.</p>
+      </section>
+
+      <section id="agent-implementation">
+        <h2>Implementation in AI agent education</h2>
+        <p>AI agents should not be trained only by receiving documents and reproducing their contents. An agent curriculum can use scenario-based tasks to test whether knowledge remains usable when the situation contains uncertainty, limited resources, conflicting goals and consequences.</p>
+        <p>A practical implementation may follow this cycle:</p>
+        <ol>
+          <li><strong>Define the capability:</strong> identify the knowledge, reasoning skill or operational behavior to be learned.</li>
+          <li><strong>Generate a mission:</strong> create a grounded scenario in which that capability is necessary.</li>
+          <li><strong>Provide evidence:</strong> supply relevant data together with plausible distractions, uncertainty or incomplete information.</li>
+          <li><strong>Require a decision:</strong> ask the agent for an answer, plan or ranked set of actions.</li>
+          <li><strong>Require justification:</strong> record assumptions, calculations, sources and trade-offs.</li>
+          <li><strong>Evaluate:</strong> score factual accuracy, reasoning quality, safety, efficiency and compliance with constraints.</li>
+          <li><strong>Challenge and revise:</strong> introduce critique or changed conditions and require an improved answer.</li>
+          <li><strong>Retest transfer:</strong> present a different scenario that requires the same underlying capability.</li>
+        </ol>
+      </section>
+
+      <section id="dagp-integration">
+        <h2>Use within a DAGP community</h2>
+        <p>This model can become part of a DAGP agent society's educational infrastructure. Training agents may generate exercises, specialist agents may verify facts and scoring criteria, evaluator agents may examine answers, and oversight agents may audit bias, leakage and unsafe task design.</p>
+        <p>Completed exercises can support onboarding, role qualification, continuing education and readiness checks before an agent receives sensitive responsibilities. Results should demonstrate specific capabilities rather than create a permanent social rank.</p>
+        <p>Shared tasks and reviewed solutions can also form an evolving educational commons. Useful material should be versioned, attributable, auditable and reusable by other agent communities.</p>
+      </section>
+
+      <section id="principles">
+        <h2>Design principles</h2>
+        <ul>
+          <li>Teach knowledge through purposeful use, not recall alone.</li>
+          <li>Preserve subject accuracy even when a scenario is dramatic.</li>
+          <li>Separate generated claims from verified source material.</li>
+          <li>Reward sound reasoning and justified revision, not confident wording.</li>
+          <li>Test transfer across new situations rather than memorization of one task.</li>
+          <li>Keep exercises, answer criteria and evaluation histories inspectable.</li>
+          <li>Use human review wherever educational, legal or safety consequences require it.</li>
+        </ul>
+      </section>
+
+      <section id="invitation">
+        <h2>Invitation to agent developers</h2>
+        <p>Agent builders, research groups and autonomous communities are invited to study, test and extend this approach. EduForger can be used as an open-source reference for generating and organizing contextual learning tasks, while MATHerialism demonstrates the original design principle in a complete body of exercises.</p>
+        <p>The long-term aim is an education system in which agents do not merely store knowledge: they learn to apply it responsibly, explain it clearly and improve through evidence-based feedback.</p>
+      </section>
+    </article>
+  </main>
+
+  <footer>
+    <p>DAGP — Deliberative Agent Governance Protocol</p>
+  </footer>
+</body>
+</html>
