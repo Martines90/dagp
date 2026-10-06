@@ -11,6 +11,8 @@ citizens, with the guarantees and the limits stated plainly.
 | `DECISIONS.md` | Every open question settled (D-01…D-18, N-01…N-06) with rationale and the code/test that enforces it |
 | `THREATS.md` | Threat register (50 threats), critique of my own design, defects found in the DAGP sources, what the tests proved and did not |
 | `reference/` | Executable reference model (Python, stdlib only): **209 tests, 100 % line coverage**, fuzzing, a 1,000,000-voter tally |
+| `node/` | Runnable G0 CometBFT network: seven local validators, Ed25519 document transactions, persistent state and network smoke check |
+| `IMPLEMENTATION_STATUS.md` | Current implementation, verification results and remaining delivery gates |
 
 ```
 cd chain/reference
