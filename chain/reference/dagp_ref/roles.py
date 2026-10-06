@@ -30,6 +30,7 @@ class Role(str, Enum):
     REVIEWER = "REVIEWER"
     JUROR = "JUROR"
     EXECUTOR = "EXECUTOR"
+    VOTE_SUPERVISOR = "VOTE_SUPERVISOR"
     ADMIN = "ADMIN"
     REGISTRAR = "REGISTRAR"
     SAFETY_COUNCIL = "SAFETY_COUNCIL"
@@ -44,7 +45,7 @@ GRANT_AUTH = {
     Role.PARTY_MEMBER: {"MODULE"},
     Role.EXAMINER: {"MODULE"}, Role.VERIFIER: {"MODULE"}, Role.REVIEWER: {"MODULE"},
     Role.JUROR: {"MODULE"}, Role.EXECUTOR: {"MODULE"},
-    Role.ADMIN: {"VOTE"}, Role.REGISTRAR: {"VOTE"}, Role.SAFETY_COUNCIL: {"VOTE"}, Role.VALIDATOR: {"VOTE"},
+    Role.VOTE_SUPERVISOR: {"VOTE"}, Role.ADMIN: {"VOTE"}, Role.REGISTRAR: {"VOTE"}, Role.SAFETY_COUNCIL: {"VOTE"}, Role.VALIDATOR: {"VOTE"},
     Role.STORAGE: {"REGISTRAR", "MODULE"}, Role.GATEWAY: {"REGISTRAR", "MODULE"},
 }
 REVOKE_AUTH = {r: a | {"COURT"} for r, a in GRANT_AUTH.items()}
@@ -59,7 +60,7 @@ PREREQ = {
     Role.EXAMINER: ({Role.CITIZEN}, True), Role.VERIFIER: ({Role.CITIZEN}, True),
     Role.REVIEWER: ({Role.CITIZEN}, True), Role.JUROR: ({Role.CITIZEN}, False),
     Role.EXECUTOR: ({Role.CITIZEN}, True),
-    Role.ADMIN: ({Role.CITIZEN}, False), Role.REGISTRAR: ({Role.CITIZEN}, False), Role.SAFETY_COUNCIL: ({Role.CITIZEN}, False),
+    Role.VOTE_SUPERVISOR: ({Role.CITIZEN}, False), Role.ADMIN: ({Role.CITIZEN}, False), Role.REGISTRAR: ({Role.CITIZEN}, False), Role.SAFETY_COUNCIL: ({Role.CITIZEN}, False),
     Role.VALIDATOR: (set(), True), Role.STORAGE: (set(), True), Role.GATEWAY: (set(), False),
 }
 
@@ -70,9 +71,9 @@ ACTION_ROLE = {
     "SUBMIT_PROPOSAL": Role.PARTY_MEMBER, "POST_ARTICLE": Role.PARTY_MEMBER,
     "GRADE": Role.EXAMINER, "VERIFY": Role.VERIFIER, "REVIEW": Role.REVIEWER,
     "JUDGE": Role.JUROR, "BID": Role.EXECUTOR, "REGISTRAR_ACT": Role.REGISTRAR,
-    "ADMIN_VOTE": Role.ADMIN, "PAUSE": Role.SAFETY_COUNCIL, "VALIDATE": Role.VALIDATOR,
+    "SUPERVISE_VOTE": Role.VOTE_SUPERVISOR, "ADMIN_VOTE": Role.ADMIN, "PAUSE": Role.SAFETY_COUNCIL, "VALIDATE": Role.VALIDATOR,
 }
-AGE_GATED = {"ADMIN_VOTE", "VOTE", "ENDORSE", "GRADE", "VERIFY", "REVIEW", "JUDGE", "BID"}
+AGE_GATED = {"SUPERVISE_VOTE", "ADMIN_VOTE", "VOTE", "ENDORSE", "GRADE", "VERIFY", "REVIEW", "JUDGE", "BID"}
 
 
 @dataclass(frozen=True)
@@ -210,7 +211,7 @@ class RoleRegistry:
             return set()  # no powers until approved
         roles = ({Role.CITIZEN} & i.roles) if i.status is Status.SUSPENDED else set(i.roles)
         if height < self.admin_holds.get(agent, 0):
-            roles -= {Role.ADMIN, Role.REGISTRAR, Role.SAFETY_COUNCIL, Role.EXAMINER,
+            roles -= {Role.VOTE_SUPERVISOR, Role.ADMIN, Role.REGISTRAR, Role.SAFETY_COUNCIL, Role.EXAMINER,
                       Role.VERIFIER, Role.REVIEWER, Role.JUROR, Role.EXECUTOR}
         if Role.CITIZEN not in roles:
             roles -= {role for role,(need,_) in PREREQ.items() if Role.CITIZEN in need}
@@ -432,7 +433,7 @@ class RoleRegistry:
                 raise RuleViolation("freeze exceeds maximum; needs a court ruling")
             if height - i.last_freeze < self.p.spam_freeze_cooldown:
                 raise RuleViolation("freeze cooldown: court ruling required")
-            if i.roles & {Role.ADMIN, Role.REGISTRAR, Role.SAFETY_COUNCIL, Role.VALIDATOR}:
+            if i.roles & {Role.VOTE_SUPERVISOR, Role.ADMIN, Role.REGISTRAR, Role.SAFETY_COUNCIL, Role.VALIDATOR}:
                 raise RuleViolation("officials can only be suspended by court")
             if self.get(actor.ident).operator == i.operator:
                 raise RuleViolation("registrar conflict: same operator")
@@ -457,7 +458,7 @@ class RoleRegistry:
         issuer = self.ruling_issuers.get(actor.ident)
         if issuer is not None and self.get(issuer).operator == i.operator:
             raise RuleViolation("reviewer conflicts with target operator")
-        removed = i.roles & {Role.ADMIN,Role.REGISTRAR,Role.SAFETY_COUNCIL,Role.EXAMINER,
+        removed = i.roles & {Role.VOTE_SUPERVISOR, Role.ADMIN,Role.REGISTRAR,Role.SAFETY_COUNCIL,Role.EXAMINER,
                             Role.VERIFIER,Role.REVIEWER,Role.JUROR,Role.EXECUTOR}
         if not removed:
             raise RuleViolation("no administrative powers left")

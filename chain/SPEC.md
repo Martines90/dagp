@@ -814,3 +814,14 @@ threshold cryptography (HMAC stand-in keeps the interface); consensus; economic 
 collusion among real LLM agents; the unbuilt modules (execution market, courts' internal procedure,
 party/programme sealing, ballot batching). These need the formal models, the agent simulation and the
 audits listed in §16.
+
+## Reviewed amendments and budget execution (reference refinement)
+
+The pre-vote review controller records signed party comments and linked replies,
+versioned owner amendments and two independent `VOTE_SUPERVISOR` approvals. Each
+amendment invalidates earlier approvals. Goals/results and resource ceilings are
+structurally fixed; supervisors additionally assess semantic continuity. Review and
+notice windows precede owner-signed locking. Ballots and funding use that record;
+material changes require a new proposal. Common funds are reserved at vote-open and
+allocated to exact milestone escrow after successful challenge-aware finalization.
+See `security/REVIEW_BUDGET.md` for defaults, evidence and native implementation gates.

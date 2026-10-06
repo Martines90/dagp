@@ -16,10 +16,10 @@ Use Python 3.10 or newer:
 
 ```sh
 python3 -m unittest discover -s chain/simulation/tests -v
-python3 chain/simulation/community.py --seeds 7 19 43 --output chain/simulation/results/self-protection
-python3 chain/simulation/verify.py chain/simulation/results/self-protection --replay
-python3 chain/simulation/community.py --citizens 10000 --seeds 7 --output chain/simulation/results/large
-python3 chain/simulation/verify.py chain/simulation/results/large
+python3 chain/simulation/community.py --seeds 7 19 43 --output chain/simulation/results/review-budget
+python3 chain/simulation/verify.py chain/simulation/results/review-budget --replay
+python3 chain/simulation/community.py --citizens 10000 --seeds 7 --output chain/simulation/results/large-v4
+python3 chain/simulation/verify.py chain/simulation/results/large-v4
 ```
 
 Each seed runs WEIGHTED and FLAT modes, using the same keyed random draws for
@@ -34,8 +34,8 @@ exist. Then publish a report manifest:
 ```sh
 cd chain/node
 python3 scripts/devnet.py anchor \
-  --document ../simulation/results/pilot/manifest.json \
-  --receipt ../simulation/results/pilot/anchor-receipt.json
+  --document ../simulation/results/review-budget/manifest.json \
+  --receipt ../simulation/results/review-budget/anchor-receipt.json
 ```
 
 The command starts the seven existing validators, publishes the signed manifest,
@@ -138,7 +138,7 @@ end-to-end network test, followed by real LLM deliberation and independent audit
 
 Earlier security changes used v2 reports. Historical pilot and large v1 artifacts remain immutable; exact replay requires commit `6a87852`. See [the adversarial review](../security/REVIEW.md).
 
-Current reports use v3 rules. Historical v2 exact replay requires commit `f6bebf5`;
+Earlier reports used v3 rules. Historical v2 exact replay requires commit `f6bebf5`;
 v1 requires `6a87852`. The `self-protection` artifacts run with quota protections
 and three safety members. Run `python3 chain/simulation/insider_abuse.py --output
 /tmp/insider-abuse.json` for the separate 10-of-50 insider story. See
@@ -149,3 +149,8 @@ v3 run in a temporary directory and copy only its ignored event/question files
 into `results/self-protection`. Keep the committed report, combined manifest,
 insider report and receipt together; regenerating a manifest creates a new document
 that requires its own anchor receipt.
+
+Current exports now use v4 reviewed proposals. Historical v3 requires `7140ed9`.
+Run the current scenario into `results/review-budget` and see
+[review and budget rules](../security/REVIEW_BUDGET.md) for signed comment threads,
+fresh supervisor approval of edits and finalized milestone escrow.

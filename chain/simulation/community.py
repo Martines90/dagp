@@ -22,6 +22,7 @@ from dagp_ref.emergency import Emergency
 from dagp_ref.params import Params
 from dagp_ref.proposal import Envelope, FilingRegistry, Proposal, amendment_is_refinement
 from dagp_ref.roles import Actor, Role, RoleRegistry, Status
+from dagp_ref.review import ProposalReview,VotingDraft,Milestone
 from dagp_ref.session import ELECTION, Effects, VoteSession, Windows, snapshot_electorate
 from dagp_ref.sortition import draw, panel_size
 from dagp_ref.tally import Ballot, Kind, Outcome, tally
@@ -113,6 +114,7 @@ class Community:
                            (Role.JUROR,self.citizens[-10:]),(Role.EXECUTOR,self.leaders[:10])]:
             for a in group:self.reg.grant(MODULE,a,role,self.height,stake=50)
         for a in self.citizens[3:6]: self.appointed(a,Role.SAFETY_COUNCIL)
+        for a in self.citizens[6:9]: self.appointed(a,Role.VOTE_SUPERVISOR)
         validators=self.citizens[3:10]
         for a in validators:self.appointed(a,Role.VALIDATOR)
         ref='bootstrap-validator-set'; self.reg.register_ratification(MODULE,ref,'VALIDATOR_SET',','.join(sorted(validators)))
@@ -162,7 +164,7 @@ class Community:
         self.documents.append(dict(issue=issue,question_bank_root=bank.root,questions=display))
         return bank,keys
 
-    def open(self,issue,kind=Kind.ORDINARY,party=None,amount=0,qualified=None):
+    def open(self,issue,kind=Kind.ORDINARY,party=None,amount=0,qualified=None,review=None):
         self.height+=1
         # Continuing active agents renew; deliberately dormant agents stay dormant.
         for a,i in self.reg.ids.items():
@@ -175,9 +177,14 @@ class Community:
         el=snapshot_electorate(self.reg,self.height,set(recused)|set(board.members))
         bank,keys=self.bank(issue)
         effects=Effects(self.tr,self.cr,issue,amount,[amount//2,amount-amount//2],party) if amount else Effects()
-        s=VoteSession(issue,kind,self.p,self.reg,self.kr,el.root,el.size,board,bank,self.attempts,
-            beacon,self.height,Windows(self.height+100,self.height+120,self.height+320),recused=recused,
-            effects=effects,qualified_parties=qualified,pool=available)
+        windows=Windows(self.height+100,self.height+120,self.height+320)
+        if review is not None:
+            s=review.open_vote(self.tr,kind=kind,board=board,bank=bank,attempts=self.attempts,
+                              beacon=beacon,open_height=self.height,windows=windows,pool=available)
+            el=s.electorate
+        else:
+            s=VoteSession(issue,kind,self.p,self.reg,self.kr,el.root,el.size,board,bank,self.attempts,
+                beacon,self.height,windows,recused=recused,effects=effects,qualified_parties=qualified,pool=available)
         s.electorate=el;s.keys=keys
         self.event('vote-opened',issue=issue,electorate=el.size,electorate_root=el.root.hex(),
                    rules_hash=s.rules_hash,board=list(board.members),recused=len(recused),reserved=amount)
@@ -305,19 +312,44 @@ class Community:
 
     def proposal(self,index,title,kind,party):
         issue=f'project-{index}';self.require_can(sorted(self.members[party])[0],'SUBMIT_PROPOSAL')
-        self.cr.spend(party,self.p.proposal_cost)
         self.filings.file(hx(title),self.height)
         prop=Proposal(issue);prop.move('IN_DELIBERATION')
-        envelope=Envelope(hx(title),hx(title,'result'),(('compute',4000),))
-        refined=Envelope(envelope.objective_hash,envelope.result_hash,(('compute',3000),))
-        self.check('safe refinement '+issue,amendment_is_refinement(envelope,refined))
-        self.check('bait-and-switch rejected '+issue,not amendment_is_refinement(envelope,Envelope(hx('other'),envelope.result_hash,envelope.caps)))
-        self.event('deliberation',issue=issue,title=title,party=party,rounds=[
-            dict(round=r,responses=[dict(party=p,topic=PLATFORMS[p],position=('oppose' if kind=='reckless' else 'request safeguards'))
-                for p in PARTIES[:5] if p!=party],reply='Reduced resource ceiling; independent verification retained') for r in range(1,4)],
-            envelope=asdict(envelope),refinement=asdict(refined),policy='scripted briefs; semantic debate quality not evaluated')
+        owner=sorted(self.members[party])[0]
+        goal=title;result='Published and independently accepted outcome: '+title
+        envelope=Envelope(hx('goal',goal),hx('result',result),(('compute',4000),('treasury',4000)))
+        draft=VotingDraft(title,goal,result,'Initial plan; independent verification required',envelope,4000,
+            (Milestone('design',2000,'Independent design verification'),Milestone('delivery',2000,'Independent outcome acceptance')))
+        review=ProposalReview('dagp-reference',issue,owner,party,self.members,self.citizens[6:9],draft,
+                              self.reg,self.kr,self.height,self.height+20,credits=self.cr)
+        for round_n in range(1,4):
+            for other in PARTIES[:5]:
+                if other==party:continue
+                author=sorted(self.members[other])[0];text='Request feasibility, cost and verification safeguards'
+                nonce=f'{round_n}:{other}'
+                comment=review.comment(author,other,text,None,nonce,self.height,
+                    self.kr.sign(author,review.comment_message(author,other,text,None,nonce)))
+                reply='Reduced resource ceiling; independent verification retained';nonce='reply:'+nonce
+                review.comment(owner,party,reply,comment,nonce,self.height,
+                    self.kr.sign(owner,review.comment_message(owner,party,reply,comment,nonce)))
+        refined=Envelope(envelope.objective_hash,envelope.result_hash,(('compute',3000),('treasury',3000)))
+        amendment=VotingDraft(title,goal,result,'Refined plan: reduced cost with independent verification',refined,3000,
+            (Milestone('design',1500,'Independent design verification'),Milestone('delivery',1500,'Independent outcome acceptance')))
+        review.amend(owner,amendment,'refine-1',self.height,self.kr.sign(owner,review.amendment_message(amendment,'refine-1')))
+        self.refused('bait-and-switch rejected '+issue,lambda:review.amend(owner,
+            VotingDraft(title,'Other goal',result,'Changed project',refined,3000,amendment.milestones),'bad',self.height,'invalid'))
+        for supervisor in self.citizens[6:8]:
+            note='Same committed goal/result; smaller resource and treasury caps; measurable milestones retained'
+            review.approve(supervisor,note,self.height,self.kr.sign(supervisor,H(review.approval_message(),note)))
+        self.height+=20
+        approved=review.lock(owner,self.height,self.kr.sign(owner,review.lock_message()))
+        self.event('deliberation',issue=issue,title=title,party=party,comments=review.snapshot()['comments'],
+                   approved_version=review.snapshot()['version'],supervisors=self.citizens[6:8],
+                   original_record=asdict(draft),approved_record=asdict(approved),
+                   supervisor_approvals=review.snapshot()['approvals'],amendments=review.snapshot()['amendments'],
+                   record_hash=approved.digest(),milestones=[asdict(m) for m in approved.milestones],
+                   policy='signed reference review; semantic assessment is scripted')
         prop.move('EXAMINATION');prop.move('VOTING')
-        before_credit=self.cr.balance[party];s=self.open(issue,party=party,amount=3000)
+        before_credit=self.cr.balance[party];s=self.open(issue,party=party,amount=approved.budget,review=review)
         stats=Counter();truths={};voters=self.electorate_voters(s)
         if kind=='outage':s.extend(MODULE,30);stats['halt_compensation_heights']=30
         for a in voters:
@@ -379,7 +411,9 @@ class Community:
         else:
             prop.move('REJECTED')
             if outcome==Outcome.NO_QUORUM:self.check('no quorum credit refunded '+issue,self.cr.balance[party]==before_credit+1)
-        self.tr.assert_invariants();self.sessions[-1].update(title=title,party=party,project_state=prop.state)
+        self.tr.assert_invariants();self.sessions[-1].update(title=title,party=party,project_state=prop.state,
+            approved_record=asdict(approved),review_record_hash=approved.digest(),
+            approved_version=review.snapshot()['version'],supervisor_approvals=review.snapshot()['approvals'])
         self.event('project-closed',issue=issue,state=prop.state,treasury_total=self.tr.total())
 
     def run(self):
@@ -457,7 +491,7 @@ def main():
             differences=[dict(issue=a['issue'],weighted=a['outcome'],flat=b['outcome'])
                 for a,b in zip(pair['WEIGHTED']['sessions'],pair['FLAT']['sessions']) if a['outcome']!=b['outcome']]
             comparisons.append(dict(seed=seed,outcome_differences=differences))
-    report=dict(format='dagp-community-simulation-v3',execution='reference-governance-with-optional-G0-result-anchoring',
+    report=dict(format='dagp-community-simulation-v4',execution='reference-governance-with-optional-G0-result-anchoring',
         limitations=['Synthetic policies, not AGI or LLM agents','Reference signatures are HMAC stand-ins',
         'HTTP challenge admission is not implemented','Court semantics and milestone evidence are scripted',
         'G0 chain records result commitment, does not enforce governance','Seven validators share one host'],

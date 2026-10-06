@@ -68,3 +68,14 @@ Full defaults and trust assumptions are in `security/INSIDER_PROTECTION.md`.
 Registrar spam freezes preserve civic voting, endorsement, case-filing and key-custody
 rights. Courts may impose full suspensions; a registrar cannot determine eligibility
 through a unilateral short freeze. This intentionally refines the earlier D-01 rule.
+
+## Supervised review refinement (reference)
+
+Other parties may comment and reply during review. A new owner amendment requires
+fresh signatures from two conflict-excluded vote supervisors on its full version;
+ordinary admins do not automatically have supervision authority. Goal/result or
+cap increases require a new proposal. The owner locks the record after review and
+minimum notice, before examinations/ballots. The approved budget is reserved from
+common funds and becomes exact milestone escrow only after final successful voting.
+Acceptance descriptions are committed alongside tranche amounts. See
+`security/REVIEW_BUDGET.md`; semantic equivalence and delivery need independent evidence.

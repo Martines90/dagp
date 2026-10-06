@@ -55,6 +55,7 @@ class Treasury:
     granted: dict = field(default_factory=dict)     # project -> total approved
     released: dict = field(default_factory=dict)    # project -> total paid out
     tranches: dict = field(default_factory=dict)    # project -> list[int]
+    milestone_conditions: dict = field(default_factory=dict)  # reviewed immutable acceptance records
     paid_idx: dict = field(default_factory=dict)    # project -> next tranche index
     terminated: set = field(default_factory=set)
     paused_until: dict = field(default_factory=dict)  # project -> height; 0/absent = running

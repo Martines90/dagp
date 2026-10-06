@@ -102,3 +102,13 @@ and **six simulation tests** pass. The **47-check** insider scenario and **20,47
 community events replay exactly. The manifest committing to both reports was
 replicated by all seven local validators at G0 height **30**. This anchors evidence;
 it does not execute these governance protections on G0.
+
+## Supervised proposal review and budget allocation
+
+[Review/budget protocol](security/REVIEW_BUDGET.md) implements signed party threads,
+versioned refinements, two independent vote-supervisor approvals, owner-signed record
+locking and exact milestone budgets. All nine community proposals use this controller.
+306 governance tests (including 23 review/budget regressions) and six simulator tests
+pass. Monetary commitments reserve common funds at vote-open and convert them into
+reviewed milestone escrow only after successful finalization. Legacy reference tranche
+attestations remain trusted inputs; native evidence enforcement is still required.

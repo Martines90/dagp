@@ -125,3 +125,11 @@ and **six simulation tests** pass. The **47-check** insider scenario and **20,47
 community events replay exactly. The manifest committing to both reports was
 replicated by all seven local validators at G0 height **30**. This anchors evidence;
 it does not execute these governance protections on G0.
+
+## Supervised review and escrow
+
+[Review/budget protocol](REVIEW_BUDGET.md) now binds party discussions and amendments
+to two independent supervisor approvals and an owner-signed locked voting record.
+Successful finalization creates exact milestone escrow from reserved common funds.
+306 reference tests, including 23 review/budget regressions, pass. Semantic review
+and actual delivery evidence still require independent judgments and native keepers.

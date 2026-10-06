@@ -88,6 +88,8 @@ class Params:
     admin_containment_duration: int = 300
     admin_vote_window: int = 100
     admin_min_council: int = 5
+    review_supervisors: int = 2
+    review_notice_blocks: int = 5
     challenge_resolution_grace: int = 100  # unresolved juries cannot lock funds forever
     challenge_window: int = 200
     rotation_delay: int = 50             # key rotation takes effect this long after the signed request
@@ -101,12 +103,14 @@ class Params:
                     self.sanction_global_limit,self.sanction_population_floor,self.ban_global_limit,
                     self.admission_actor_limit,self.admission_global_limit,self.pause_actor_limit,
                     self.pause_global_limit,self.admin_containment_duration,self.admin_vote_window,
-                    self.admin_min_council)
+                    self.admin_min_council,self.review_supervisors,self.review_notice_blocks)
         if any(type(n) is not int or n <= 0 for n in positive):
             raise ValueError("protection limits and windows must be positive integers")
         if any(type(n) is not int or not 0 < n <= BPS for n in
                (self.sanction_population_bps,self.pause_concurrent_bps)):
             raise ValueError("protection fractions outside (0,10000]")
+        if self.review_supervisors < 2:
+            raise ValueError("review needs at least two independent supervisors")
         if self.admin_min_council < 3:
             raise ValueError("admin council needs at least three members")
 

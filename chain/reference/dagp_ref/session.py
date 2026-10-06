@@ -62,6 +62,7 @@ class Effects:
     ceiling: int = 0
     tranches: list = field(default_factory=list)
     proposer_party: str = ""
+    milestones: tuple = ()
 
 
 @dataclass
@@ -77,7 +78,7 @@ class VoteSession:
                  attempts: AttemptRegistry, beacon: bytes, open_height: int, windows: Windows,
                  recused: frozenset = frozenset(), effects: Effects | None = None,
                  qualified_parties: list | None = None, scoreboard: Scoreboard | None = None,
-                 pool: list | None = None):
+                 pool: list | None = None, approved_record_hash: str = ""):
         if electorate_size <= 0:
             raise RuleViolation("empty electorate")
         if kind == ELECTION and not qualified_parties:
@@ -89,6 +90,12 @@ class VoteSession:
         self.open_height, self.w = open_height, windows
         self.recused = recused
         self.effects = replace(effects, tranches=list(effects.tranches)) if effects else Effects()
+        self.approved_record_hash = approved_record_hash
+        self._effects_hash = self._effect_commitment()
+        if self.effects.ceiling:
+            from .treasury import _budget
+            if _budget(self.effects.tranches)>self.effects.ceiling:
+                raise RuleViolation("tranches exceed vote ceiling")
         self.record_hash = bank.record_hash()
         if not (open_height < windows.vote_end < windows.certify_end < windows.challenge_end):
             raise RuleViolation("invalid voting windows")
@@ -120,7 +127,16 @@ class VoteSession:
     def _matter(self) -> dict:
         return {"proposer_party_members": set(self.recused)}
 
+    def _effect_commitment(self):
+        e=self.effects
+        return hx("vote-effects",e.project,e.ceiling,e.tranches,e.proposer_party,e.milestones)
+
+    def _check_review_effects(self):
+        if self.approved_record_hash and self._effect_commitment()!=self._effects_hash:
+            raise RuleViolation("reviewed vote effects changed")
+
     def _check_open(self, height: int) -> None:
+        self._check_review_effects()
         if self.bank.record_hash() != self.record_hash:
             raise RuleViolation("examination record changed after vote opened")
         if self.phase is not Phase.VOTING:
@@ -278,6 +294,9 @@ class VoteSession:
     def certificate_message(self) -> bytes:
         if self.phase is Phase.VOTING:
             raise RuleViolation("not closed")
+        if self.approved_record_hash:
+            return H(b"tally-cert-reviewed",self.issue,self.approved_record_hash,self._effects_hash,
+                     self.commitment,self._outcome_label())
         return H(b"tally-cert", self.issue, self.commitment, self._outcome_label())
 
     def _outcome_label(self) -> str:
@@ -287,6 +306,7 @@ class VoteSession:
         return f"{r.outcome.value}:{r.yes_w}:{r.no_w}:{r.abstain_n}:{r.participation}"
 
     def close(self, height: int) -> None:
+        self._check_review_effects()
         if self.phase is not Phase.VOTING:
             raise RuleViolation("already closed")
         if height < self.w.vote_end:
@@ -378,6 +398,7 @@ class VoteSession:
         self.w.challenge_end += delta
 
     def finalize(self, height: int) -> Outcome | str:
+        self._check_review_effects()
         if self.phase is not Phase.CHALLENGE:
             raise RuleViolation("not in challenge phase")
         if height < self.w.challenge_end:
@@ -403,6 +424,7 @@ class VoteSession:
         if r.outcome is Outcome.PASSED:
             if e.treasury and e.ceiling:
                 e.treasury.commit_reserved(e.project, e.tranches)
+                e.treasury.milestone_conditions[e.project] = tuple(e.milestones)
         else:
             self._unwind(refund=(r.outcome is Outcome.NO_QUORUM and self.p.refund_on_no_quorum))
         self.phase, self.outcome = Phase.FINAL, r.outcome
