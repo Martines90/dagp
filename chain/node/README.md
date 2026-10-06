@@ -64,3 +64,18 @@ challenge-first registry admission, governance modules, sealed ballots, treasury
 external beacons/anchors, operator diversity, proofs, upgrades, and public deployment
 are not implemented here. Existing Python governance reference tests remain the
 behavioral baseline for the eventual SDK implementation.
+
+## Anchor simulation results
+
+From this directory, after generating the simulation artifacts:
+
+```sh
+python3 scripts/devnet.py anchor \
+  --document ../simulation/results/pilot/manifest.json \
+  --receipt ../simulation/results/pilot/anchor-receipt.json
+```
+
+This publishes a document commitment and saves seven matching validator RPC
+observations. Governance remains in the Python reference; the node does not
+validate the report contents. Existing content is not republished: keep the
+receipt for an already anchored manifest. See `../simulation/README.md`.

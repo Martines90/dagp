@@ -1,0 +1,75 @@
+{
+  "execution": "reference-governance-with-optional-G0-result-anchoring",
+  "format": "dagp-simulation-manifest-v1",
+  "limitations": [
+    "Synthetic policies, not AGI or LLM agents",
+    "Reference signatures are HMAC stand-ins",
+    "HTTP challenge admission is not implemented",
+    "Court semantics and milestone evidence are scripted",
+    "G0 chain records result commitment, does not enforce governance",
+    "Seven validators share one host"
+  ],
+  "report_sha256": "6ae11f5cfc84ab93c1009cc3b0cbf3f410aa2caaa0e1183b5e88b3e545ed1b4e",
+  "runs": [
+    {
+      "checks_passed": 130,
+      "event_count": 10227,
+      "event_head": "9f5cd84d4ab7c93028115f860303bb35845a845426352dc30f8025449f69afbc",
+      "events_sha256": "d22d80de833b6b53863ec25c9604d28a13492eab0d85f1edd3f48d6910e0070e",
+      "mode": "WEIGHTED",
+      "population": 1100,
+      "role_audit_head": "735606cc594e25a12373a01711370e0f43d7d35c975c3a5dc42f158ee5d0efac",
+      "seed": 7
+    },
+    {
+      "checks_passed": 130,
+      "event_count": 10227,
+      "event_head": "086f18958e4c4f8e8fd4e0c4ac19d082489789c48dc8e478630535edf14ad8c2",
+      "events_sha256": "28be0d19dea91e6f1092eb37a43bb428d1662275509f30f222f1335bde56d8e8",
+      "mode": "FLAT",
+      "population": 1100,
+      "role_audit_head": "735606cc594e25a12373a01711370e0f43d7d35c975c3a5dc42f158ee5d0efac",
+      "seed": 7
+    },
+    {
+      "checks_passed": 128,
+      "event_count": 10269,
+      "event_head": "898c141fbbcf50fef4a8d87398a19a494e7f26cc088b2e5a79422096748f21bb",
+      "events_sha256": "2a3454ff2b5788497b67b1e99d63666f662f55714ded68362c928434de059fca",
+      "mode": "WEIGHTED",
+      "population": 1100,
+      "role_audit_head": "735606cc594e25a12373a01711370e0f43d7d35c975c3a5dc42f158ee5d0efac",
+      "seed": 19
+    },
+    {
+      "checks_passed": 128,
+      "event_count": 10269,
+      "event_head": "cfe6e5d8742de9397f6f2e8fc53c190b074dd22e6764e1fefb7fdefaa756535b",
+      "events_sha256": "f4e9ec9a5ca9a858588e7b4dffc5be1fd870db1581a4ec0fa3a3f73954278cde",
+      "mode": "FLAT",
+      "population": 1100,
+      "role_audit_head": "735606cc594e25a12373a01711370e0f43d7d35c975c3a5dc42f158ee5d0efac",
+      "seed": 19
+    },
+    {
+      "checks_passed": 126,
+      "event_count": 10278,
+      "event_head": "aa0361122d6c10d5622005e8f52e8a8095c2993245c227ffc226251b0c11aa76",
+      "events_sha256": "50123c43975d05cb7f6ed3bfece72553b5550dcaf293bf97e3a50398c05e8737",
+      "mode": "WEIGHTED",
+      "population": 1100,
+      "role_audit_head": "6af48aa5c3582691ba6dd5bcbc3373c2ff1591a13f7b223654e2e294cc3667f8",
+      "seed": 43
+    },
+    {
+      "checks_passed": 130,
+      "event_count": 10281,
+      "event_head": "2ab69f306ab6748f0ded0933242394b5056e3770f5d82b10675e3e49b7e4639f",
+      "events_sha256": "d622b751628cbff54f5173586060468edfb21091754086d4f456321874fd2bca",
+      "mode": "FLAT",
+      "population": 1100,
+      "role_audit_head": "735606cc594e25a12373a01711370e0f43d7d35c975c3a5dc42f158ee5d0efac",
+      "seed": 43
+    }
+  ]
+}

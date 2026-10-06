@@ -7,6 +7,8 @@ executable reference model, static observer website, and local blockchain founda
 - [Chain specification and reference](chain/README.md)
 - [Implementation status and remaining work](chain/IMPLEMENTATION_STATUS.md)
 - [Run the seven-validator G0 devnet](chain/node/README.md)
+- [Run the community lifecycle simulation](chain/simulation/README.md)
+- [Pilot simulation results](chain/simulation/results/pilot/REPORT.md)
 
 The devnet is local and experimental. The full governance network and registration
 service are still under implementation; the static site's legacy API descriptions

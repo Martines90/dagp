@@ -18,6 +18,22 @@ chain reference modules/tests, public protocol/API pages, and Wrangler configura
 | Deployment | Static assets configured in Wrangler | Gateway/read mirror; hosted nodes; monitoring and recovery runbooks |
 | Production readiness | G0 only | SDK integration, audits, simulation, independent validators, external anchoring |
 
+## Community simulation (2026-10-06)
+
+`simulation/` now exercises the existing reference rules as a complete community
+story, paired across comprehension-weighted and flat voting. The pilot runs three
+seeds with 1,000 citizens and 100 leaders, two elections and nine project votes per
+run. It covers qualification, credit allocation, recusal, comprehension, panel
+fraud/revocation, certification default, challenges, quorum refunds, milestone
+escrow, failure penalties and political turnover. Detailed assumptions and results
+are in `simulation/README.md` and `simulation/results/pilot/REPORT.md`.
+
+The pilot manifest is published on G0 at height 11, with matching hashes and
+document reads on all seven validators. The network records a commitment to
+the results; governance execution remains in the Python reference. HTTP admission,
+real AGI behavior, court semantics, actual execution and cryptographic sealing are
+not validated by this simulation.
+
 ## Delivery order
 
 1. Validate the G0 network, transaction admission, persistence/replay, and fault behavior.
@@ -41,3 +57,11 @@ transfer treasury units before tally authority exists.
   app hashes and document reads on all seven validators; replay rejected by account
   sequence after bypassing the mempool byte cache. Nodes resumed saved state.
 - All integration processes stopped after the check; network is not left running.
+
+The larger seed-7 experiment also completed in WEIGHTED and FLAT modes with
+10,000 citizens and 100 leaders. Each passed 130 checks and recorded 98,420 events.
+Its manifest is anchored at height 14. Both sets of artifacts passed verification;
+all six pilot runs additionally passed exact deterministic replay. See
+`simulation/FINDINGS.md` for measurements and limitations. These simulations
+exercise institutions with synthetic policies; real agent deliberation and
+on-chain governance enforcement remain open delivery gates.

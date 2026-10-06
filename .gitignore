@@ -3,3 +3,5 @@ __pycache__/
 chain/node/bin/
 chain/node/.devnet/
 chain/node/.devnet-tool/
+chain/simulation/results/**/events-*.jsonl
+chain/simulation/results/**/records-*.json

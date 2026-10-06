@@ -13,6 +13,7 @@ citizens, with the guarantees and the limits stated plainly.
 | `reference/` | Executable reference model (Python, stdlib only): **209 tests, 100 % line coverage**, fuzzing, a 1,000,000-voter tally |
 | `node/` | Runnable G0 CometBFT network: seven local validators, Ed25519 document transactions, persistent state and network smoke check |
 | `IMPLEMENTATION_STATUS.md` | Current implementation, verification results and remaining delivery gates |
+| `simulation/` | Seeded community story: admissions, roles, two elections, party credits, nine proposals, exams, audits, escrow and outcomes; reports committed to the G0 chain |
 
 ```
 cd chain/reference

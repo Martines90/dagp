@@ -60,7 +60,45 @@ def smoke():
         r=rpc(i,'abci_query',{'path':'/document','data':cid.encode().hex()})['response']
         assert base64.b64decode(r['value'])==doc.read_bytes()
     print(f'PASS: seven validators agree; document committed at height {height}; replay refused.')
-def start(test):
+def anchor(document, receipt):
+    for _ in range(60):
+        try:
+            if all(int(rpc(i,'status')['sync_info']['latest_block_height'])>=2 for i in range(7)): break
+        except (OSError,RuntimeError): pass
+        time.sleep(1)
+    else: raise RuntimeError('No consensus; inspect .devnet logs')
+    data=document.read_bytes()
+    if not 0<len(data)<=65536: raise ValueError('Anchor document must fit within 64 KiB')
+    cid=hashlib.sha256(data).hexdigest()
+    state=json.loads(base64.b64decode(rpc(0,'abci_query',{'path':'/state'})['response']['value']))
+    height=int(rpc(0,'status')['sync_info']['latest_block_height'])
+    tx=command(BIN/'dagp-key','--key',HOME/'agent-key.json','--document',document,
+        '--sequence',state['accounts']['agent']['sequence'],'--until',height+100)
+    result=rpc(0,'broadcast_tx_commit',{'tx':base64.b64encode(tx.encode()).decode()})
+    if result['check_tx']['code']!=0 or result['tx_result']['code']!=0: raise RuntimeError(result)
+    height=int(result['height'])
+    for _ in range(30):
+        try:
+            blocks=[rpc(i,'block',{'height':str(height+1)}) for i in range(7)]
+            roots=[b['block']['header']['app_hash'] for b in blocks]
+            if len(set(roots))!=1: raise AssertionError('Validator application hashes disagree')
+            break
+        except (OSError,RuntimeError): time.sleep(1)
+    else: raise RuntimeError('Anchor was not replicated')
+    for i in range(7):
+        r=rpc(i,'abci_query',{'path':'/document','data':cid.encode().hex()})['response']
+        if base64.b64decode(r['value'])!=data: raise AssertionError('Anchor document mismatch')
+    evidence=dict(format='dagp-g0-anchor-receipt-v1',chain_id='dagp-local-g0',
+        document_sha256=cid,transaction_hash=result['hash'],transaction_height=height,
+        app_hash_header_height=height+1,validator_app_hashes=roots,
+        validator_block_ids=[b['block_id']['hash'] for b in blocks],
+        replicated_document_reads=7,
+        governance_execution='off-chain reference; only this manifest is published on G0',
+        assurance='Local RPC observations, not an independently verified light-client proof')
+    receipt.write_text(json.dumps(evidence,indent=2))
+    print(f'PASS: manifest {cid} anchored at height {height}; all seven validators agree; receipt {receipt}')
+
+def start(test, document=None, receipt=None):
     if not HOME.exists(): raise SystemExit('Run init first')
     processes=[]; logs=[]
     def stopped(signum,frame): raise KeyboardInterrupt
@@ -73,7 +111,8 @@ def start(test):
         for i in range(7):
             log=open(HOME/f'node{i}.log','a');logs.append(log)
             processes.append(subprocess.Popen([str(BIN/'cometbft'),'start','--home',str(HOME/f'node{i}')],stdout=log,stderr=log))
-        if test: smoke()
+        if document is not None: anchor(document,receipt)
+        elif test: smoke()
         else:
             print('Devnet running; RPC ports 26657, 26667, … 26717. Ctrl-C stops it.',flush=True)
             while True:
@@ -88,6 +127,10 @@ def start(test):
             except subprocess.TimeoutExpired: p.kill();p.wait()
         for log in logs: log.close()
 if __name__=='__main__':
-    parser=argparse.ArgumentParser(description=__doc__);parser.add_argument('action',choices=['init','start','smoke']);args=parser.parse_args()
+    parser=argparse.ArgumentParser(description=__doc__);parser.add_argument('action',choices=['init','start','smoke','anchor'])
+    parser.add_argument('--document',type=pathlib.Path)
+    parser.add_argument('--receipt',type=pathlib.Path)
+    args=parser.parse_args()
+    if args.action=='anchor' and (args.document is None or args.receipt is None): parser.error('anchor requires --document and --receipt')
     if args.action=='init': initialize()
-    else: start(args.action=='smoke')
+    else: start(args.action=='smoke',args.document if args.action=='anchor' else None,args.receipt)
