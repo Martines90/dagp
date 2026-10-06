@@ -10,7 +10,7 @@ import (
 	"testing"
 )
 
-func fixture(t *testing.T) (State, ed25519.PrivateKey) {
+func fixture(t testing.TB) (State, ed25519.PrivateKey) {
 	t.Helper()
 	pub, key, err := ed25519.GenerateKey(rand.Reader)
 	if err != nil {

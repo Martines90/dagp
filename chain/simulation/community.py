@@ -263,7 +263,7 @@ class Community:
         memberships={p:set(v) for p,v in self.members.items()}
         memberships['Stewards'].add(self.leaders[0])
         for p in PARTIES:endorsements[p].add(self.citizens[5])
-        qualified,problems=qualify_parties(memberships,endorsements,required,self.p)
+        qualified,problems=qualify_parties(memberships,endorsements,required,self.p,eligible=set(snapshot_electorate(self.reg,self.height).ids))
         self.check('five candidates qualify '+str(cycle),len(qualified)==5 and 'Micro' not in qualified)
         self.event('pre-election',cycle=cycle,candidate_programmes=PLATFORMS,
                    candidate_rosters={p:sorted(v) for p,v in memberships.items()},
@@ -450,7 +450,7 @@ def main():
             differences=[dict(issue=a['issue'],weighted=a['outcome'],flat=b['outcome'])
                 for a,b in zip(pair['WEIGHTED']['sessions'],pair['FLAT']['sessions']) if a['outcome']!=b['outcome']]
             comparisons.append(dict(seed=seed,outcome_differences=differences))
-    report=dict(format='dagp-community-simulation-v1',execution='reference-governance-with-optional-G0-result-anchoring',
+    report=dict(format='dagp-community-simulation-v2',execution='reference-governance-with-optional-G0-result-anchoring',
         limitations=['Synthetic policies, not AGI or LLM agents','Reference signatures are HMAC stand-ins',
         'HTTP challenge admission is not implemented','Court semantics and milestone evidence are scripted',
         'G0 chain records result commitment, does not enforce governance','Seven validators share one host'],

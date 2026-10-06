@@ -99,6 +99,13 @@ class KeyManager:
         return bool(st) and self.kr.verify(st.active, msg, sig)
 
     # ---------------------------------------------------------------- rotation
+    def _target(self, st, new_key):
+        if new_key not in self.kr._secrets or new_key == st.active:
+            raise RuleViolation("replacement must be a known different key")
+        if any(other is not st and (other.active == new_key or
+               (other.pending and other.pending.new_key == new_key)) for other in self.state.values()):
+            raise RuleViolation("replacement key already belongs to another identity")
+
     def begin_rotation(self, agent: str, new_key: str, nonce: str, sig: str, height: int) -> int:
         st = self._live(agent, height)
         if st.pending:
@@ -107,6 +114,7 @@ class KeyManager:
             raise RuleViolation("nonce reused")
         if not self.kr.verify(st.active, self._msg("ROTATE", agent, new_key, nonce), sig):
             raise RuleViolation("rotation must be signed by the current key")
+        self._target(st, new_key)
         st.used_nonces.add(nonce)
         st.pending = Pending("ROTATE", new_key, height + self.p.rotation_delay, nonce)
         self.reg._log(height, Actor.agent(agent), "ROTATE_BEGIN", agent, new_key)
@@ -143,6 +151,8 @@ class KeyManager:
             raise RuleViolation("need distinct guardians (>= min_guardians)")
         if not 2 <= k <= len(guardians) or 2 * k <= len(guardians):
             raise RuleViolation("k must be a strict majority of guardians and >= 2")
+        if len({self.reg.get(g).operator for g in guardians}) != len(guardians):
+            raise RuleViolation("guardians must have distinct operators")
         for g in guardians:
             gi = self.reg.get(g)
             if g == agent or gi.status is not Status.ACTIVE or gi.operator == owner_op:
@@ -163,12 +173,16 @@ class KeyManager:
             raise RuleViolation("an operation is already pending")
         if not st.guardians:
             raise RuleViolation("no guardians registered")
+        if nonce in st.used_nonces:
+            raise RuleViolation("nonce reused")
+        self._target(st, new_key)
         msg = self._msg("RECOVER", agent, new_key, nonce)
         good = {g for g, s in guardian_sigs.items()
                 if g in st.guardians and self.reg.get(g).status is Status.ACTIVE
                 and self.kr.verify(self._guardian_key(g), msg, s)}
         if len(good) < st.k:
             raise RuleViolation("not enough valid guardian signatures")
+        st.used_nonces.add(nonce)
         st.pending = Pending("RECOVER", new_key, height + self.p.recovery_delay, nonce)
         self.reg._log(height, Actor("MODULE", "keys"), "RECOVER_BEGIN", agent, new_key)
         return st.pending.effective
@@ -189,9 +203,9 @@ class KeyManager:
         msg = H(b"session", agent, key_id, ",".join(sorted(scope)), expires, nonce)
         if not self.kr.verify(st.active, msg, sig):
             raise RuleViolation("session grant must be signed by the current key")
-        st.used_nonces.add(nonce)
         if key_id not in self.kr._secrets:
             raise RuleViolation("unknown session key")
+        st.used_nonces.add(nonce)
         st.sessions[key_id] = Session(frozenset(scope), expires)
 
     def session_msg(self, agent: str, key_id: str, scope: set, expires: int, nonce: str) -> bytes:

@@ -88,7 +88,11 @@ class VoteSession:
         self.board, self.bank, self.attempts, self.beacon = board, bank, attempts, beacon
         self.open_height, self.w = open_height, windows
         self.recused = recused
-        self.effects = effects or Effects()
+        self.effects = replace(effects, tranches=list(effects.tranches)) if effects else Effects()
+        self.record_hash = bank.record_hash()
+        if not (open_height < windows.vote_end < windows.certify_end < windows.challenge_end):
+            raise RuleViolation("invalid voting windows")
+        self.w = replace(windows)
         self.qualified = qualified_parties or []
         self.scoreboard = scoreboard or Scoreboard(p)
         # Exam graders come from `pool` (never the certification board); one small panel per ticket.
@@ -117,6 +121,8 @@ class VoteSession:
         return {"proposer_party_members": set(self.recused)}
 
     def _check_open(self, height: int) -> None:
+        if self.bank.record_hash() != self.record_hash:
+            raise RuleViolation("examination record changed after vote opened")
         if self.phase is not Phase.VOTING:
             raise RuleViolation(f"phase is {self.phase.value}")
         if not (self.open_height <= height < self.w.vote_end):
@@ -136,9 +142,14 @@ class VoteSession:
 
     def panel_for(self, ticket: str) -> Board:
         """Deterministic, publicly recomputable grader panel for one exam ticket."""
-        owner = self.attempts.ticket_owner.get(ticket)
-        members = tuple(draw(H(b"exam-panel", self.beacon, ticket), self.pool, self.p.exam_panel,
-                             exclude={owner} if owner else frozenset()))
+        record = self.attempts.records.get(ticket)
+        if record is None or record.issue != self.issue:
+            raise RuleViolation("unknown ticket for this issue")
+        owner = record.voter
+        # A voter-chosen secret MUST NOT select the panel. All retries keep the same panel.
+        members = tuple(draw(H(b"exam-panel-v2", self.beacon, self.issue, owner), self.pool, self.p.exam_panel,
+                             exclude={a for a in self.pool if a == owner or a in self.recused
+                                      or self.registry.get(a).operator == self.registry.get(owner).operator}))
         if len(members) < self.p.exam_panel:
             raise RuleViolation("examiner pool too small for a grader panel")
         return Board(f"panel-{ticket[:12]}", members, self.issue)
@@ -151,32 +162,40 @@ class VoteSession:
         """Board step. member_verdicts: member -> {qid: bool}. Returns (token, bond_slashed).
         Raises if the exam failed (voter may retry until attempts run out)."""
         self._check_open(height)
-        if sub.ticket != attempt.ticket or self.attempts.ticket_owner.get(attempt.ticket) is None:
+        if (sub.ticket != attempt.ticket or self.attempts.records.get(attempt.ticket) != attempt
+                or attempt.issue != self.issue):
             raise RuleViolation("unknown ticket")
+        if attempt.ticket in self.issued:
+            raise RuleViolation("ticket already graded")
+        self._check_voter(attempt.voter, height)
         panel = self.panel_for(attempt.ticket)
         if any(m not in panel.members for m in member_verdicts):
             raise RuleViolation("verdict from a member outside this ticket's panel")
+        if any(not self.registry.can(m, "GRADE", height, self._matter())[0] for m in member_verdicts):
+            raise RuleViolation("grader lacks current independent examiner authority")
         if len(member_verdicts) < panel.threshold:
             raise RuleViolation("not enough graders")
         plan = plan_exam(self.bank, self.beacon, attempt.ticket, sub.declared_articles, self.p)
         items = [q.qid for q in plan.proposal_qs] + [q.qid for _, q in plan.sampled]
         res = majority(member_verdicts, items)
-        for m, v in member_verdicts.items():
-            for it in items:
-                self.scoreboard.record_item(m, v.get(it, False) == res[it])
         verdict = evaluate(plan, res, self.p)
         if not verdict.passed:
             raise RuleViolation("comprehension check failed")
-        slashed = False
-        if verdict.slash:
-            owner = self.attempts.ticket_owner[attempt.ticket]
-            ident = self.registry.get(owner)
-            ident.bond -= min(ident.bond, self.p.citizen_bond // 10)
-            self.slashed.append(owner)
-            slashed = True
+        if (len(set(signers)) != len(signers) or not set(signers) <= set(member_verdicts)
+                or not set(signers) <= set(panel.members)):
+            raise RuleViolation("token signers must be distinct graders on this panel")
         tok = issue_token(panel, self.keyring, self.issue, attempt.ticket, verdict, signers,
                           height, self.p)
-        verify_token(tok, panel, self.keyring, self.issue, height)       # panel must reach threshold
+        verify_token(tok, panel, self.keyring, self.issue, height)
+        # Commit scores/bonds only once token validation has succeeded.
+        for m, v in member_verdicts.items():
+            for it in items:
+                self.scoreboard.record_item(m, v.get(it, False) == res[it])
+        slashed = verdict.slash
+        if slashed:
+            ident = self.registry.get(attempt.voter)
+            ident.bond -= min(ident.bond, self.p.citizen_bond // 10)
+            self.slashed.append(attempt.voter)
         self.token_count += 1
         self.issued[attempt.ticket] = (tok, panel, self.attempts.ticket_owner[attempt.ticket])
         return tok, slashed
@@ -196,12 +215,19 @@ class VoteSession:
         if ticket in self.revoked:
             raise RuleViolation("token revoked by audit")
         verify_token(token, self.panel_for(ticket), self.keyring, self.issue, height)
+        recorded = self.issued.get(ticket)
+        if recorded is None or recorded[2] != voter:
+            raise RuleViolation("unrecorded eligibility token")
         if self.kind == ELECTION:
             w = 1
             if not isinstance(choice, tuple):
                 raise RuleViolation("election ballot must be a tuple of picks")
         else:
-            w = weight(token.R, self.p)
+            recorded = self.issued.get(ticket)
+            if recorded is None or recorded[2] != voter:
+                raise RuleViolation("unrecorded eligibility token")
+            # Valid old signatures cannot undo a board's authoritative downward correction.
+            w = weight(min(token.R, recorded[0].R), self.p)
         self._sealed[voter] = (choice, w)
         self.commits[voter] = hx("ballot-commit", voter, self.issue, str(choice), w)
 
@@ -215,17 +241,21 @@ class VoteSession:
         """Random sample of issued tickets for re-grading. Its size depends only on the fraud
         rate to detect and the miss probability, NOT on how many voters there are."""
         n = audit_sample_size(self.p.audit_fraud_bps, self.p.audit_miss_den)
-        return draw(H(b"audit", self.beacon), sorted(self.issued), min(n, len(self.issued)))
+        # Audit assignment also ignores the client secret, preventing offline sample evasion.
+        labels = {hx("audit-slot", self.issue, self.attempts.records[t].voter,
+                     self.attempts.records[t].n): t for t in self.issued}
+        return [labels[label] for label in draw(H(b"audit-v2", self.beacon), sorted(labels), min(n, len(labels)))]
 
     def audit(self, ticket: str, true_verdict, height: int) -> str:
         """Board re-grades one issued token while voting is still open. Returns OK | CORRECTED |
         STRUCK. A wrong token revokes it, strikes/corrects the sealed ballot, and flags the
         panel members who signed it."""
-        if self.phase is not Phase.VOTING:
-            raise RuleViolation("audits run while voting is open")
+        self._check_open(height)
         if ticket not in self.issued:
             raise RuleViolation("unknown ticket")
         tok, panel, voter = self.issued[ticket]
+        if type(true_verdict.R) is not int or not 0 <= true_verdict.R <= tok.R:
+            raise RuleViolation("an audit may only reduce verified reading")
         if true_verdict.passed and true_verdict.R == tok.R:
             return "OK"
         for m, _ in tok.sigs:
@@ -238,7 +268,9 @@ class VoteSession:
             return "STRUCK"
         if voter in self._sealed:
             choice, _ = self._sealed[voter]
-            self._sealed[voter] = (choice, weight(true_verdict.R, self.p))
+            corrected = weight(true_verdict.R, self.p)
+            self._sealed[voter] = (choice, corrected)
+            self.commits[voter] = hx("ballot-commit", voter, self.issue, str(choice), corrected)
         self.issued[ticket] = (replace(tok, R=true_verdict.R), panel, voter)
         return "CORRECTED"
 
@@ -310,15 +342,23 @@ class VoteSession:
 
     # ------------------------------------------------------------- challenge / finalize
     def challenge(self, by: str, grounds: str, height: int) -> int:
-        if self.phase is not Phase.CHALLENGE or height >= self.w.challenge_end:
+        if self.phase is not Phase.CHALLENGE or not self.w.vote_end <= height < self.w.challenge_end:
             raise RuleViolation("no open challenge window")
         ok, why = self.registry.can(by, "FILE_CASE", height)
         if not ok:
             raise RuleViolation(f"cannot file: {why}")
+        if any(ch.by == by for ch in self.challenges):
+            raise RuleViolation("one challenge per identity per issue")
+        if not isinstance(grounds, str) or not 0 < len(grounds) <= 1024:
+            raise RuleViolation("challenge grounds outside bounds")
         self.challenges.append(Challenge(by, grounds))
         return len(self.challenges) - 1
 
     def rule(self, court: Actor, idx: int, upheld: bool, height: int) -> None:
+        if self.phase is not Phase.CHALLENGE or height < self.w.vote_end:
+            raise RuleViolation("not in challenge phase")
+        if type(idx) is not int or not 0 <= idx < len(self.challenges):
+            raise RuleViolation("unknown challenge")
         self.registry._authorize(court, {"COURT"}, height, "CHALLENGE", f"{self.issue}:{idx}")
         ch = self.challenges[idx]
         if ch.status != "OPEN":
@@ -328,7 +368,9 @@ class VoteSession:
 
     def extend(self, actor: Actor, delta: int) -> None:
         """Halt compensation: an outage of `delta` cannot shorten any remaining window."""
-        if actor.kind != "MODULE" or delta <= 0:
+        if self.phase in (Phase.FINAL, Phase.VOIDED):
+            raise RuleViolation("terminal session")
+        if actor.kind != "MODULE" or type(delta) is not int or delta <= 0:
             raise RuleViolation("module only, positive delta")
         if self.phase is Phase.VOTING:
             self.w.vote_end += delta
@@ -341,23 +383,29 @@ class VoteSession:
         if height < self.w.challenge_end:
             raise RuleViolation("challenge window still open")
         if any(c.status == "OPEN" for c in self.challenges):
-            raise RuleViolation("unresolved challenge")
-        if any(c.status == "UPHELD" for c in self.challenges):
-            self.phase, self.outcome = Phase.VOIDED, None
+            if height < self.w.challenge_end + self.p.challenge_resolution_grace:
+                raise RuleViolation("unresolved challenge")
+            # Fail closed on court unavailability: no grant, no permanent reservation.
             self._unwind(refund=True)
+            self.phase, self.outcome = Phase.VOIDED, None
+            self.registry._log(height, Actor("MODULE", "tally"), "CHALLENGE_TIMEOUT", self.issue)
             return "VOIDED"
-        self.phase = Phase.FINAL
+        if any(c.status == "UPHELD" for c in self.challenges):
+            self._unwind(refund=True)
+            self.phase, self.outcome = Phase.VOIDED, None
+            return "VOIDED"
         r = self.result
         if isinstance(r, ElectionResult):
+            self.phase = Phase.FINAL
             self.outcome = Outcome.PASSED if r.valid else Outcome.FAILED
             return self.outcome
-        self.outcome = r.outcome
         e = self.effects
         if r.outcome is Outcome.PASSED:
             if e.treasury and e.ceiling:
                 e.treasury.commit_reserved(e.project, e.tranches)
         else:
             self._unwind(refund=(r.outcome is Outcome.NO_QUORUM and self.p.refund_on_no_quorum))
+        self.phase, self.outcome = Phase.FINAL, r.outcome
         return self.outcome
 
     def _unwind(self, refund: bool) -> None:

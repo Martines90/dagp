@@ -36,3 +36,19 @@ may later be changed by ordinary vote *inside* declared bounds; the rest need a 
 | **N-04** | **No role of any kind can be granted to a banned, suspended or exited identity**; rejection returns the applicant's bond in full. | Fuzzing found `grant(CITIZEN)` bypassing the status check. |
 | **N-05** | **One tally function (`decide`) for every scale**; the sharded path is the only production path. | Eliminates "small-vote code" vs "large-vote code" divergence. |
 | **N-06** | **Validator seat cap is an exact fraction (1/3)**, not basis points. | 3/9 operators was wrongly rejected by a 3333-bps constant. |
+
+## Security refinement — 2026-10-06 (reference / G0)
+
+Examiner assignment binds the frozen issue, beacon and voter identity rather than
+client-chosen secrets and retries. Audit ordering ignores client secrets. A future
+native implementation must commit pools before fresh unpredictable randomness;
+these refinements do not establish private or unbiasable production sortition.
+
+Unresolved challenges fail closed after `challenge_resolution_grace` blocks beyond
+`challenge_end`: void the session and unwind reserved money/credits once. This
+prevents permanent locks, while evidence-based admissibility and court availability
+remain necessary against denial of service. Reference default grace is 100 blocks.
+
+All rejected money, key, grade and block operations validate before mutation.
+Eligibility requires an issued token record, and audits may only reduce recorded
+reading. Native keepers must preserve these invariants. See `security/REVIEW.md`.

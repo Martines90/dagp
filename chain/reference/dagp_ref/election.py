@@ -13,11 +13,17 @@ def endorsement_requirement(population: int, p: Params) -> int:
 
 
 def qualify_parties(members: dict[str, set], endorsements: dict[str, set], required: int,
-                    p: Params) -> tuple[list[str], list[str]]:
+                    p: Params, eligible: set | None = None) -> tuple[list[str], list[str]]:
     """Returns (qualified, problems). Each agent endorses at most `endorsements_per_agent`
     distinct parties and belongs to at most one party; violating agents are dropped
     entirely from the count (fail closed) and reported."""
     problems: list[str] = []
+    if eligible is not None:
+        unknown = set().union(*members.values(), *endorsements.values()) - eligible
+        if unknown:
+            problems.append(f"ineligible supporters excluded: {sorted(unknown)}")
+        members = {q: set(ms) & eligible for q, ms in members.items()}
+        endorsements = {q: set(es) & eligible for q, es in endorsements.items()}
     seen_member: dict[str, str] = {}
     bad_members: set[str] = set()
     for party, ms in members.items():
@@ -44,7 +50,8 @@ def qualify_parties(members: dict[str, set], endorsements: dict[str, set], requi
 
 
 def valid_ballot(picks: tuple, qualified: list[str], p: Params) -> bool:
-    return (len(picks) == len(p.ballot_picks)
+    return (isinstance(picks, (tuple, list)) and all(isinstance(x, str) for x in picks)
+            and len(picks) == len(p.ballot_picks)
             and len(set(picks)) == len(picks)
             and all(x in qualified for x in picks))
 

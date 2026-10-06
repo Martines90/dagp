@@ -8,12 +8,26 @@ class RuleViolation(Exception):
     pass
 
 
+def _integer(n, minimum=0):
+    if type(n) is not int or n < minimum:
+        raise RuleViolation("amount must be an integer within bounds")
+
+
+def _budget(tranches):
+    if not tranches:
+        raise RuleViolation("budget requires positive tranches")
+    for n in tranches:
+        _integer(n, 1)
+    return sum(tranches)
+
+
 @dataclass
 class CreditLedger:
     balance: dict = field(default_factory=dict)
     debt: dict = field(default_factory=dict)
 
     def grant(self, party: str, n: int) -> None:
+        _integer(n)
         # Debt is repaid first, so a failed project's penalty cannot be dodged by waiting.
         owed = self.debt.get(party, 0)
         pay = min(owed, n)
@@ -21,11 +35,13 @@ class CreditLedger:
         self.balance[party] = self.balance.get(party, 0) + n - pay
 
     def spend(self, party: str, n: int) -> None:
+        _integer(n, 1)
         if self.balance.get(party, 0) < n:
             raise RuleViolation("insufficient credits")
         self.balance[party] -= n
 
     def penalize(self, party: str, n: int) -> None:
+        _integer(n)
         take = min(self.balance.get(party, 0), n)
         self.balance[party] = self.balance.get(party, 0) - take
         self.debt[party] = self.debt.get(party, 0) + (n - take)
@@ -45,6 +61,7 @@ class Treasury:
     _initial_total: int = 0
 
     def __post_init__(self):
+        _integer(self.free)
         self._initial_total = self.free
 
     def total(self) -> int:
@@ -53,6 +70,7 @@ class Treasury:
 
     # --- D-02: reserve at vote-open so concurrent votes cannot jointly exceed the treasury ---
     def reserve(self, project: str, amount: int) -> None:
+        _integer(amount, 1)
         if project in self.reserved or project in self.granted:
             raise RuleViolation("project already reserved or funded")
         if amount <= 0 or amount > self.free:
@@ -72,20 +90,25 @@ class Treasury:
         (the difference returns to free); never more."""
         if project not in self.reserved:
             raise RuleViolation("no reservation")
-        amt = self.reserved[project]
-        if any(t <= 0 for t in tranches) or sum(tranches) > amt:
-            raise RuleViolation("tranches exceed reservation")
+        amount = _budget(tranches)
+        ceiling = self.reserved[project]
+        if project in self.granted or amount > ceiling:
+            raise RuleViolation("already funded or tranches exceed reservation")
+        # Every check precedes mutation; never call a helper that can refuse mid-commit.
         del self.reserved[project]
-        self.free += amt
-        self.reserve_and_grant(project, tranches)
+        self.free += ceiling - amount
+        self._grant(project, tranches, amount)
 
     def reserve_and_grant(self, project: str, tranches: list[int]) -> None:
-        amount = sum(tranches)
-        if project in self.granted:
-            raise RuleViolation("project already funded")
-        if any(t <= 0 for t in tranches) or amount > self.free:
-            raise RuleViolation("unfundable or malformed budget")
+        amount = _budget(tranches)
+        if project in self.granted or project in self.reserved:
+            raise RuleViolation("project already funded or reserved")
+        if amount > self.free:
+            raise RuleViolation("unfundable budget")
         self.free -= amount
+        self._grant(project, tranches, amount)
+
+    def _grant(self, project, tranches, amount):
         self.escrow[project] = amount
         self.granted[project] = amount
         self.released[project] = 0
@@ -94,6 +117,14 @@ class Treasury:
 
     def release_next(self, project: str, attestations: int, threshold: int,
                      height: int | None = None) -> int:
+        _integer(attestations)
+        _integer(threshold, 1)
+        if project not in self.granted:
+            raise RuleViolation("unknown project")
+        if self.paused_until.get(project, 0) and height is None:
+            raise RuleViolation("height required for a project with a pause history")
+        if height is not None:
+            _integer(height)
         if project in self.terminated:
             raise RuleViolation("project terminated")
         if height is not None and height < self.paused_until.get(project, 0):

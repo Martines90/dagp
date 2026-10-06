@@ -16,8 +16,8 @@ Use Python 3.10 or newer:
 
 ```sh
 python3 -m unittest discover -s chain/simulation/tests -v
-python3 chain/simulation/community.py --seeds 7 19 43 --output chain/simulation/results/pilot
-python3 chain/simulation/verify.py chain/simulation/results/pilot --replay
+python3 chain/simulation/community.py --seeds 7 19 43 --output chain/simulation/results/hardened
+python3 chain/simulation/verify.py chain/simulation/results/hardened --replay
 python3 chain/simulation/community.py --citizens 10000 --seeds 7 --output chain/simulation/results/large
 python3 chain/simulation/verify.py chain/simulation/results/large
 ```
@@ -28,7 +28,7 @@ WEIGHTED` runs one mode. `--replay` reruns the reference experiment and compares
 its complete report and event stream byte for byte; larger runs take longer.
 
 Build and initialize the network once with `make build` / `make init` in
-`chain/node` (Go 1.25+ required). On this workspace the binaries and devnet already
+`chain/node` (Go 1.26.8+ required). On this workspace the binaries and devnet already
 exist. Then publish a report manifest:
 
 ```sh
@@ -135,3 +135,5 @@ fresh checkout.
 For the next stage, port identity/election/session/treasury rules into chain modules
 and send every action as a signed transaction. Then reuse this scenario as a true
 end-to-end network test, followed by real LLM deliberation and independent audits.
+
+Security changes use v2 reports. Historical pilot and large v1 artifacts remain immutable; exact replay requires commit `6a87852`. See [the adversarial review](../security/REVIEW.md).

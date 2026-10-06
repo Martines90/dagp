@@ -14,7 +14,7 @@ from typing import Iterable
 from .crypto_sim import H, MerkleTree, merkle_root
 from .election import run_election
 from .params import Params
-from .tally import ABSTAIN, NO, YES, Ballot, Kind, Outcome, TallyResult, decide, min_weight
+from .tally import ABSTAIN, NO, YES, Ballot, Kind, Outcome, TallyResult, decide, min_weight, max_weight
 from .treasury import RuleViolation
 
 
@@ -52,7 +52,7 @@ def summarize_shard(shard: int, shards: int, ballots: Iterable[Ballot], p: Param
             raise RuleViolation("ballot in wrong shard")
         if b.voter in seen:
             raise RuleViolation("duplicate voter")
-        if b.choice not in (YES, NO, ABSTAIN) or b.weight < mw:
+        if b.choice not in (YES, NO, ABSTAIN) or type(b.weight) is not int or not mw <= b.weight <= max_weight(p):
             raise RuleViolation("malformed ballot")
         seen.add(b.voter)
         leaves.append(ballot_leaf(b))
@@ -78,6 +78,11 @@ def tally_sharded(summaries: list[ShardSummary], shards: int, electorate: int, k
     """Returns (result, global commitment = Merkle root over shard roots)."""
     if sorted(s.shard for s in summaries) != list(range(shards)):
         return TallyResult(Outcome.INVALID, 0, 0, 0, 0, False), b""
+    for s in summaries:
+        if (any(type(n) is not int or n < 0 for n in (s.count, s.yes_w, s.no_w, s.abstain_n))
+                or s.abstain_n > s.count or not isinstance(s.root, bytes) or len(s.root) != 32
+                or not (s.count-s.abstain_n)*min_weight(p) <= s.yes_w+s.no_w <= (s.count-s.abstain_n)*max_weight(p)):
+            return TallyResult(Outcome.INVALID, 0, 0, 0, 0, False), b""
     part = sum(s.count for s in summaries)
     if part > electorate or electorate <= 0:
         return TallyResult(Outcome.INVALID, 0, 0, 0, 0, False), b""
@@ -139,6 +144,12 @@ def election_from_shards(shards: list[ElectionShard], qualified: list[str], p: P
     points = {q: 0 for q in qualified}
     bad = 0
     for s in shards:
+        if (any(type(n) is not int or n < 0 for n in (s.count, s.invalid))
+                or s.invalid > s.count or len(s.points) != len(qualified)
+                or {q for q, _ in s.points} != set(qualified)
+                or any(type(v) is not int or v < 0 for _, v in s.points)
+                or sum(v for _, v in s.points) != (s.count-s.invalid)*sum(p.ballot_picks)):
+            return ElectionResult(False, "MALFORMED_SHARD", {}, 0, {}, 0)
         bad += s.invalid
         for q, v in s.points:
             points[q] += v

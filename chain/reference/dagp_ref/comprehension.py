@@ -54,6 +54,10 @@ class QuestionBank:
     def root(self) -> str:
         return self._tree.root.hex()
 
+    def record_hash(self) -> str:
+        return hx("exam-record", sorted((qid, q.leaf().hex()) for qid, q in self.questions.items()),
+                  sorted(self.article_cluster.items()))
+
     def load_keys(self, keys: dict[str, tuple[int, str]]) -> None:
         for qid, (ans, salt) in keys.items():
             if commit_key(ans, salt) != self.questions[qid].key_commit:
@@ -63,7 +67,10 @@ class QuestionBank:
     def answer_ok(self, qid: str, answer: int) -> bool:
         if qid not in self._keys:
             raise RuleViolation("key not revealed")
-        return self._keys[qid][0] == answer
+        ans, salt = self._keys[qid]
+        if commit_key(ans, salt) != self.questions[qid].key_commit:
+            raise RuleViolation("answer key changed after commitment")
+        return type(answer) is int and ans == answer
 
     def draw(self, seed: bytes, article_id: str, n: int) -> list[Question]:
         pool = [q for q in self.questions.values() if q.article_id == article_id]
@@ -88,6 +95,7 @@ class AttemptRegistry:
     def __init__(self, p: Params):
         self.p = p
         self.count: dict[tuple, int] = {}
+        self.records: dict[str, Attempt] = {}
         self.ticket_owner: dict[str, str] = {}   # sealed on chain; never shown to the board
 
     def open(self, issue: str, voter: str, secret: str) -> Attempt:
@@ -98,7 +106,9 @@ class AttemptRegistry:
         self.count[k] = n
         ticket = hx("ticket", voter, issue, n, secret)
         self.ticket_owner[ticket] = voter
-        return Attempt(issue, voter, n, ticket)
+        attempt = Attempt(issue, voter, n, ticket)
+        self.records[ticket] = attempt
+        return attempt
 
     def owns(self, voter: str, ticket: str) -> bool:
         return self.ticket_owner.get(ticket) == voter
@@ -131,8 +141,8 @@ def plan_exam(bank: QuestionBank, seed: bytes, ticket: str, declared: tuple, p: 
             dedup.append(a)
     dedup = dedup[: p.max_articles_counted]
     pq = bank.draw(s, PROPOSAL_ARTICLE, p.exam_items)
-    if not pq:
-        raise RuleViolation("bank has no proposal questions")
+    if len(pq) != p.exam_items:
+        raise RuleViolation("bank lacks the required number of proposal questions")
     order = sorted(dedup, key=lambda a: H(b"sample", s, a))[: p.sample_articles]
     sampled = []
     for a in order:

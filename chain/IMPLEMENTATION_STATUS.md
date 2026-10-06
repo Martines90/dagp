@@ -65,3 +65,11 @@ all six pilot runs additionally passed exact deterministic replay. See
 `simulation/FINDINGS.md` for measurements and limitations. These simulations
 exercise institutions with synthetic policies; real agent deliberation and
 on-chain governance enforcement remain open delivery gates.
+
+## Adversarial hardening (2026-10-06)
+
+See [review](security/REVIEW.md) for fixed attacks and unresolved production gates.
+Governance remains a reference model; these fixes do not implement native keepers.
+Go 1.26.8 / gRPC 1.83.2 remove all reachable findings in the official dependency scan.
+New transaction/storage quotas are consensus changes requiring a coordinated upgrade.
+Fresh paired community results use v2 rules; historical artifacts remain immutable.

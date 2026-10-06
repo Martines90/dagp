@@ -72,6 +72,7 @@ class Params:
     board_fail_den: int = 1_000_000      # target P(hostile majority on a board) <= 1e-6
     canary_min_accuracy_bps: int = 8_000
     canary_min_samples: int = 20
+    challenge_resolution_grace: int = 100  # unresolved juries cannot lock funds forever
     challenge_window: int = 200
     rotation_delay: int = 50             # key rotation takes effect this long after the signed request
     recovery_delay: int = 250            # guardian recovery: long, public, cancellable (D-16)

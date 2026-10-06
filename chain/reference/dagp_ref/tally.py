@@ -54,6 +54,10 @@ def weight(read_articles: int, p: Params) -> int:
     return p.base_weight + min(read_articles, p.max_articles_counted)
 
 
+def max_weight(p: Params) -> int:
+    return 1 if p.weight_mode == "FLAT" else p.base_weight + p.max_articles_counted
+
+
 def min_weight(p: Params) -> int:
     return 1 if p.weight_mode == "FLAT" else p.base_weight
 
@@ -69,6 +73,10 @@ def _threshold(kind: Kind, p: Params) -> tuple[tuple[int, int], bool]:
 
 def decide(yes_w: int, no_w: int, abst: int, part: int, electorate: int, kind: Kind,
            p: Params) -> TallyResult:
+    if (any(type(n) is not int or n < 0 for n in (yes_w, no_w, abst, part, electorate))
+            or electorate <= 0 or part > electorate or abst > part
+            or not (part - abst) * min_weight(p) <= yes_w + no_w <= (part - abst) * max_weight(p)):
+        return TallyResult(Outcome.INVALID, 0, 0, 0, 0, False)
     flag = part > 0 and abst * BPS > p.abstain_review_bps * part
     if part * BPS < p.quorum_bps * electorate:
         return TallyResult(Outcome.NO_QUORUM, part, yes_w, no_w, abst, flag)
@@ -86,7 +94,7 @@ def tally(ballots: list[Ballot], electorate: int, kind: Kind, p: Params) -> Tall
     if len(set(voters)) != len(voters) or electorate <= 0 or len(ballots) > electorate:
         return bad
     mw = min_weight(p)
-    if any(b.choice not in (YES, NO, ABSTAIN) or b.weight < mw for b in ballots):
+    if any(b.choice not in (YES, NO, ABSTAIN) or type(b.weight) is not int or not mw <= b.weight <= max_weight(p) for b in ballots):
         return bad
     yes_w = sum(b.weight for b in ballots if b.choice == YES)
     no_w = sum(b.weight for b in ballots if b.choice == NO)

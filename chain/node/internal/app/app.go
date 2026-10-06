@@ -4,7 +4,6 @@ package app
 import (
 	"bytes"
 	"context"
-	"crypto/ed25519"
 	"crypto/sha256"
 	"encoding/hex"
 	"encoding/json"
@@ -19,8 +18,11 @@ import (
 )
 
 type Account struct {
-	Key      []byte `json:"key"`
-	Sequence uint64 `json:"sequence"`
+	PublishEpoch   int64  `json:"publish_epoch,omitempty"`
+	EpochBytes     int64  `json:"epoch_bytes,omitempty"`
+	EpochDocuments int64  `json:"epoch_documents,omitempty"`
+	Key            []byte `json:"key"`
+	Sequence       uint64 `json:"sequence"`
 }
 type State struct {
 	ChainID   string             `json:"chain_id"`
@@ -48,6 +50,9 @@ func (t Transaction) SignBytes() []byte {
 func Root(s State) []byte { b, _ := json.Marshal(s); h := sha256.Sum256(b); return h[:] }
 func clone(s State) State { b, _ := json.Marshal(s); var n State; _ = json.Unmarshal(b, &n); return n }
 func decode(b []byte, v any) error {
+	if err := strictJSON(b); err != nil {
+		return err
+	}
 	d := json.NewDecoder(bytes.NewReader(b))
 	d.DisallowUnknownFields()
 	if err := d.Decode(v); err != nil {
@@ -59,28 +64,21 @@ func decode(b []byte, v any) error {
 	return nil
 }
 func Execute(s *State, raw []byte, height int64) error {
-	if len(raw) > 90000 {
-		return errors.New("transaction too large")
-	}
-	var t Transaction
-	if err := decode(raw, &t); err != nil {
+	t, err := validateTransaction(s, raw, height)
+	if err != nil {
 		return err
 	}
-	a, ok := s.Accounts[t.Account]
-	if !ok || t.ChainID != s.ChainID || t.Sequence != a.Sequence || t.ValidUntil < height || t.ValidUntil > height+1000 || a.Sequence == ^uint64(0) {
-		return errors.New("invalid account, domain, sequence or expiry")
-	}
-	if !ed25519.Verify(ed25519.PublicKey(a.Key), t.SignBytes(), t.Signature) {
-		return errors.New("invalid signature")
-	}
-	if t.Type != "publish_document" || len(t.Body) == 0 || len(t.Body) > 65536 {
-		return errors.New("unsupported message or document size")
-	}
+	a := s.Accounts[t.Account]
 	h := sha256.Sum256(t.Body)
 	id := hex.EncodeToString(h[:])
-	if _, exists := s.Documents[id]; exists {
-		return errors.New("document already exists")
+	epoch := (height-1)/PublishEpochBlocks + 1
+	if a.PublishEpoch != epoch {
+		a.PublishEpoch = epoch
+		a.EpochBytes = 0
+		a.EpochDocuments = 0
 	}
+	a.EpochBytes += int64(len(t.Body))
+	a.EpochDocuments++
 	s.Documents[id] = append([]byte(nil), t.Body...)
 	a.Sequence++
 	s.Accounts[t.Account] = a
@@ -97,14 +95,25 @@ type Application struct {
 
 func Open(path string) (*Application, error) {
 	a := &Application{path: path}
-	b, err := os.ReadFile(path)
+	f, err := os.Open(path)
 	if errors.Is(err, os.ErrNotExist) {
 		return a, nil
 	}
 	if err != nil {
 		return nil, err
 	}
+	defer f.Close()
+	b, err := io.ReadAll(io.LimitReader(f, MaxSnapshotBytes+1))
+	if err != nil {
+		return nil, err
+	}
+	if len(b) > MaxSnapshotBytes {
+		return nil, errors.New("snapshot exceeds limit")
+	}
 	if err = decode(b, &a.committed); err != nil {
+		return nil, err
+	}
+	if err = validateState(a.committed); err != nil {
 		return nil, err
 	}
 	return a, nil
@@ -132,22 +141,24 @@ func (a *Application) InitChain(_ context.Context, r *abci.RequestInitChain) (*a
 		return nil, errors.New("invalid genesis")
 	}
 	for id, k := range s.Accounts {
-		if id == "" || len(k.Key) != ed25519.PublicKeySize || k.Sequence != 0 {
+		if id == "" || len(k.Key) != 32 || k.Sequence != 0 || k.PublishEpoch != 0 || k.EpochBytes != 0 || k.EpochDocuments != 0 {
 			return nil, errors.New("invalid genesis account")
 		}
 	}
 	s.Documents = map[string][]byte{}
-	a.committed = s
+	if err := validateState(s); err != nil {
+		return nil, err
+	}
 	if err := a.persist(s); err != nil {
 		return nil, err
 	}
+	a.committed = s
 	return &abci.ResponseInitChain{AppHash: Root(s)}, nil
 }
 func (a *Application) CheckTx(_ context.Context, r *abci.RequestCheckTx) (*abci.ResponseCheckTx, error) {
 	a.mu.Lock()
 	defer a.mu.Unlock()
-	s := clone(a.committed)
-	if err := Execute(&s, r.Tx, s.Height+1); err != nil {
+	if _, err := validateTransaction(&a.committed, r.Tx, a.committed.Height+1); err != nil {
 		return &abci.ResponseCheckTx{Code: 1, Log: err.Error()}, nil
 	}
 	return &abci.ResponseCheckTx{}, nil
@@ -157,8 +168,14 @@ func (a *Application) PrepareProposal(_ context.Context, r *abci.RequestPrepareP
 	defer a.mu.Unlock()
 	s := clone(a.committed)
 	var txs [][]byte
+	if r.MaxTxBytes > MaxBlockBytes {
+		r.MaxTxBytes = MaxBlockBytes
+	}
 	var size int64
 	for _, t := range r.Txs {
+		if len(txs) >= MaxBlockTransactions {
+			break
+		}
 		if size+int64(len(t)) > r.MaxTxBytes {
 			continue
 		}
@@ -172,6 +189,9 @@ func (a *Application) PrepareProposal(_ context.Context, r *abci.RequestPrepareP
 func (a *Application) ProcessProposal(_ context.Context, r *abci.RequestProcessProposal) (*abci.ResponseProcessProposal, error) {
 	a.mu.Lock()
 	defer a.mu.Unlock()
+	if !validBlock(r.Txs) || r.Height != a.committed.Height+1 {
+		return &abci.ResponseProcessProposal{Status: abci.ResponseProcessProposal_REJECT}, nil
+	}
 	s := clone(a.committed)
 	for _, t := range r.Txs {
 		if Execute(&s, t, r.Height) != nil {
@@ -183,6 +203,9 @@ func (a *Application) ProcessProposal(_ context.Context, r *abci.RequestProcessP
 func (a *Application) FinalizeBlock(_ context.Context, r *abci.RequestFinalizeBlock) (*abci.ResponseFinalizeBlock, error) {
 	a.mu.Lock()
 	defer a.mu.Unlock()
+	if !validBlock(r.Txs) {
+		return nil, errors.New("application block limit")
+	}
 	if r.Height != a.committed.Height+1 {
 		return nil, errors.New("unexpected height")
 	}
@@ -254,9 +277,14 @@ func (a *Application) Query(_ context.Context, r *abci.RequestQuery) (*abci.Resp
 	var value []byte
 	switch r.Path {
 	case "/state":
-		value, _ = json.Marshal(a.committed)
+		value, _ = json.Marshal(struct {
+			ChainID       string             `json:"chain_id"`
+			Height        int64              `json:"height"`
+			Accounts      map[string]Account `json:"accounts"`
+			DocumentCount int                `json:"document_count"`
+		}{a.committed.ChainID, a.committed.Height, a.committed.Accounts, len(a.committed.Documents)})
 	case "/document":
-		value = a.committed.Documents[string(r.Data)]
+		value = append([]byte(nil), a.committed.Documents[string(r.Data)]...)
 	default:
 		return &abci.ResponseQuery{Code: 1, Log: fmt.Sprintf("unknown path %s", r.Path)}, nil
 	}

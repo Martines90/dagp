@@ -7,7 +7,7 @@ No public deployment, real treasury, or production identity admission is enabled
 
 ## Run
 
-Requires Go 1.25+, Python 3.10+, and a C compiler for race tests. No Docker required.
+Requires Go 1.26.8+, Python 3.10+, and a C compiler for race tests. No Docker required.
 
 ```sh
 cd chain/node
