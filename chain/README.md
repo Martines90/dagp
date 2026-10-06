@@ -10,6 +10,7 @@ citizens, with the guarantees and the limits stated plainly.
 | `SPEC.md` | Protocol and system specification. Part I: architecture, roles, identity, constitution tiers, voting, elections, treasury, courts, consensus, bootstrap, invariants. **Part II (v0.2): examiner-run voting process, role and node lifecycle, scale by design, test map** |
 | `DECISIONS.md` | Every open question settled (D-01…D-18, N-01…N-06) with rationale and the code/test that enforces it |
 | `THREATS.md` | Threat register (50 threats), critique of my own design, defects found in the DAGP sources, what the tests proved and did not |
+| `CODEX_HANDOFF.md` | **Paste-ready prompt + full context and milestone roadmap (M0–M11) for building the Go implementation with ChatGPT Codex** |
 | `reference/` | Executable reference model (Python, stdlib only): **209 tests, 100 % line coverage**, fuzzing, a 1,000,000-voter tally |
 
 ```
