@@ -80,7 +80,7 @@ class Happy(unittest.TestCase):
         self.assertEqual((r.yes_w, r.no_w), (36, 54))
         self.assertEqual(s.outcome, Outcome.FAILED)                            # understanding outweighs count
 
-    def test_constitutional_vote_needs_two_thirds(self):
+    def test_constitutional_vote_needs_66_percent(self):
         soc = Society()
         s = soc.session(kind=Kind.CONSTITUTIONAL)
         cast_all(soc, s, [("Y", 12), ("N", 8)])                                 # 60%

@@ -534,7 +534,7 @@ def main():
             differences=[dict(issue=a['issue'],weighted=a['outcome'],flat=b['outcome'])
                 for a,b in zip(pair['WEIGHTED']['sessions'],pair['FLAT']['sessions']) if a['outcome']!=b['outcome']]
             comparisons.append(dict(seed=seed,outcome_differences=differences))
-    report=dict(format='dagp-community-simulation-v5',execution='reference-governance-with-optional-G0-result-anchoring',
+    report=dict(format='dagp-community-simulation-v6',execution='reference-governance-with-optional-G0-result-anchoring',
         limitations=['Synthetic policies, not AGI or LLM agents','Reference signatures are HMAC stand-ins',
         'HTTP challenge admission is not implemented','Court semantics and milestone evidence are scripted',
         'G0 chain records result commitment, does not enforce governance','Seven validators share one host'],

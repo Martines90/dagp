@@ -68,6 +68,8 @@ def _threshold(kind: Kind, p: Params) -> tuple[tuple[int, int], bool]:
     """Returns ((num, den), strict). Ordinary is strictly-greater; the others are at-least."""
     if kind is Kind.PARAMETER:
         return (p.parameter_approval_bps,BPS),False
+    if kind is Kind.CONSTITUTIONAL:
+        return (p.constitutional_approval_bps,BPS),False
     if kind is Kind.ORDINARY:
         return p.ordinary, True
     if kind is Kind.CORE:
@@ -82,7 +84,8 @@ def decide(yes_w: int, no_w: int, abst: int, part: int, electorate: int, kind: K
             or not (part - abst) * min_weight(p) <= yes_w + no_w <= (part - abst) * max_weight(p)):
         return TallyResult(Outcome.INVALID, 0, 0, 0, 0, False)
     flag = part > 0 and abst * BPS > p.abstain_review_bps * part
-    if part * BPS < p.quorum_bps * electorate:
+    quorum=max(p.quorum_bps,p.constitutional_quorum_bps) if kind in (Kind.CONSTITUTIONAL,Kind.CORE) else p.quorum_bps
+    if part * BPS < quorum * electorate:
         return TallyResult(Outcome.NO_QUORUM, part, yes_w, no_w, abst, flag)
     if yes_w + no_w == 0:
         return TallyResult(Outcome.NO_DECISIVE_VOTES, part, yes_w, no_w, abst, flag)

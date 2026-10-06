@@ -1,4 +1,4 @@
-> Current reference defaults are superseded by [security/POLICY_POINTS.md](security/POLICY_POINTS.md): 20% minimum turnout, monthly credits, 66% parameter referendums and independent clauses with partial funding. Historical 50% and package examples below describe earlier rules. These features await native G0 enforcement.
+> Current reference defaults are superseded by [security/POLICY_POINTS.md](security/POLICY_POINTS.md): 20% minimum turnout, monthly credits, 66%/50%-turnout constitutional changes, 66% parameter referendums and independent clauses with partial funding. Historical 50% and package examples below describe earlier rules. These features await native G0 enforcement.
 
 # DAGP Chain — Protocol & System Specification (draft 0.1)
 
@@ -207,7 +207,7 @@ verifiable check, not a promise.
 | Tier | Contents (examples) | Change rule |
 |---|---|---|
 | **T0 – Entrenched core** | Sunset of guardian powers; no token-weighted voting; no vote delegation; append-only history; voting-secrecy/sealing rules; amendment thresholds themselves; this tier list | Supermajority (≥ 75 %) in **two separate votes ≥ 1 election cycle apart**, plus audit & delay. Cannot be touched by any lower route. |
-| **T1 – Constitutional** | Role powers, thresholds table, credit schedule, bill limits, sanction ladder, validator-set rules | `CONSTITUTIONAL` rule (≥ 2/3 of Yw+Nw, quorum 50 %) + 7-day time-lock |
+| **T1 – Constitutional** | Role powers, thresholds table, credit schedule, bill limits, sanction ladder, validator-set rules | `CONSTITUTIONAL` rule (≥ 66% of Yw+Nw, quorum ≥ 50%) + 7-day time-lock |
 | **T2 – Ordinary law** | Policies, standing rules, textual Legal Code below T1 | `ORDINARY` (> 50 %) |
 | **T3 – Bounded parameters** | Timings, round counts, response slots, weight cap, quorum within constitutional min/max | Ordinary vote, only **inside** registry-declared `[min,max]`, only for the **next** cycle |
 
@@ -287,7 +287,7 @@ count in `P` (closing the "drain the electorate" and "flood the electorate" quor
 | Type | Quorum | Approval (on weighted Y vs N; abstain excluded) | Extra conditions |
 |---|---|---|---|
 | Ordinary law/policy/project | ≥ 50 % of P | Yw/(Yw+Nw) **> 50 %** **[tested]** | Standard deliberation |
-| Constitutional (T1) | ≥ 50 % | **≥ 2/3 exactly** (`Yw·3 ≥ 2·(Yw+Nw)`; the note's "66 percent" read as two-thirds **[decided D-13]**) **[tested]** | Affected sections identified & verified (§6.1); 7-day time-lock |
+| Constitutional (T1) | ≥ 50 % | **≥ 66.00% exactly** (`Yw·100 ≥ 66·(Yw+Nw)`) **[tested]** | Affected sections identified & verified (§6.1); 7-day time-lock |
 | T0 core | ≥ 50 % | ≥ 3/4 ×2, cycles apart **[tested]** | §6.2 |
 | Early election | ≥ 50 % | ≥ 2/3 | Once per annual cycle (counter in state) |
 | Multi-point bill | ≥ 50 % (each point) | Per point; package fails if **more than half** of points fail | ≤ 10 points, one subject, `subject_tag` attested **[tested]** |

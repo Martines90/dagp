@@ -40,6 +40,21 @@ class CurrentThresholds(unittest.TestCase):
         self.assertEqual(tally(ballots,501,Kind.PARAMETER,Params()).outcome,Outcome.NO_QUORUM)
         ballots[65]=Ballot('65','N',3)
         self.assertEqual(tally(ballots,500,Kind.PARAMETER,Params()).outcome,Outcome.FAILED)
+    def test_constitution_exact_66_approval_and_50_turnout(self):
+        ballots=[Ballot(str(n),'Y' if n<33 else 'N',3) for n in range(50)]
+        self.assertEqual(tally(ballots,100,Kind.CONSTITUTIONAL,Params()).outcome,Outcome.PASSED)
+        ballots[32]=Ballot('32','N',3)
+        self.assertEqual(tally(ballots,100,Kind.CONSTITUTIONAL,Params()).outcome,Outcome.FAILED)
+        all_yes=[Ballot(str(n),'Y',3) for n in range(49)]
+        self.assertEqual(tally(all_yes,100,Kind.CONSTITUTIONAL,Params()).outcome,Outcome.NO_QUORUM)
+        self.assertEqual(tally(all_yes,100,Kind.CORE,Params()).outcome,Outcome.NO_QUORUM)
+        with self.assertRaises(ValueError):Params(constitutional_quorum_bps=4999)
+        with self.assertRaises(RuleViolation):validate_changes(Params(),(('constitutional_quorum_bps',2000),))
+    def test_constitution_higher_general_quorum_and_per_point_floor(self):
+        ballots=[Ballot(str(n),'Y',3) for n in range(50)]
+        self.assertEqual(tally(ballots,100,Kind.CONSTITUTIONAL,Params(quorum_bps=6000)).outcome,Outcome.NO_QUORUM)
+        self.assertEqual(tally_bill([ballots,ballots[:-1]],100,Kind.CONSTITUTIONAL,Params()).point_outcomes,
+                         (Outcome.PASSED,Outcome.NO_QUORUM))
     def test_no_automatic_credits_below_five_percent(self):
         self.assertEqual(set(allocate_credits({str(n):4 for n in range(25)},100,Params()).values()),{0})
     def test_unapproved_constants_and_security_floors_cannot_change(self):

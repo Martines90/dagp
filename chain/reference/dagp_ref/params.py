@@ -19,7 +19,9 @@ class Params:
     # --- voting (exact fractions as (numerator, denominator)) ---
     quorum_bps: int = 2_000              # participation >= 20% of snapshot electorate
     ordinary: tuple = (1, 2)             # Yw/(Yw+Nw) strictly greater than
-    supermajority: tuple = (2, 3)        # at least (D-13: "66 percent" read as two-thirds)
+    supermajority: tuple = (2, 3)        # early-election threshold
+    constitutional_approval_bps: int = 6_600
+    constitutional_quorum_bps: int = 5_000
     core: tuple = (3, 4)                 # T0 entrenched core (each of two votes)
     abstain_review_bps: int = 3_000      # above this share an incoherence jury is mandatory (D-15)
     base_weight: int = 3
@@ -105,6 +107,10 @@ class Params:
             raise ValueError("citizen participation cannot fall below 20 percent")
         if self.parameter_approval_bps!=6600 or type(self.parameter_approval_bps) is not int:
             raise ValueError("parameter changes require at least 66 percent approval")
+        if type(self.constitutional_approval_bps) is not int or self.constitutional_approval_bps!=6600:
+            raise ValueError("constitutional changes require at least 66 percent approval")
+        if type(self.constitutional_quorum_bps) is not int or not 5000<=self.constitutional_quorum_bps<=BPS:
+            raise ValueError("constitutional participation cannot fall below 50 percent")
         if self.bill_mode not in ("INDEPENDENT","PACKAGE"):
             raise ValueError("unknown bill mode")
         if (type(self.credit_step_bps) is not int or not 1<=self.credit_step_bps<=BPS

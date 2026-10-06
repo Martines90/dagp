@@ -33,11 +33,11 @@ class DocExamples(unittest.TestCase):
         self.assertEqual(tally(bs(y=250, n=250), 1000, Kind.ORDINARY, P).outcome, Outcome.FAILED)
         self.assertEqual(tally(bs(y=251, n=249), 1000, Kind.ORDINARY, P).outcome, Outcome.PASSED)
 
-    def test_constitutional_is_exactly_two_thirds(self):
-        # D-13: "66 percent" is read as two-thirds, compared with exact integers.
+    def test_constitutional_requires_exactly_66_percent(self):
+        # Constitutional approval is at least 66.00%, compared with exact integers.
         self.assertEqual(tally(bs(y=400, n=200), 1000, Kind.CONSTITUTIONAL, P).outcome, Outcome.PASSED)  # 2/3 exactly
-        self.assertEqual(tally(bs(y=333, n=167), 1000, Kind.CONSTITUTIONAL, P).outcome, Outcome.FAILED)  # 66.6%
-        self.assertEqual(tally(bs(y=334, n=166), 1000, Kind.CONSTITUTIONAL, P).outcome, Outcome.PASSED)
+        self.assertEqual(tally(bs(y=329, n=171), 1000, Kind.CONSTITUTIONAL, P).outcome, Outcome.FAILED)  # 65.8%
+        self.assertEqual(tally(bs(y=330, n=170), 1000, Kind.CONSTITUTIONAL, P).outcome, Outcome.PASSED)
 
     def test_core_needs_three_quarters(self):
         self.assertEqual(tally(bs(y=450, n=150), 1000, Kind.CORE, P).outcome, Outcome.PASSED)

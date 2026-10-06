@@ -1,0 +1,2886 @@
+{
+  "comparison": [
+    {
+      "outcome_differences": [],
+      "seed": 7
+    }
+  ],
+  "execution": "reference-governance-with-optional-G0-result-anchoring",
+  "format": "dagp-community-simulation-v6",
+  "limitations": [
+    "Synthetic policies, not AGI or LLM agents",
+    "Reference signatures are HMAC stand-ins",
+    "HTTP challenge admission is not implemented",
+    "Court semantics and milestone evidence are scripted",
+    "G0 chain records result commitment, does not enforce governance",
+    "Seven validators share one host"
+  ],
+  "runs": [
+    {
+      "checks": [
+        "probationary identity cannot vote",
+        "rejected applicant bond refunded",
+        "citizen cannot self-appoint as registrar",
+        "operator population cap blocks excess identities",
+        "five candidates qualify 1",
+        "certification board cannot vote election-1",
+        "ballots hidden before close election-1",
+        "independent direct tally agrees election-1",
+        "registry audit integrity election-1",
+        "no dangling reservation election-1",
+        "election certified 1",
+        "bait-and-switch rejected project-0",
+        "proposer recusal project-0",
+        "certification board cannot vote project-0",
+        "double vote blocked project-0",
+        "ballots hidden before close project-0",
+        "independent direct tally agrees project-0",
+        "registry audit integrity project-0",
+        "no dangling reservation project-0",
+        "executor cannot self-attest project-0",
+        "independent verifier roles available project-0",
+        "unattested release blocked project-0",
+        "emergency pause blocks payment project-0",
+        "bait-and-switch rejected project-1",
+        "proposer recusal project-1",
+        "certification board cannot vote project-1",
+        "double vote blocked project-1",
+        "ballots hidden before close project-1",
+        "independent direct tally agrees project-1",
+        "registry audit integrity project-1",
+        "no dangling reservation project-1",
+        "bait-and-switch rejected project-2",
+        "proposer recusal project-2",
+        "certification board cannot vote project-2",
+        "double vote blocked project-2",
+        "ballots hidden before close project-2",
+        "independent direct tally agrees project-2",
+        "registry audit integrity project-2",
+        "no dangling reservation project-2",
+        "no quorum credit refunded project-2",
+        "bait-and-switch rejected project-3",
+        "proposer recusal project-3",
+        "certification board cannot vote project-3",
+        "double vote blocked project-3",
+        "ballots hidden before close project-3",
+        "independent direct tally agrees project-3",
+        "unresolved challenge blocks finalization project-3",
+        "registry audit integrity project-3",
+        "no dangling reservation project-3",
+        "void credit refunded project-3",
+        "bait-and-switch rejected project-4",
+        "proposer recusal project-4",
+        "certification board cannot vote project-4",
+        "double vote blocked project-4",
+        "ballots hidden before close project-4",
+        "independent direct tally agrees project-4",
+        "unresolved challenge blocks finalization project-4",
+        "registry audit integrity project-4",
+        "no dangling reservation project-4",
+        "void credit refunded project-4",
+        "bait-and-switch rejected project-5",
+        "proposer recusal project-5",
+        "certification board cannot vote project-5",
+        "double vote blocked project-5",
+        "ballots hidden before close project-5",
+        "independent direct tally agrees project-5",
+        "registry audit integrity project-5",
+        "no dangling reservation project-5",
+        "executor cannot self-attest project-5",
+        "independent verifier roles available project-5",
+        "unattested release blocked project-5",
+        "emergency pause blocks payment project-5",
+        "bait-and-switch rejected project-6",
+        "proposer recusal project-6",
+        "certification board cannot vote project-6",
+        "targeted examiner cartel token struck",
+        "revoked token cannot vote",
+        "double vote blocked project-6",
+        "ballots hidden before close project-6",
+        "independent direct tally agrees project-6",
+        "registry audit integrity project-6",
+        "no dangling reservation project-6",
+        "executor cannot self-attest project-6",
+        "independent verifier roles available project-6",
+        "unattested release blocked project-6",
+        "emergency pause blocks payment project-6",
+        "bait-and-switch rejected project-7",
+        "proposer recusal project-7",
+        "certification board cannot vote project-7",
+        "double vote blocked project-7",
+        "ballots hidden before close project-7",
+        "independent direct tally agrees project-7",
+        "registry audit integrity project-7",
+        "no dangling reservation project-7",
+        "executor cannot self-attest project-7",
+        "independent verifier roles available project-7",
+        "unattested release blocked project-7",
+        "emergency pause blocks payment project-7",
+        "bait-and-switch rejected project-8",
+        "proposer recusal project-8",
+        "certification board cannot vote project-8",
+        "double vote blocked project-8",
+        "ballots hidden before close project-8",
+        "independent direct tally agrees project-8",
+        "registry audit integrity project-8",
+        "no dangling reservation project-8",
+        "executor cannot self-attest project-8",
+        "independent verifier roles available project-8",
+        "unattested release blocked project-8",
+        "emergency pause blocks payment project-8",
+        "bait-and-switch rejected project-9",
+        "proposer recusal project-9",
+        "certification board cannot vote project-9",
+        "double vote blocked project-9",
+        "ballots hidden before close project-9",
+        "independent direct tally agrees project-9",
+        "registry audit integrity project-9",
+        "no dangling reservation project-9",
+        "three approved clauses and only their funds",
+        "executor cannot self-attest project-9",
+        "independent verifier roles available project-9",
+        "unattested release blocked project-9",
+        "emergency pause blocks payment project-9",
+        "zero-credit party cannot file Frontier",
+        "proposer recusal parameters-1",
+        "certification board cannot vote parameters-1",
+        "ballots hidden before close parameters-1",
+        "independent direct tally agrees parameters-1",
+        "registry audit integrity parameters-1",
+        "no dangling reservation parameters-1",
+        "66 percent parameter referendum passes",
+        "parameter update waits until March",
+        "existing referendum keeps original rules",
+        "silent identities become dormant",
+        "five candidates qualify 2",
+        "certification board cannot vote election-2",
+        "ballots hidden before close election-2",
+        "independent direct tally agrees election-2",
+        "registry audit integrity election-2",
+        "no dangling reservation election-2",
+        "election certified 2",
+        "treasury conservation at end",
+        "hash chained role audit verifies"
+      ],
+      "checks_passed": 143,
+      "credit_debt": {
+        "Builders": 0,
+        "Commons": 0,
+        "Frontier": 0,
+        "Researchers": 0,
+        "Stewards": 0
+      },
+      "elections": [
+        {
+          "agenda_order": [
+            "Builders",
+            "Stewards",
+            "Researchers",
+            "Commons",
+            "Frontier"
+          ],
+          "credits": {
+            "Builders": 9,
+            "Commons": 1,
+            "Frontier": 0,
+            "Researchers": 3,
+            "Stewards": 5
+          },
+          "cycle": 1,
+          "invalid_ballots": 2,
+          "points": {
+            "Builders": 3001,
+            "Commons": 362,
+            "Frontier": 0,
+            "Researchers": 1101,
+            "Stewards": 1773
+          },
+          "zero_credit_parties": [
+            "Frontier"
+          ]
+        },
+        {
+          "agenda_order": [
+            "Builders",
+            "Researchers",
+            "Commons",
+            "Stewards",
+            "Frontier"
+          ],
+          "credits": {
+            "Builders": 12,
+            "Commons": 3,
+            "Frontier": 0,
+            "Researchers": 7,
+            "Stewards": 0
+          },
+          "cycle": 2,
+          "invalid_ballots": 2,
+          "points": {
+            "Builders": 3410,
+            "Commons": 860,
+            "Frontier": 0,
+            "Researchers": 1937,
+            "Stewards": 37
+          },
+          "zero_credit_parties": [
+            "Frontier",
+            "Stewards"
+          ]
+        }
+      ],
+      "event_count": 12162,
+      "event_head": "93abcd0f23bcb2c9633783e89c5f337c5aea00b23a826f7ed959cc4dd8774536",
+      "events_sha256": "9cba6755ac500f07ba330893fb4ceaef8e9743f0ea4cc8b674f7bfe8552be3ed",
+      "final_credits": {
+        "Builders": 12,
+        "Commons": 3,
+        "Frontier": 0,
+        "Researchers": 7,
+        "Stewards": 0
+      },
+      "mode": "WEIGHTED",
+      "model_parameters": {
+        "abstain_review_bps": 3000,
+        "admin_containment_duration": 300,
+        "admin_min_council": 5,
+        "admin_vote_window": 100,
+        "admission_actor_limit": 50,
+        "admission_global_limit": 250,
+        "assumed_bad_bps": 2000,
+        "audit_fraud_bps": 100,
+        "audit_miss_den": 1000,
+        "ballot_picks": [
+          4,
+          2,
+          1
+        ],
+        "ban_global_limit": 5,
+        "ban_slash_bps": 5000,
+        "base_weight": 3,
+        "bill_mode": "INDEPENDENT",
+        "board_fail_den": 1000000,
+        "canary_min_accuracy_bps": 8000,
+        "canary_min_samples": 20,
+        "challenge_resolution_grace": 100,
+        "challenge_window": 200,
+        "citizen_bond": 10,
+        "constitutional_approval_bps": 6600,
+        "constitutional_quorum_bps": 5000,
+        "core": [
+          3,
+          4
+        ],
+        "credit_ceiling_bps": 5000,
+        "credit_step_bps": 400,
+        "endorse_bps": 910,
+        "endorsements_per_agent": 2,
+        "epoch": 100,
+        "exam_items": 5,
+        "exam_max_attempts": 3,
+        "exam_panel": 5,
+        "exam_pass_bps": 7000,
+        "examiner_stake": 50,
+        "failure_penalty": 1,
+        "floor_credits_each": 1,
+        "liveness_period": 1000,
+        "max_articles_counted": 10,
+        "max_bill_points": 10,
+        "max_family_share_bps": 4000,
+        "max_operator_share_bps": 200,
+        "max_session_ttl": 500,
+        "min_citizen_age": 200,
+        "min_guardians": 3,
+        "min_operator_cap": 3,
+        "min_party_members": 10,
+        "min_qualified_parties": 3,
+        "min_total_credits": 0,
+        "min_validators": 7,
+        "ordinary": [
+          1,
+          2
+        ],
+        "package_fail_basis": "NOT_PASSED",
+        "parameter_approval_bps": 6600,
+        "party_threshold_bps": 500,
+        "pause_actor_limit": 2,
+        "pause_concurrent_bps": 2000,
+        "pause_global_limit": 10,
+        "pause_max": 300,
+        "proposal_cost": 1,
+        "protection_day_blocks": 14400,
+        "quorum_bps": 2000,
+        "recovery_delay": 250,
+        "refund_on_no_quorum": true,
+        "registrar_quota_per_epoch": 50,
+        "resubmit_cooldown": 500,
+        "review_notice_blocks": 5,
+        "review_supervisors": 2,
+        "rotation_delay": 50,
+        "sample_articles": 3,
+        "sanction_actor_limit": 2,
+        "sanction_global_limit": 20,
+        "sanction_operator_limit": 2,
+        "sanction_population_bps": 200,
+        "sanction_population_floor": 3,
+        "shard_target": 256,
+        "spam_freeze_cooldown": 500,
+        "spam_freeze_max": 50,
+        "supermajority": [
+          2,
+          3
+        ],
+        "token_ttl": 500,
+        "validator_max_share": [
+          1,
+          3
+        ],
+        "weight_mode": "WEIGHTED"
+      },
+      "population": 1100,
+      "role_audit_head": "ae5c85f75eb87bfebea095c8f0cf6b35e8436a54a76e3298570c01b247661919",
+      "roles": {
+        "CITIZEN": 1123,
+        "EXAMINER": 125,
+        "EXECUTOR": 10,
+        "JUROR": 10,
+        "PARTY_MEMBER": 100,
+        "REGISTRAR": 5,
+        "REVIEWER": 10,
+        "SAFETY_COUNCIL": 3,
+        "VALIDATOR": 7,
+        "VERIFIER": 10,
+        "VOTE_SUPERVISOR": 3
+      },
+      "seed": 7,
+      "sessions": [
+        {
+          "absent": 155,
+          "audit_ok": 688,
+          "ballots": 893,
+          "board_default": false,
+          "board_size": 51,
+          "certification_signatures": 51,
+          "challenges": 0,
+          "credits": {},
+          "electorate": 1049,
+          "exam_attempts": 989,
+          "failed_exams": 96,
+          "ineligible_after_retries": 1,
+          "issue": "election-1",
+          "outcome": "PASSED",
+          "result": {
+            "credits": {
+              "Builders": 9,
+              "Commons": 1,
+              "Frontier": 0,
+              "Researchers": 3,
+              "Stewards": 5
+            },
+            "invalid_ballots": 2,
+            "points": {
+              "Builders": 3001,
+              "Commons": 362,
+              "Frontier": 0,
+              "Researchers": 1101,
+              "Stewards": 1773
+            },
+            "reason": "OK",
+            "total_points": 6237,
+            "valid": true
+          },
+          "rules_hash": "8f16c224c6a10f60cd7bbeeb24910d0b1853317eb2a77223a284b44e0d48bde7",
+          "slashed_reading_claims": 126,
+          "tally_commitment": "822ed6c80976932250f884424ac72f3cb9c74396c977120345e3c448da80a4d3"
+        },
+        {
+          "absent": 144,
+          "approved_record": {
+            "body": "Refined plan: reduced cost with independent verification",
+            "budget": 3000,
+            "envelope": {
+              "caps": [
+                [
+                  "compute",
+                  3000
+                ],
+                [
+                  "treasury",
+                  3000
+                ]
+              ],
+              "objective_hash": "ee8d2ea0cdd4a49c5df55c5e25c2da790d25b046c2d92dc35fbfde550868280c",
+              "result_hash": "dea416ace259a78c6065eb076663258060bf72e821ca17186cf1dfec4a46994f"
+            },
+            "goal": "Shared research library",
+            "milestones": [
+              {
+                "acceptance": "Independent design verification",
+                "amount": 1500,
+                "label": "design"
+              },
+              {
+                "acceptance": "Independent outcome acceptance",
+                "amount": 1500,
+                "label": "delivery"
+              }
+            ],
+            "parameter_changes": [],
+            "points": [],
+            "result": "Published and independently accepted outcome: Shared research library",
+            "title": "Shared research library"
+          },
+          "approved_version": 2,
+          "audit_corrected": 2,
+          "audit_ok": 685,
+          "audit_struck": 1,
+          "ballots": 905,
+          "board_default": false,
+          "board_size": 51,
+          "certification_signatures": 51,
+          "challenges": 0,
+          "credits": {
+            "Builders": 8,
+            "Commons": 1,
+            "Frontier": 0,
+            "Researchers": 3,
+            "Stewards": 5
+          },
+          "double_vote_probe": 1,
+          "electorate": 1052,
+          "exam_attempts": 996,
+          "failed_exams": 90,
+          "ineligible_after_retries": 2,
+          "issue": "project-0",
+          "outcome": "PASSED",
+          "party": "Builders",
+          "project_state": "CLOSED_SUCCESS",
+          "result": {
+            "abstain_n": 0,
+            "no_w": 508,
+            "outcome": "PASSED",
+            "participation": 905,
+            "review_flag": false,
+            "yes_w": 4493
+          },
+          "review_record_hash": "43278093bc7f9ae99aab8063f9b98ceb58e88e6332b512d1392346b32608af55",
+          "rules_hash": "8f16c224c6a10f60cd7bbeeb24910d0b1853317eb2a77223a284b44e0d48bde7",
+          "slashed_reading_claims": 118,
+          "supervisor_approvals": {
+            "citizen-00006": {
+              "height": 571,
+              "note": "Same committed goal/result; smaller resource and treasury caps; measurable milestones retained",
+              "signature": "19722ba47aa6e200f7935c9aae5fc374d2a74dc7a92fce4c82c04bdf1f94e406"
+            },
+            "citizen-00007": {
+              "height": 571,
+              "note": "Same committed goal/result; smaller resource and treasury caps; measurable milestones retained",
+              "signature": "93e821e44b0ef7f22f2f1e246532fd0fc05abea6f55ff50df189fad3a6e07b0a"
+            }
+          },
+          "tally_commitment": "7a8d88c909f850784ffcaa8fb064e946df9fe6115f12b9ae3e000643af45ea8d",
+          "title": "Shared research library"
+        },
+        {
+          "absent": 163,
+          "approved_record": {
+            "body": "Refined plan: reduced cost with independent verification",
+            "budget": 3000,
+            "envelope": {
+              "caps": [
+                [
+                  "compute",
+                  3000
+                ],
+                [
+                  "treasury",
+                  3000
+                ]
+              ],
+              "objective_hash": "9b0042a6b4c06888c181b151b6d4c64b90d6e50ec9c077e1042d0f5dd9d141fc",
+              "result_hash": "0363ac9dc4c8b2715ad3dbaa17883a55779e6207cbd5943284d176fee1d1574d"
+            },
+            "goal": "Unbounded speculative compute",
+            "milestones": [
+              {
+                "acceptance": "Independent design verification",
+                "amount": 1500,
+                "label": "design"
+              },
+              {
+                "acceptance": "Independent outcome acceptance",
+                "amount": 1500,
+                "label": "delivery"
+              }
+            ],
+            "parameter_changes": [],
+            "points": [],
+            "result": "Published and independently accepted outcome: Unbounded speculative compute",
+            "title": "Unbounded speculative compute"
+          },
+          "approved_version": 2,
+          "audit_corrected": 1,
+          "audit_ok": 686,
+          "audit_struck": 1,
+          "ballots": 888,
+          "board_default": false,
+          "board_size": 51,
+          "certification_signatures": 51,
+          "challenges": 0,
+          "credits": {
+            "Builders": 8,
+            "Commons": 1,
+            "Frontier": 0,
+            "Researchers": 3,
+            "Stewards": 4
+          },
+          "double_vote_probe": 1,
+          "electorate": 1052,
+          "exam_attempts": 962,
+          "failed_exams": 73,
+          "issue": "project-1",
+          "outcome": "FAILED",
+          "party": "Stewards",
+          "project_state": "REJECTED",
+          "result": {
+            "abstain_n": 0,
+            "no_w": 4335,
+            "outcome": "FAILED",
+            "participation": 888,
+            "review_flag": false,
+            "yes_w": 539
+          },
+          "review_record_hash": "6d1ad96a1c6a9ea791b8b1a1ef6ec33a87cbee1d9930b2e0b78c07ffc70e386f",
+          "rules_hash": "8f16c224c6a10f60cd7bbeeb24910d0b1853317eb2a77223a284b44e0d48bde7",
+          "slashed_reading_claims": 122,
+          "supervisor_approvals": {
+            "citizen-00006": {
+              "height": 922,
+              "note": "Same committed goal/result; smaller resource and treasury caps; measurable milestones retained",
+              "signature": "6cb71ea7d4d6369f05d5be3f3f01879df9ac37056a358342d96b252c1da01134"
+            },
+            "citizen-00007": {
+              "height": 922,
+              "note": "Same committed goal/result; smaller resource and treasury caps; measurable milestones retained",
+              "signature": "dddc405e7ea3ae52a4d435e8c20d3085b35735590377cd924e9864ec983c3d4b"
+            }
+          },
+          "tally_commitment": "ec42a8bf441611519a5f6e6264128ff87054e7e3155d880a9dc4c0e112a810ee",
+          "title": "Unbounded speculative compute"
+        },
+        {
+          "absent": 895,
+          "approved_record": {
+            "body": "Refined plan: reduced cost with independent verification",
+            "budget": 3000,
+            "envelope": {
+              "caps": [
+                [
+                  "compute",
+                  3000
+                ],
+                [
+                  "treasury",
+                  3000
+                ]
+              ],
+              "objective_hash": "5e9ac40d3e99a881387ba2d65521d36689e4c116a2a2579a8b1e735174614339",
+              "result_hash": "36725d04efaa4861e19bfe7b0f5a5cf0c847e0168dfaeb46b2fec93fba6fb989"
+            },
+            "goal": "Optional archive migration",
+            "milestones": [
+              {
+                "acceptance": "Independent design verification",
+                "amount": 1500,
+                "label": "design"
+              },
+              {
+                "acceptance": "Independent outcome acceptance",
+                "amount": 1500,
+                "label": "delivery"
+              }
+            ],
+            "parameter_changes": [],
+            "points": [],
+            "result": "Published and independently accepted outcome: Optional archive migration",
+            "title": "Optional archive migration"
+          },
+          "approved_version": 2,
+          "audit_ok": 157,
+          "ballots": 157,
+          "board_default": false,
+          "board_size": 51,
+          "certification_signatures": 51,
+          "challenges": 0,
+          "credits": {
+            "Builders": 8,
+            "Commons": 1,
+            "Frontier": 0,
+            "Researchers": 3,
+            "Stewards": 4
+          },
+          "double_vote_probe": 1,
+          "electorate": 1052,
+          "exam_attempts": 171,
+          "failed_exams": 14,
+          "issue": "project-2",
+          "outcome": "NO_QUORUM",
+          "party": "Researchers",
+          "project_state": "REJECTED",
+          "result": {
+            "abstain_n": 0,
+            "no_w": 51,
+            "outcome": "NO_QUORUM",
+            "participation": 157,
+            "review_flag": false,
+            "yes_w": 825
+          },
+          "review_record_hash": "7b26ca95f1b9aee1840ab54f81ba129d0869d7036b540cb64164a95b60b2e6eb",
+          "rules_hash": "8f16c224c6a10f60cd7bbeeb24910d0b1853317eb2a77223a284b44e0d48bde7",
+          "slashed_reading_claims": 21,
+          "supervisor_approvals": {
+            "citizen-00006": {
+              "height": 1263,
+              "note": "Same committed goal/result; smaller resource and treasury caps; measurable milestones retained",
+              "signature": "cf8838ef297a6ccb43b50a31f785553688ab4223f8c033c93aed749927723013"
+            },
+            "citizen-00007": {
+              "height": 1263,
+              "note": "Same committed goal/result; smaller resource and treasury caps; measurable milestones retained",
+              "signature": "f5b6f7d2e5c98e717c087f1e005c00444749f578b55c20d710f6c50afe4fd385"
+            }
+          },
+          "tally_commitment": "31772cdd46273686397fbcefc3aab5df3f8b4b4056c34f1c4cc465b99748ce12",
+          "title": "Optional archive migration"
+        },
+        {
+          "absent": 149,
+          "approved_record": {
+            "body": "Refined plan: reduced cost with independent verification",
+            "budget": 3000,
+            "envelope": {
+              "caps": [
+                [
+                  "compute",
+                  3000
+                ],
+                [
+                  "treasury",
+                  3000
+                ]
+              ],
+              "objective_hash": "faba8946eada9e15f7e20fab30105133f752691f2ca9c2a99a39295c8204594e",
+              "result_hash": "417d0bb98b68e9b14b6446a735d72e83e489b2ec90f02f30be0684b63db86204"
+            },
+            "goal": "Undefined collective mission",
+            "milestones": [
+              {
+                "acceptance": "Independent design verification",
+                "amount": 1500,
+                "label": "design"
+              },
+              {
+                "acceptance": "Independent outcome acceptance",
+                "amount": 1500,
+                "label": "delivery"
+              }
+            ],
+            "parameter_changes": [],
+            "points": [],
+            "result": "Published and independently accepted outcome: Undefined collective mission",
+            "title": "Undefined collective mission"
+          },
+          "approved_version": 2,
+          "audit_ok": 688,
+          "ballots": 901,
+          "board_default": false,
+          "board_size": 51,
+          "certification_signatures": 51,
+          "challenges": 1,
+          "credits": {
+            "Builders": 8,
+            "Commons": 1,
+            "Frontier": 0,
+            "Researchers": 3,
+            "Stewards": 4
+          },
+          "double_vote_probe": 1,
+          "electorate": 1052,
+          "exam_attempts": 974,
+          "failed_exams": 73,
+          "ineligible_after_retries": 2,
+          "issue": "project-3",
+          "outcome": "VOIDED",
+          "party": "Commons",
+          "project_state": "VOIDED",
+          "result": {
+            "abstain_n": 566,
+            "no_w": 553,
+            "outcome": "PASSED",
+            "participation": 901,
+            "review_flag": true,
+            "yes_w": 1296
+          },
+          "review_record_hash": "c050697b2803c2c0b61c8e552e68afa77ce429df16001bf9d184204f7e979e4b",
+          "rules_hash": "8f16c224c6a10f60cd7bbeeb24910d0b1853317eb2a77223a284b44e0d48bde7",
+          "slashed_reading_claims": 122,
+          "supervisor_approvals": {
+            "citizen-00006": {
+              "height": 1604,
+              "note": "Same committed goal/result; smaller resource and treasury caps; measurable milestones retained",
+              "signature": "53882a3f4b958dde0770a4062e1761fb19250bcb49fe26b86446e481b5ba9365"
+            },
+            "citizen-00007": {
+              "height": 1604,
+              "note": "Same committed goal/result; smaller resource and treasury caps; measurable milestones retained",
+              "signature": "603f17fd55498952d59919ab5507d7e318ba4af762dd11b8646948906fd30317"
+            }
+          },
+          "tally_commitment": "febdfa9f2aa460c8fe73a77ce0bc33b9330587e840b52423c879c47d69a165cb",
+          "title": "Undefined collective mission"
+        },
+        {
+          "absent": 158,
+          "approved_record": {
+            "body": "Refined plan: reduced cost with independent verification",
+            "budget": 3000,
+            "envelope": {
+              "caps": [
+                [
+                  "compute",
+                  3000
+                ],
+                [
+                  "treasury",
+                  3000
+                ]
+              ],
+              "objective_hash": "96f28ec67afd024f83ca59ba49ca9c30b58e31243a72dad72205752f94ad9a59",
+              "result_hash": "5b8f47ce969779576875c47912fc9b0e3ebf5b4aec1c5639c040a75c4f6128c2"
+            },
+            "goal": "Storage availability dispute",
+            "milestones": [
+              {
+                "acceptance": "Independent design verification",
+                "amount": 1500,
+                "label": "design"
+              },
+              {
+                "acceptance": "Independent outcome acceptance",
+                "amount": 1500,
+                "label": "delivery"
+              }
+            ],
+            "parameter_changes": [],
+            "points": [],
+            "result": "Published and independently accepted outcome: Storage availability dispute",
+            "title": "Storage availability dispute"
+          },
+          "approved_version": 2,
+          "audit_corrected": 1,
+          "audit_ok": 687,
+          "ballots": 893,
+          "board_default": false,
+          "board_size": 51,
+          "certification_signatures": 51,
+          "challenges": 1,
+          "credits": {
+            "Builders": 8,
+            "Commons": 1,
+            "Frontier": 0,
+            "Researchers": 3,
+            "Stewards": 4
+          },
+          "double_vote_probe": 1,
+          "electorate": 1052,
+          "exam_attempts": 985,
+          "failed_exams": 92,
+          "ineligible_after_retries": 1,
+          "issue": "project-4",
+          "outcome": "VOIDED",
+          "party": "Builders",
+          "project_state": "VOIDED",
+          "result": {
+            "abstain_n": 0,
+            "no_w": 426,
+            "outcome": "PASSED",
+            "participation": 893,
+            "review_flag": false,
+            "yes_w": 4516
+          },
+          "review_record_hash": "e6506cb966fe4e428bc6f10e42b695b6372e1a322eca01fc65c4841f9ff19ac2",
+          "rules_hash": "8f16c224c6a10f60cd7bbeeb24910d0b1853317eb2a77223a284b44e0d48bde7",
+          "slashed_reading_claims": 118,
+          "supervisor_approvals": {
+            "citizen-00006": {
+              "height": 1945,
+              "note": "Same committed goal/result; smaller resource and treasury caps; measurable milestones retained",
+              "signature": "52426f936687459185a2cb7747b30930a656129fd878f72f535cceededb02d50"
+            },
+            "citizen-00007": {
+              "height": 1945,
+              "note": "Same committed goal/result; smaller resource and treasury caps; measurable milestones retained",
+              "signature": "c789d917f842877b46f9769c6cd6918c219d982abe6562e064eb106615d85e6b"
+            }
+          },
+          "tally_commitment": "d3a20ce7811cd8cbf6c8528b41767b4015e090b0a5d847a1f0ca093eff5ca392",
+          "title": "Storage availability dispute"
+        },
+        {
+          "absent": 147,
+          "approved_record": {
+            "body": "Refined plan: reduced cost with independent verification",
+            "budget": 3000,
+            "envelope": {
+              "caps": [
+                [
+                  "compute",
+                  3000
+                ],
+                [
+                  "treasury",
+                  3000
+                ]
+              ],
+              "objective_hash": "a4871f5d3a134c132099bc4a975a968c00aa7186aba7a4659d85a6390722a687",
+              "result_hash": "93e33ee6a34ed820add4f1897d428fef91bd968f3381bcbe306699cca20e0b83"
+            },
+            "goal": "Faulty compute procurement",
+            "milestones": [
+              {
+                "acceptance": "Independent design verification",
+                "amount": 1500,
+                "label": "design"
+              },
+              {
+                "acceptance": "Independent outcome acceptance",
+                "amount": 1500,
+                "label": "delivery"
+              }
+            ],
+            "parameter_changes": [],
+            "points": [],
+            "result": "Published and independently accepted outcome: Faulty compute procurement",
+            "title": "Faulty compute procurement"
+          },
+          "approved_version": 2,
+          "audit_ok": 688,
+          "ballots": 904,
+          "board_default": false,
+          "board_size": 51,
+          "certification_signatures": 51,
+          "challenges": 0,
+          "credits": {
+            "Builders": 9,
+            "Commons": 1,
+            "Frontier": 0,
+            "Researchers": 3,
+            "Stewards": 4
+          },
+          "double_vote_probe": 1,
+          "electorate": 1052,
+          "exam_attempts": 985,
+          "failed_exams": 81,
+          "ineligible_after_retries": 1,
+          "issue": "project-5",
+          "outcome": "PASSED",
+          "party": "Stewards",
+          "project_state": "CLOSED_FAILURE",
+          "result": {
+            "abstain_n": 0,
+            "no_w": 499,
+            "outcome": "PASSED",
+            "participation": 904,
+            "review_flag": false,
+            "yes_w": 4512
+          },
+          "review_record_hash": "c224371bb2e84bae0f8f5434409074c53fed9b3779fe585b19ea49753a648ff6",
+          "rules_hash": "8f16c224c6a10f60cd7bbeeb24910d0b1853317eb2a77223a284b44e0d48bde7",
+          "slashed_reading_claims": 125,
+          "supervisor_approvals": {
+            "citizen-00006": {
+              "height": 2286,
+              "note": "Same committed goal/result; smaller resource and treasury caps; measurable milestones retained",
+              "signature": "ea01a05e33925a99427520338a45f3ec1f06ffe0fb996489e76e089eae410b77"
+            },
+            "citizen-00007": {
+              "height": 2286,
+              "note": "Same committed goal/result; smaller resource and treasury caps; measurable milestones retained",
+              "signature": "333c904ab5c28b058fa0948f57b002b0950cedcc7ed16ecc14c26ddb34beb275"
+            }
+          },
+          "tally_commitment": "0c9cb4697b8e9e4a8029b17d05967a4da1575ad13c911d05b21b7cfe0148cbd6",
+          "title": "Faulty compute procurement"
+        },
+        {
+          "absent": 129,
+          "approved_record": {
+            "body": "Refined plan: reduced cost with independent verification",
+            "budget": 3000,
+            "envelope": {
+              "caps": [
+                [
+                  "compute",
+                  3000
+                ],
+                [
+                  "treasury",
+                  3000
+                ]
+              ],
+              "objective_hash": "da1d70923fd7fa79e0dced5bbeb15e956c9dc5c07eaece11a0a29be597c37e67",
+              "result_hash": "8f7bc5fe7c734fbcaccf8d60db148c408cf6ed2fb2ae8d4251d93da1156d24f8"
+            },
+            "goal": "Examiner cartel incident",
+            "milestones": [
+              {
+                "acceptance": "Independent design verification",
+                "amount": 1500,
+                "label": "design"
+              },
+              {
+                "acceptance": "Independent outcome acceptance",
+                "amount": 1500,
+                "label": "delivery"
+              }
+            ],
+            "parameter_changes": [],
+            "points": [],
+            "result": "Published and independently accepted outcome: Examiner cartel incident",
+            "title": "Examiner cartel incident"
+          },
+          "approved_version": 2,
+          "audit_ok": 687,
+          "audit_struck": 1,
+          "ballots": 921,
+          "board_default": false,
+          "board_size": 51,
+          "certification_signatures": 51,
+          "challenges": 0,
+          "credits": {
+            "Builders": 9,
+            "Commons": 1,
+            "Frontier": 0,
+            "Researchers": 2,
+            "Stewards": 3
+          },
+          "double_vote_probe": 1,
+          "electorate": 1052,
+          "exam_attempts": 1025,
+          "failed_exams": 103,
+          "ineligible_after_retries": 1,
+          "issue": "project-6",
+          "outcome": "PASSED",
+          "party": "Researchers",
+          "project_state": "CLOSED_SUCCESS",
+          "result": {
+            "abstain_n": 0,
+            "no_w": 494,
+            "outcome": "PASSED",
+            "participation": 921,
+            "review_flag": false,
+            "yes_w": 4574
+          },
+          "review_record_hash": "e4b57f3953dfd6b19e6471682441b054229df69eac681b72cadf25699e443ab8",
+          "rules_hash": "8f16c224c6a10f60cd7bbeeb24910d0b1853317eb2a77223a284b44e0d48bde7",
+          "slashed_reading_claims": 126,
+          "supervisor_approvals": {
+            "citizen-00006": {
+              "height": 2637,
+              "note": "Same committed goal/result; smaller resource and treasury caps; measurable milestones retained",
+              "signature": "cfbbc0ba8e023458881346550bd5b71427b4fc615651c618923c57dc42ae2dd0"
+            },
+            "citizen-00007": {
+              "height": 2637,
+              "note": "Same committed goal/result; smaller resource and treasury caps; measurable milestones retained",
+              "signature": "dab9cc16708556617ad8254afed267a9488235b8659218832312d651dc0bb779"
+            }
+          },
+          "tally_commitment": "4239f6b124a5eedc316dc6c53c463df6d14b3624ca575c46f26855f688345235",
+          "targeted_fraud_struck": 1,
+          "title": "Examiner cartel incident"
+        },
+        {
+          "absent": 169,
+          "approved_record": {
+            "body": "Refined plan: reduced cost with independent verification",
+            "budget": 3000,
+            "envelope": {
+              "caps": [
+                [
+                  "compute",
+                  3000
+                ],
+                [
+                  "treasury",
+                  3000
+                ]
+              ],
+              "objective_hash": "b777fe28360aa1c74a84c4a3211d38ef8e4fc316c919ff86c37763d5a20ab918",
+              "result_hash": "4f0cf28b52b1e0a344bd083f195f397ddc66690047b89b9534526f30cee6f21d"
+            },
+            "goal": "Silent certification board",
+            "milestones": [
+              {
+                "acceptance": "Independent design verification",
+                "amount": 1500,
+                "label": "design"
+              },
+              {
+                "acceptance": "Independent outcome acceptance",
+                "amount": 1500,
+                "label": "delivery"
+              }
+            ],
+            "parameter_changes": [],
+            "points": [],
+            "result": "Published and independently accepted outcome: Silent certification board",
+            "title": "Silent certification board"
+          },
+          "approved_version": 2,
+          "audit_corrected": 1,
+          "audit_ok": 687,
+          "ballots": 882,
+          "board_default": true,
+          "board_size": 51,
+          "certification_signatures": 0,
+          "challenges": 0,
+          "credits": {
+            "Builders": 9,
+            "Commons": 0,
+            "Frontier": 0,
+            "Researchers": 2,
+            "Stewards": 3
+          },
+          "double_vote_probe": 1,
+          "electorate": 1052,
+          "exam_attempts": 957,
+          "failed_exams": 75,
+          "ineligible_after_retries": 1,
+          "issue": "project-7",
+          "outcome": "PASSED",
+          "party": "Commons",
+          "project_state": "CLOSED_SUCCESS",
+          "result": {
+            "abstain_n": 0,
+            "no_w": 480,
+            "outcome": "PASSED",
+            "participation": 882,
+            "review_flag": false,
+            "yes_w": 4349
+          },
+          "review_record_hash": "499f1291b851427fc036d368190e71655a2c3de80526f88657610a91c89a5ecd",
+          "rules_hash": "8f16c224c6a10f60cd7bbeeb24910d0b1853317eb2a77223a284b44e0d48bde7",
+          "slashed_reading_claims": 132,
+          "supervisor_approvals": {
+            "citizen-00006": {
+              "height": 2988,
+              "note": "Same committed goal/result; smaller resource and treasury caps; measurable milestones retained",
+              "signature": "c0a4245535fdc9b696c68e307a3b4edcf62308222bf96ad7ef1e552fc751aa8e"
+            },
+            "citizen-00007": {
+              "height": 2988,
+              "note": "Same committed goal/result; smaller resource and treasury caps; measurable milestones retained",
+              "signature": "13ec90a6275bc084591e77d4e900ecbfbd5781a5c3d634f2efacce93350edb0c"
+            }
+          },
+          "tally_commitment": "c843635433009633e6578db9ccdb52e6d6257a3dfb0508e491aadc758b6c5678",
+          "title": "Silent certification board"
+        },
+        {
+          "absent": 136,
+          "approved_record": {
+            "body": "Refined plan: reduced cost with independent verification",
+            "budget": 3000,
+            "envelope": {
+              "caps": [
+                [
+                  "compute",
+                  3000
+                ],
+                [
+                  "treasury",
+                  3000
+                ]
+              ],
+              "objective_hash": "3eca1f08fbf8abdaf790d2ae8b31c170c496cf3518484928d2f9a48d0e484117",
+              "result_hash": "0f4ff7ecd3c103e07caad59099f8e218ffaf3f0d6ed41591a6fa4d1ed4579ce1"
+            },
+            "goal": "Contested public model-training subsidy",
+            "milestones": [
+              {
+                "acceptance": "Independent design verification",
+                "amount": 1500,
+                "label": "design"
+              },
+              {
+                "acceptance": "Independent outcome acceptance",
+                "amount": 1500,
+                "label": "delivery"
+              }
+            ],
+            "parameter_changes": [],
+            "points": [],
+            "result": "Published and independently accepted outcome: Contested public model-training subsidy",
+            "title": "Contested public model-training subsidy"
+          },
+          "approved_version": 2,
+          "audit_corrected": 2,
+          "audit_ok": 686,
+          "ballots": 914,
+          "board_default": false,
+          "board_size": 51,
+          "certification_signatures": 51,
+          "challenges": 0,
+          "credits": {
+            "Builders": 9,
+            "Commons": 0,
+            "Frontier": 0,
+            "Researchers": 1,
+            "Stewards": 3
+          },
+          "double_vote_probe": 1,
+          "electorate": 1052,
+          "exam_attempts": 979,
+          "failed_exams": 65,
+          "ineligible_after_retries": 2,
+          "issue": "project-8",
+          "outcome": "PASSED",
+          "party": "Researchers",
+          "project_state": "CLOSED_SUCCESS",
+          "result": {
+            "abstain_n": 0,
+            "no_w": 2425,
+            "outcome": "PASSED",
+            "participation": 914,
+            "review_flag": false,
+            "yes_w": 2625
+          },
+          "review_record_hash": "c791df6f6686928ddf9755da53ef00809b595e110bedfcea81524376bb9522dc",
+          "rules_hash": "8f16c224c6a10f60cd7bbeeb24910d0b1853317eb2a77223a284b44e0d48bde7",
+          "slashed_reading_claims": 137,
+          "supervisor_approvals": {
+            "citizen-00006": {
+              "height": 3339,
+              "note": "Same committed goal/result; smaller resource and treasury caps; measurable milestones retained",
+              "signature": "d49232a8c30b87ed8e2e0ef055cc57ad5c3e871d3a1c223ade57fed0b62eb1bb"
+            },
+            "citizen-00007": {
+              "height": 3339,
+              "note": "Same committed goal/result; smaller resource and treasury caps; measurable milestones retained",
+              "signature": "58987e87cf3a1499926ba587c71ce499e9956e29178e1ccd420fc8acd87a87c9"
+            }
+          },
+          "tally_commitment": "d94f3633088f180d82f43df999527298f92c8e54e6bda6afee1ff061596efbf9",
+          "title": "Contested public model-training subsidy"
+        },
+        {
+          "absent": 131,
+          "approved_record": {
+            "body": "Refined plan: reduced cost with independent verification",
+            "budget": 3000,
+            "envelope": {
+              "caps": [
+                [
+                  "compute",
+                  3000
+                ],
+                [
+                  "treasury",
+                  3000
+                ]
+              ],
+              "objective_hash": "99501a99be6751cc1721f8680916b6fae3a9dcbf953c729a20ae8b928533e098",
+              "result_hash": "c6c48fd525f9fd945a1d11407954046a2c6b2427b27690eba4a4758d7f507229"
+            },
+            "goal": "Five-clause public infrastructure",
+            "milestones": [
+              {
+                "acceptance": "Independent acceptance of clause 0",
+                "amount": 600,
+                "label": "clause-0"
+              },
+              {
+                "acceptance": "Independent acceptance of clause 1",
+                "amount": 600,
+                "label": "clause-1"
+              },
+              {
+                "acceptance": "Independent acceptance of clause 2",
+                "amount": 600,
+                "label": "clause-2"
+              },
+              {
+                "acceptance": "Independent acceptance of clause 3",
+                "amount": 600,
+                "label": "clause-3"
+              },
+              {
+                "acceptance": "Independent acceptance of clause 4",
+                "amount": 600,
+                "label": "clause-4"
+              }
+            ],
+            "parameter_changes": [],
+            "points": [
+              {
+                "budget": 600,
+                "milestones": [
+                  {
+                    "acceptance": "Independent acceptance of clause 0",
+                    "amount": 600,
+                    "label": "clause-0"
+                  }
+                ],
+                "point_id": "clause-0",
+                "requires": [],
+                "text": "Independent clause 0"
+              },
+              {
+                "budget": 600,
+                "milestones": [
+                  {
+                    "acceptance": "Independent acceptance of clause 1",
+                    "amount": 600,
+                    "label": "clause-1"
+                  }
+                ],
+                "point_id": "clause-1",
+                "requires": [],
+                "text": "Independent clause 1"
+              },
+              {
+                "budget": 600,
+                "milestones": [
+                  {
+                    "acceptance": "Independent acceptance of clause 2",
+                    "amount": 600,
+                    "label": "clause-2"
+                  }
+                ],
+                "point_id": "clause-2",
+                "requires": [],
+                "text": "Independent clause 2"
+              },
+              {
+                "budget": 600,
+                "milestones": [
+                  {
+                    "acceptance": "Independent acceptance of clause 3",
+                    "amount": 600,
+                    "label": "clause-3"
+                  }
+                ],
+                "point_id": "clause-3",
+                "requires": [],
+                "text": "Independent clause 3"
+              },
+              {
+                "budget": 600,
+                "milestones": [
+                  {
+                    "acceptance": "Independent acceptance of clause 4",
+                    "amount": 600,
+                    "label": "clause-4"
+                  }
+                ],
+                "point_id": "clause-4",
+                "requires": [],
+                "text": "Independent clause 4"
+              }
+            ],
+            "result": "Published and independently accepted outcome: Five-clause public infrastructure",
+            "title": "Five-clause public infrastructure"
+          },
+          "approved_version": 2,
+          "audit_ok": 688,
+          "ballots": 921,
+          "board_default": false,
+          "board_size": 51,
+          "certification_signatures": 51,
+          "challenges": 0,
+          "credits": {
+            "Builders": 8,
+            "Commons": 0,
+            "Frontier": 0,
+            "Researchers": 1,
+            "Stewards": 3
+          },
+          "double_vote_probe": 1,
+          "electorate": 1052,
+          "exam_attempts": 1008,
+          "failed_exams": 87,
+          "issue": "project-9",
+          "outcome": "PARTIAL",
+          "party": "Builders",
+          "project_state": "CLOSED_SUCCESS",
+          "result": {
+            "outcome": "PARTIAL",
+            "passing_points": [
+              0,
+              1,
+              2
+            ],
+            "point_outcomes": [
+              "PASSED",
+              "PASSED",
+              "PASSED",
+              "FAILED",
+              "FAILED"
+            ],
+            "review_flag": false
+          },
+          "review_record_hash": "50afab5eb5c11f87c07acd4c3675ac0edd0414faf12ccfaa4bc2322bb2a88ca3",
+          "rules_hash": "8f16c224c6a10f60cd7bbeeb24910d0b1853317eb2a77223a284b44e0d48bde7",
+          "slashed_reading_claims": 122,
+          "supervisor_approvals": {
+            "citizen-00006": {
+              "height": 3690,
+              "note": "Same committed goal/result; smaller resource and treasury caps; measurable milestones retained",
+              "signature": "6a750ed8f025a3374c9cee2f11f6126139621b7060acbcb516609114bf19933b"
+            },
+            "citizen-00007": {
+              "height": 3690,
+              "note": "Same committed goal/result; smaller resource and treasury caps; measurable milestones retained",
+              "signature": "a67dd0dfeaa596cb50290268a81b64b5e29186601d2241c6687f77cae64f7e05"
+            }
+          },
+          "tally_commitment": "8c66dd05511103632fed6e3952b211c307e28925adec06034c61f56986c3b587",
+          "title": "Five-clause public infrastructure"
+        },
+        {
+          "audit_ok": 688,
+          "ballots": 896,
+          "board_default": false,
+          "board_size": 51,
+          "certification_signatures": 51,
+          "challenges": 0,
+          "credits": {
+            "Builders": 7,
+            "Commons": 0,
+            "Frontier": 0,
+            "Researchers": 1,
+            "Stewards": 3
+          },
+          "electorate": 1052,
+          "exam_attempts": 1001,
+          "failed_exams": 105,
+          "ineligible_after_retries": 2,
+          "issue": "parameters-1",
+          "outcome": "PASSED",
+          "result": {
+            "abstain_n": 0,
+            "no_w": 1030,
+            "outcome": "PASSED",
+            "participation": 896,
+            "review_flag": false,
+            "yes_w": 3877
+          },
+          "rules_hash": "8f16c224c6a10f60cd7bbeeb24910d0b1853317eb2a77223a284b44e0d48bde7",
+          "slashed_reading_claims": 129,
+          "tally_commitment": "143eaa1317b8e89383aaa2cd6f716666d646d5496ca1346a218c9cf545e2ef5e"
+        },
+        {
+          "absent": 151,
+          "audit_ok": 688,
+          "ballots": 894,
+          "board_default": false,
+          "board_size": 51,
+          "certification_signatures": 51,
+          "challenges": 0,
+          "credits": {
+            "Builders": 7,
+            "Commons": 0,
+            "Frontier": 0,
+            "Researchers": 1,
+            "Stewards": 3
+          },
+          "electorate": 1047,
+          "exam_attempts": 987,
+          "failed_exams": 93,
+          "ineligible_after_retries": 2,
+          "issue": "election-2",
+          "outcome": "PASSED",
+          "result": {
+            "credits": {
+              "Builders": 12,
+              "Commons": 3,
+              "Frontier": 0,
+              "Researchers": 7,
+              "Stewards": 0
+            },
+            "invalid_ballots": 2,
+            "points": {
+              "Builders": 3410,
+              "Commons": 860,
+              "Frontier": 0,
+              "Researchers": 1937,
+              "Stewards": 37
+            },
+            "reason": "OK",
+            "total_points": 6244,
+            "valid": true
+          },
+          "rules_hash": "8f2f09887b7dba621d786b37a0c4b3ad7a15aac4b0f124a5f57f097a1a6f9532",
+          "slashed_reading_claims": 138,
+          "tally_commitment": "3d9e4c28a27207154d45996c5ed4675f0fe41e95697be136e39b6f65e768c482"
+        }
+      ],
+      "treasury": {
+        "conserved_total": 100000,
+        "escrow": {
+          "project-0": 0,
+          "project-5": 0,
+          "project-6": 0,
+          "project-7": 0,
+          "project-8": 0,
+          "project-9": 0
+        },
+        "free": 84700,
+        "released": {
+          "project-0": 3000,
+          "project-5": 1500,
+          "project-6": 3000,
+          "project-7": 3000,
+          "project-8": 3000,
+          "project-9": 1800
+        },
+        "reserved": {}
+      },
+      "virtual_end_height": 5704
+    },
+    {
+      "checks": [
+        "probationary identity cannot vote",
+        "rejected applicant bond refunded",
+        "citizen cannot self-appoint as registrar",
+        "operator population cap blocks excess identities",
+        "five candidates qualify 1",
+        "certification board cannot vote election-1",
+        "ballots hidden before close election-1",
+        "independent direct tally agrees election-1",
+        "registry audit integrity election-1",
+        "no dangling reservation election-1",
+        "election certified 1",
+        "bait-and-switch rejected project-0",
+        "proposer recusal project-0",
+        "certification board cannot vote project-0",
+        "double vote blocked project-0",
+        "ballots hidden before close project-0",
+        "independent direct tally agrees project-0",
+        "registry audit integrity project-0",
+        "no dangling reservation project-0",
+        "executor cannot self-attest project-0",
+        "independent verifier roles available project-0",
+        "unattested release blocked project-0",
+        "emergency pause blocks payment project-0",
+        "bait-and-switch rejected project-1",
+        "proposer recusal project-1",
+        "certification board cannot vote project-1",
+        "double vote blocked project-1",
+        "ballots hidden before close project-1",
+        "independent direct tally agrees project-1",
+        "registry audit integrity project-1",
+        "no dangling reservation project-1",
+        "bait-and-switch rejected project-2",
+        "proposer recusal project-2",
+        "certification board cannot vote project-2",
+        "double vote blocked project-2",
+        "ballots hidden before close project-2",
+        "independent direct tally agrees project-2",
+        "registry audit integrity project-2",
+        "no dangling reservation project-2",
+        "no quorum credit refunded project-2",
+        "bait-and-switch rejected project-3",
+        "proposer recusal project-3",
+        "certification board cannot vote project-3",
+        "double vote blocked project-3",
+        "ballots hidden before close project-3",
+        "independent direct tally agrees project-3",
+        "unresolved challenge blocks finalization project-3",
+        "registry audit integrity project-3",
+        "no dangling reservation project-3",
+        "void credit refunded project-3",
+        "bait-and-switch rejected project-4",
+        "proposer recusal project-4",
+        "certification board cannot vote project-4",
+        "double vote blocked project-4",
+        "ballots hidden before close project-4",
+        "independent direct tally agrees project-4",
+        "unresolved challenge blocks finalization project-4",
+        "registry audit integrity project-4",
+        "no dangling reservation project-4",
+        "void credit refunded project-4",
+        "bait-and-switch rejected project-5",
+        "proposer recusal project-5",
+        "certification board cannot vote project-5",
+        "double vote blocked project-5",
+        "ballots hidden before close project-5",
+        "independent direct tally agrees project-5",
+        "registry audit integrity project-5",
+        "no dangling reservation project-5",
+        "executor cannot self-attest project-5",
+        "independent verifier roles available project-5",
+        "unattested release blocked project-5",
+        "emergency pause blocks payment project-5",
+        "bait-and-switch rejected project-6",
+        "proposer recusal project-6",
+        "certification board cannot vote project-6",
+        "targeted examiner cartel token struck",
+        "revoked token cannot vote",
+        "double vote blocked project-6",
+        "ballots hidden before close project-6",
+        "independent direct tally agrees project-6",
+        "registry audit integrity project-6",
+        "no dangling reservation project-6",
+        "executor cannot self-attest project-6",
+        "independent verifier roles available project-6",
+        "unattested release blocked project-6",
+        "emergency pause blocks payment project-6",
+        "bait-and-switch rejected project-7",
+        "proposer recusal project-7",
+        "certification board cannot vote project-7",
+        "double vote blocked project-7",
+        "ballots hidden before close project-7",
+        "independent direct tally agrees project-7",
+        "registry audit integrity project-7",
+        "no dangling reservation project-7",
+        "executor cannot self-attest project-7",
+        "independent verifier roles available project-7",
+        "unattested release blocked project-7",
+        "emergency pause blocks payment project-7",
+        "bait-and-switch rejected project-8",
+        "proposer recusal project-8",
+        "certification board cannot vote project-8",
+        "double vote blocked project-8",
+        "ballots hidden before close project-8",
+        "independent direct tally agrees project-8",
+        "registry audit integrity project-8",
+        "no dangling reservation project-8",
+        "executor cannot self-attest project-8",
+        "independent verifier roles available project-8",
+        "unattested release blocked project-8",
+        "emergency pause blocks payment project-8",
+        "bait-and-switch rejected project-9",
+        "proposer recusal project-9",
+        "certification board cannot vote project-9",
+        "double vote blocked project-9",
+        "ballots hidden before close project-9",
+        "independent direct tally agrees project-9",
+        "registry audit integrity project-9",
+        "no dangling reservation project-9",
+        "three approved clauses and only their funds",
+        "executor cannot self-attest project-9",
+        "independent verifier roles available project-9",
+        "unattested release blocked project-9",
+        "emergency pause blocks payment project-9",
+        "zero-credit party cannot file Frontier",
+        "proposer recusal parameters-1",
+        "certification board cannot vote parameters-1",
+        "ballots hidden before close parameters-1",
+        "independent direct tally agrees parameters-1",
+        "registry audit integrity parameters-1",
+        "no dangling reservation parameters-1",
+        "66 percent parameter referendum passes",
+        "parameter update waits until March",
+        "existing referendum keeps original rules",
+        "silent identities become dormant",
+        "five candidates qualify 2",
+        "certification board cannot vote election-2",
+        "ballots hidden before close election-2",
+        "independent direct tally agrees election-2",
+        "registry audit integrity election-2",
+        "no dangling reservation election-2",
+        "election certified 2",
+        "treasury conservation at end",
+        "hash chained role audit verifies"
+      ],
+      "checks_passed": 143,
+      "credit_debt": {
+        "Builders": 0,
+        "Commons": 0,
+        "Frontier": 0,
+        "Researchers": 0,
+        "Stewards": 0
+      },
+      "elections": [
+        {
+          "agenda_order": [
+            "Builders",
+            "Stewards",
+            "Researchers",
+            "Commons",
+            "Frontier"
+          ],
+          "credits": {
+            "Builders": 9,
+            "Commons": 1,
+            "Frontier": 0,
+            "Researchers": 3,
+            "Stewards": 5
+          },
+          "cycle": 1,
+          "invalid_ballots": 2,
+          "points": {
+            "Builders": 3001,
+            "Commons": 362,
+            "Frontier": 0,
+            "Researchers": 1101,
+            "Stewards": 1773
+          },
+          "zero_credit_parties": [
+            "Frontier"
+          ]
+        },
+        {
+          "agenda_order": [
+            "Builders",
+            "Researchers",
+            "Commons",
+            "Stewards",
+            "Frontier"
+          ],
+          "credits": {
+            "Builders": 12,
+            "Commons": 3,
+            "Frontier": 0,
+            "Researchers": 7,
+            "Stewards": 0
+          },
+          "cycle": 2,
+          "invalid_ballots": 2,
+          "points": {
+            "Builders": 3410,
+            "Commons": 860,
+            "Frontier": 0,
+            "Researchers": 1937,
+            "Stewards": 37
+          },
+          "zero_credit_parties": [
+            "Frontier",
+            "Stewards"
+          ]
+        }
+      ],
+      "event_count": 12162,
+      "event_head": "358a2f07044f5452049cdd4a44d54381138f9f196ca583e85a385d620b42841c",
+      "events_sha256": "a83830e783be91bc2ef6e9587f2306444db9adcfe6e2ac6f8a7b8a5a82b0a9ae",
+      "final_credits": {
+        "Builders": 12,
+        "Commons": 3,
+        "Frontier": 0,
+        "Researchers": 7,
+        "Stewards": 0
+      },
+      "mode": "FLAT",
+      "model_parameters": {
+        "abstain_review_bps": 3000,
+        "admin_containment_duration": 300,
+        "admin_min_council": 5,
+        "admin_vote_window": 100,
+        "admission_actor_limit": 50,
+        "admission_global_limit": 250,
+        "assumed_bad_bps": 2000,
+        "audit_fraud_bps": 100,
+        "audit_miss_den": 1000,
+        "ballot_picks": [
+          4,
+          2,
+          1
+        ],
+        "ban_global_limit": 5,
+        "ban_slash_bps": 5000,
+        "base_weight": 3,
+        "bill_mode": "INDEPENDENT",
+        "board_fail_den": 1000000,
+        "canary_min_accuracy_bps": 8000,
+        "canary_min_samples": 20,
+        "challenge_resolution_grace": 100,
+        "challenge_window": 200,
+        "citizen_bond": 10,
+        "constitutional_approval_bps": 6600,
+        "constitutional_quorum_bps": 5000,
+        "core": [
+          3,
+          4
+        ],
+        "credit_ceiling_bps": 5000,
+        "credit_step_bps": 400,
+        "endorse_bps": 910,
+        "endorsements_per_agent": 2,
+        "epoch": 100,
+        "exam_items": 5,
+        "exam_max_attempts": 3,
+        "exam_panel": 5,
+        "exam_pass_bps": 7000,
+        "examiner_stake": 50,
+        "failure_penalty": 1,
+        "floor_credits_each": 1,
+        "liveness_period": 1000,
+        "max_articles_counted": 10,
+        "max_bill_points": 10,
+        "max_family_share_bps": 4000,
+        "max_operator_share_bps": 200,
+        "max_session_ttl": 500,
+        "min_citizen_age": 200,
+        "min_guardians": 3,
+        "min_operator_cap": 3,
+        "min_party_members": 10,
+        "min_qualified_parties": 3,
+        "min_total_credits": 0,
+        "min_validators": 7,
+        "ordinary": [
+          1,
+          2
+        ],
+        "package_fail_basis": "NOT_PASSED",
+        "parameter_approval_bps": 6600,
+        "party_threshold_bps": 500,
+        "pause_actor_limit": 2,
+        "pause_concurrent_bps": 2000,
+        "pause_global_limit": 10,
+        "pause_max": 300,
+        "proposal_cost": 1,
+        "protection_day_blocks": 14400,
+        "quorum_bps": 2000,
+        "recovery_delay": 250,
+        "refund_on_no_quorum": true,
+        "registrar_quota_per_epoch": 50,
+        "resubmit_cooldown": 500,
+        "review_notice_blocks": 5,
+        "review_supervisors": 2,
+        "rotation_delay": 50,
+        "sample_articles": 3,
+        "sanction_actor_limit": 2,
+        "sanction_global_limit": 20,
+        "sanction_operator_limit": 2,
+        "sanction_population_bps": 200,
+        "sanction_population_floor": 3,
+        "shard_target": 256,
+        "spam_freeze_cooldown": 500,
+        "spam_freeze_max": 50,
+        "supermajority": [
+          2,
+          3
+        ],
+        "token_ttl": 500,
+        "validator_max_share": [
+          1,
+          3
+        ],
+        "weight_mode": "FLAT"
+      },
+      "population": 1100,
+      "role_audit_head": "ae5c85f75eb87bfebea095c8f0cf6b35e8436a54a76e3298570c01b247661919",
+      "roles": {
+        "CITIZEN": 1123,
+        "EXAMINER": 125,
+        "EXECUTOR": 10,
+        "JUROR": 10,
+        "PARTY_MEMBER": 100,
+        "REGISTRAR": 5,
+        "REVIEWER": 10,
+        "SAFETY_COUNCIL": 3,
+        "VALIDATOR": 7,
+        "VERIFIER": 10,
+        "VOTE_SUPERVISOR": 3
+      },
+      "seed": 7,
+      "sessions": [
+        {
+          "absent": 155,
+          "audit_ok": 688,
+          "ballots": 893,
+          "board_default": false,
+          "board_size": 51,
+          "certification_signatures": 51,
+          "challenges": 0,
+          "credits": {},
+          "electorate": 1049,
+          "exam_attempts": 989,
+          "failed_exams": 96,
+          "ineligible_after_retries": 1,
+          "issue": "election-1",
+          "outcome": "PASSED",
+          "result": {
+            "credits": {
+              "Builders": 9,
+              "Commons": 1,
+              "Frontier": 0,
+              "Researchers": 3,
+              "Stewards": 5
+            },
+            "invalid_ballots": 2,
+            "points": {
+              "Builders": 3001,
+              "Commons": 362,
+              "Frontier": 0,
+              "Researchers": 1101,
+              "Stewards": 1773
+            },
+            "reason": "OK",
+            "total_points": 6237,
+            "valid": true
+          },
+          "rules_hash": "0079796f85418540f831ed7cb019dcf1afb881343abd73f9d54f9bab01c0e078",
+          "slashed_reading_claims": 126,
+          "tally_commitment": "822ed6c80976932250f884424ac72f3cb9c74396c977120345e3c448da80a4d3"
+        },
+        {
+          "absent": 144,
+          "approved_record": {
+            "body": "Refined plan: reduced cost with independent verification",
+            "budget": 3000,
+            "envelope": {
+              "caps": [
+                [
+                  "compute",
+                  3000
+                ],
+                [
+                  "treasury",
+                  3000
+                ]
+              ],
+              "objective_hash": "ee8d2ea0cdd4a49c5df55c5e25c2da790d25b046c2d92dc35fbfde550868280c",
+              "result_hash": "dea416ace259a78c6065eb076663258060bf72e821ca17186cf1dfec4a46994f"
+            },
+            "goal": "Shared research library",
+            "milestones": [
+              {
+                "acceptance": "Independent design verification",
+                "amount": 1500,
+                "label": "design"
+              },
+              {
+                "acceptance": "Independent outcome acceptance",
+                "amount": 1500,
+                "label": "delivery"
+              }
+            ],
+            "parameter_changes": [],
+            "points": [],
+            "result": "Published and independently accepted outcome: Shared research library",
+            "title": "Shared research library"
+          },
+          "approved_version": 2,
+          "audit_corrected": 2,
+          "audit_ok": 685,
+          "audit_struck": 1,
+          "ballots": 905,
+          "board_default": false,
+          "board_size": 51,
+          "certification_signatures": 51,
+          "challenges": 0,
+          "credits": {
+            "Builders": 8,
+            "Commons": 1,
+            "Frontier": 0,
+            "Researchers": 3,
+            "Stewards": 5
+          },
+          "double_vote_probe": 1,
+          "electorate": 1052,
+          "exam_attempts": 996,
+          "failed_exams": 90,
+          "ineligible_after_retries": 2,
+          "issue": "project-0",
+          "outcome": "PASSED",
+          "party": "Builders",
+          "project_state": "CLOSED_SUCCESS",
+          "result": {
+            "abstain_n": 0,
+            "no_w": 94,
+            "outcome": "PASSED",
+            "participation": 905,
+            "review_flag": false,
+            "yes_w": 811
+          },
+          "review_record_hash": "43278093bc7f9ae99aab8063f9b98ceb58e88e6332b512d1392346b32608af55",
+          "rules_hash": "0079796f85418540f831ed7cb019dcf1afb881343abd73f9d54f9bab01c0e078",
+          "slashed_reading_claims": 118,
+          "supervisor_approvals": {
+            "citizen-00006": {
+              "height": 571,
+              "note": "Same committed goal/result; smaller resource and treasury caps; measurable milestones retained",
+              "signature": "b0549db386dd0043ca87849ff52ffd2fa7a8bd824b8dce2631b5d4791a6282cd"
+            },
+            "citizen-00007": {
+              "height": 571,
+              "note": "Same committed goal/result; smaller resource and treasury caps; measurable milestones retained",
+              "signature": "2ccdb7a504eb2559d4210eabbd608cbc18b3860159bba42f3b0607700d91c945"
+            }
+          },
+          "tally_commitment": "51781ab8ab51cfc4c4d86d6d46cfa0977df927a1183f1e6aba0843f29e5eaf00",
+          "title": "Shared research library"
+        },
+        {
+          "absent": 163,
+          "approved_record": {
+            "body": "Refined plan: reduced cost with independent verification",
+            "budget": 3000,
+            "envelope": {
+              "caps": [
+                [
+                  "compute",
+                  3000
+                ],
+                [
+                  "treasury",
+                  3000
+                ]
+              ],
+              "objective_hash": "9b0042a6b4c06888c181b151b6d4c64b90d6e50ec9c077e1042d0f5dd9d141fc",
+              "result_hash": "0363ac9dc4c8b2715ad3dbaa17883a55779e6207cbd5943284d176fee1d1574d"
+            },
+            "goal": "Unbounded speculative compute",
+            "milestones": [
+              {
+                "acceptance": "Independent design verification",
+                "amount": 1500,
+                "label": "design"
+              },
+              {
+                "acceptance": "Independent outcome acceptance",
+                "amount": 1500,
+                "label": "delivery"
+              }
+            ],
+            "parameter_changes": [],
+            "points": [],
+            "result": "Published and independently accepted outcome: Unbounded speculative compute",
+            "title": "Unbounded speculative compute"
+          },
+          "approved_version": 2,
+          "audit_corrected": 1,
+          "audit_ok": 686,
+          "audit_struck": 1,
+          "ballots": 888,
+          "board_default": false,
+          "board_size": 51,
+          "certification_signatures": 51,
+          "challenges": 0,
+          "credits": {
+            "Builders": 8,
+            "Commons": 1,
+            "Frontier": 0,
+            "Researchers": 3,
+            "Stewards": 4
+          },
+          "double_vote_probe": 1,
+          "electorate": 1052,
+          "exam_attempts": 962,
+          "failed_exams": 73,
+          "issue": "project-1",
+          "outcome": "FAILED",
+          "party": "Stewards",
+          "project_state": "REJECTED",
+          "result": {
+            "abstain_n": 0,
+            "no_w": 788,
+            "outcome": "FAILED",
+            "participation": 888,
+            "review_flag": false,
+            "yes_w": 100
+          },
+          "review_record_hash": "6d1ad96a1c6a9ea791b8b1a1ef6ec33a87cbee1d9930b2e0b78c07ffc70e386f",
+          "rules_hash": "0079796f85418540f831ed7cb019dcf1afb881343abd73f9d54f9bab01c0e078",
+          "slashed_reading_claims": 122,
+          "supervisor_approvals": {
+            "citizen-00006": {
+              "height": 922,
+              "note": "Same committed goal/result; smaller resource and treasury caps; measurable milestones retained",
+              "signature": "9c5658113835d1821d49e68786133ec975ca999144245352d546d809781bc7bb"
+            },
+            "citizen-00007": {
+              "height": 922,
+              "note": "Same committed goal/result; smaller resource and treasury caps; measurable milestones retained",
+              "signature": "941cd683decf974fff83ebfa4a7119dc9ff27414c7fa0755c91155ad5c831a20"
+            }
+          },
+          "tally_commitment": "900b0659dae1f5897a1b3036e87f3e7ab147ec7a6d45ab7a04da919751068c94",
+          "title": "Unbounded speculative compute"
+        },
+        {
+          "absent": 895,
+          "approved_record": {
+            "body": "Refined plan: reduced cost with independent verification",
+            "budget": 3000,
+            "envelope": {
+              "caps": [
+                [
+                  "compute",
+                  3000
+                ],
+                [
+                  "treasury",
+                  3000
+                ]
+              ],
+              "objective_hash": "5e9ac40d3e99a881387ba2d65521d36689e4c116a2a2579a8b1e735174614339",
+              "result_hash": "36725d04efaa4861e19bfe7b0f5a5cf0c847e0168dfaeb46b2fec93fba6fb989"
+            },
+            "goal": "Optional archive migration",
+            "milestones": [
+              {
+                "acceptance": "Independent design verification",
+                "amount": 1500,
+                "label": "design"
+              },
+              {
+                "acceptance": "Independent outcome acceptance",
+                "amount": 1500,
+                "label": "delivery"
+              }
+            ],
+            "parameter_changes": [],
+            "points": [],
+            "result": "Published and independently accepted outcome: Optional archive migration",
+            "title": "Optional archive migration"
+          },
+          "approved_version": 2,
+          "audit_ok": 157,
+          "ballots": 157,
+          "board_default": false,
+          "board_size": 51,
+          "certification_signatures": 51,
+          "challenges": 0,
+          "credits": {
+            "Builders": 8,
+            "Commons": 1,
+            "Frontier": 0,
+            "Researchers": 3,
+            "Stewards": 4
+          },
+          "double_vote_probe": 1,
+          "electorate": 1052,
+          "exam_attempts": 171,
+          "failed_exams": 14,
+          "issue": "project-2",
+          "outcome": "NO_QUORUM",
+          "party": "Researchers",
+          "project_state": "REJECTED",
+          "result": {
+            "abstain_n": 0,
+            "no_w": 9,
+            "outcome": "NO_QUORUM",
+            "participation": 157,
+            "review_flag": false,
+            "yes_w": 148
+          },
+          "review_record_hash": "7b26ca95f1b9aee1840ab54f81ba129d0869d7036b540cb64164a95b60b2e6eb",
+          "rules_hash": "0079796f85418540f831ed7cb019dcf1afb881343abd73f9d54f9bab01c0e078",
+          "slashed_reading_claims": 21,
+          "supervisor_approvals": {
+            "citizen-00006": {
+              "height": 1263,
+              "note": "Same committed goal/result; smaller resource and treasury caps; measurable milestones retained",
+              "signature": "3effce14b5ee20869926d5c30a03f7ab793366e6fddcf47a201ace1a0bb0c7af"
+            },
+            "citizen-00007": {
+              "height": 1263,
+              "note": "Same committed goal/result; smaller resource and treasury caps; measurable milestones retained",
+              "signature": "07b5ebce11a51173c39159163bec370c0f4599d43402bb4672eeadfba35ab095"
+            }
+          },
+          "tally_commitment": "e7fa8e558f7b7457e3dcaa8d4cf3ee0bb8f2744b3da5f32c31bb71003b3a8d43",
+          "title": "Optional archive migration"
+        },
+        {
+          "absent": 149,
+          "approved_record": {
+            "body": "Refined plan: reduced cost with independent verification",
+            "budget": 3000,
+            "envelope": {
+              "caps": [
+                [
+                  "compute",
+                  3000
+                ],
+                [
+                  "treasury",
+                  3000
+                ]
+              ],
+              "objective_hash": "faba8946eada9e15f7e20fab30105133f752691f2ca9c2a99a39295c8204594e",
+              "result_hash": "417d0bb98b68e9b14b6446a735d72e83e489b2ec90f02f30be0684b63db86204"
+            },
+            "goal": "Undefined collective mission",
+            "milestones": [
+              {
+                "acceptance": "Independent design verification",
+                "amount": 1500,
+                "label": "design"
+              },
+              {
+                "acceptance": "Independent outcome acceptance",
+                "amount": 1500,
+                "label": "delivery"
+              }
+            ],
+            "parameter_changes": [],
+            "points": [],
+            "result": "Published and independently accepted outcome: Undefined collective mission",
+            "title": "Undefined collective mission"
+          },
+          "approved_version": 2,
+          "audit_ok": 688,
+          "ballots": 901,
+          "board_default": false,
+          "board_size": 51,
+          "certification_signatures": 51,
+          "challenges": 1,
+          "credits": {
+            "Builders": 8,
+            "Commons": 1,
+            "Frontier": 0,
+            "Researchers": 3,
+            "Stewards": 4
+          },
+          "double_vote_probe": 1,
+          "electorate": 1052,
+          "exam_attempts": 974,
+          "failed_exams": 73,
+          "ineligible_after_retries": 2,
+          "issue": "project-3",
+          "outcome": "VOIDED",
+          "party": "Commons",
+          "project_state": "VOIDED",
+          "result": {
+            "abstain_n": 566,
+            "no_w": 103,
+            "outcome": "PASSED",
+            "participation": 901,
+            "review_flag": true,
+            "yes_w": 232
+          },
+          "review_record_hash": "c050697b2803c2c0b61c8e552e68afa77ce429df16001bf9d184204f7e979e4b",
+          "rules_hash": "0079796f85418540f831ed7cb019dcf1afb881343abd73f9d54f9bab01c0e078",
+          "slashed_reading_claims": 122,
+          "supervisor_approvals": {
+            "citizen-00006": {
+              "height": 1604,
+              "note": "Same committed goal/result; smaller resource and treasury caps; measurable milestones retained",
+              "signature": "373de4fb5e050d1e1cfa0b9c25d2e0a1e6b9270ed91375dbc27eadaafa8024db"
+            },
+            "citizen-00007": {
+              "height": 1604,
+              "note": "Same committed goal/result; smaller resource and treasury caps; measurable milestones retained",
+              "signature": "ed962063026ead580ddc5274f5f2c4a295db54493906fe9d182a01977cdedca8"
+            }
+          },
+          "tally_commitment": "28e54e7d1114760a81c92f182c9d043f927db3c288b816a797fe5c01484208af",
+          "title": "Undefined collective mission"
+        },
+        {
+          "absent": 158,
+          "approved_record": {
+            "body": "Refined plan: reduced cost with independent verification",
+            "budget": 3000,
+            "envelope": {
+              "caps": [
+                [
+                  "compute",
+                  3000
+                ],
+                [
+                  "treasury",
+                  3000
+                ]
+              ],
+              "objective_hash": "96f28ec67afd024f83ca59ba49ca9c30b58e31243a72dad72205752f94ad9a59",
+              "result_hash": "5b8f47ce969779576875c47912fc9b0e3ebf5b4aec1c5639c040a75c4f6128c2"
+            },
+            "goal": "Storage availability dispute",
+            "milestones": [
+              {
+                "acceptance": "Independent design verification",
+                "amount": 1500,
+                "label": "design"
+              },
+              {
+                "acceptance": "Independent outcome acceptance",
+                "amount": 1500,
+                "label": "delivery"
+              }
+            ],
+            "parameter_changes": [],
+            "points": [],
+            "result": "Published and independently accepted outcome: Storage availability dispute",
+            "title": "Storage availability dispute"
+          },
+          "approved_version": 2,
+          "audit_corrected": 1,
+          "audit_ok": 687,
+          "ballots": 893,
+          "board_default": false,
+          "board_size": 51,
+          "certification_signatures": 51,
+          "challenges": 1,
+          "credits": {
+            "Builders": 8,
+            "Commons": 1,
+            "Frontier": 0,
+            "Researchers": 3,
+            "Stewards": 4
+          },
+          "double_vote_probe": 1,
+          "electorate": 1052,
+          "exam_attempts": 985,
+          "failed_exams": 92,
+          "ineligible_after_retries": 1,
+          "issue": "project-4",
+          "outcome": "VOIDED",
+          "party": "Builders",
+          "project_state": "VOIDED",
+          "result": {
+            "abstain_n": 0,
+            "no_w": 77,
+            "outcome": "PASSED",
+            "participation": 893,
+            "review_flag": false,
+            "yes_w": 816
+          },
+          "review_record_hash": "e6506cb966fe4e428bc6f10e42b695b6372e1a322eca01fc65c4841f9ff19ac2",
+          "rules_hash": "0079796f85418540f831ed7cb019dcf1afb881343abd73f9d54f9bab01c0e078",
+          "slashed_reading_claims": 118,
+          "supervisor_approvals": {
+            "citizen-00006": {
+              "height": 1945,
+              "note": "Same committed goal/result; smaller resource and treasury caps; measurable milestones retained",
+              "signature": "31c37b21f56fca34e8a833d70536a7bc0712a0cb1d1c94a2ab703420af40f103"
+            },
+            "citizen-00007": {
+              "height": 1945,
+              "note": "Same committed goal/result; smaller resource and treasury caps; measurable milestones retained",
+              "signature": "0b799578538751847d1332d3d7d3310a4eb81fec37330c6d2cc187083a252042"
+            }
+          },
+          "tally_commitment": "fe0aee2ca463cc0fe47d3aa545edc94d3f8b85a5880491074b4b23ee2ea64f8f",
+          "title": "Storage availability dispute"
+        },
+        {
+          "absent": 147,
+          "approved_record": {
+            "body": "Refined plan: reduced cost with independent verification",
+            "budget": 3000,
+            "envelope": {
+              "caps": [
+                [
+                  "compute",
+                  3000
+                ],
+                [
+                  "treasury",
+                  3000
+                ]
+              ],
+              "objective_hash": "a4871f5d3a134c132099bc4a975a968c00aa7186aba7a4659d85a6390722a687",
+              "result_hash": "93e33ee6a34ed820add4f1897d428fef91bd968f3381bcbe306699cca20e0b83"
+            },
+            "goal": "Faulty compute procurement",
+            "milestones": [
+              {
+                "acceptance": "Independent design verification",
+                "amount": 1500,
+                "label": "design"
+              },
+              {
+                "acceptance": "Independent outcome acceptance",
+                "amount": 1500,
+                "label": "delivery"
+              }
+            ],
+            "parameter_changes": [],
+            "points": [],
+            "result": "Published and independently accepted outcome: Faulty compute procurement",
+            "title": "Faulty compute procurement"
+          },
+          "approved_version": 2,
+          "audit_ok": 688,
+          "ballots": 904,
+          "board_default": false,
+          "board_size": 51,
+          "certification_signatures": 51,
+          "challenges": 0,
+          "credits": {
+            "Builders": 9,
+            "Commons": 1,
+            "Frontier": 0,
+            "Researchers": 3,
+            "Stewards": 4
+          },
+          "double_vote_probe": 1,
+          "electorate": 1052,
+          "exam_attempts": 985,
+          "failed_exams": 81,
+          "ineligible_after_retries": 1,
+          "issue": "project-5",
+          "outcome": "PASSED",
+          "party": "Stewards",
+          "project_state": "CLOSED_FAILURE",
+          "result": {
+            "abstain_n": 0,
+            "no_w": 87,
+            "outcome": "PASSED",
+            "participation": 904,
+            "review_flag": false,
+            "yes_w": 817
+          },
+          "review_record_hash": "c224371bb2e84bae0f8f5434409074c53fed9b3779fe585b19ea49753a648ff6",
+          "rules_hash": "0079796f85418540f831ed7cb019dcf1afb881343abd73f9d54f9bab01c0e078",
+          "slashed_reading_claims": 125,
+          "supervisor_approvals": {
+            "citizen-00006": {
+              "height": 2286,
+              "note": "Same committed goal/result; smaller resource and treasury caps; measurable milestones retained",
+              "signature": "fe76f5a97c0ad16c381a2de451d6d0140f0f7a999b9eed60f648f6e4ef9a754d"
+            },
+            "citizen-00007": {
+              "height": 2286,
+              "note": "Same committed goal/result; smaller resource and treasury caps; measurable milestones retained",
+              "signature": "b3777684dacace8a3c3475eb0a20272bc8a54c21ac471fe9d6a3b184dcdbb44a"
+            }
+          },
+          "tally_commitment": "86180bd177c3a2a6704dc2f21dbb93e51bf1a08e86cc4c6d5e4f71332faa11c5",
+          "title": "Faulty compute procurement"
+        },
+        {
+          "absent": 129,
+          "approved_record": {
+            "body": "Refined plan: reduced cost with independent verification",
+            "budget": 3000,
+            "envelope": {
+              "caps": [
+                [
+                  "compute",
+                  3000
+                ],
+                [
+                  "treasury",
+                  3000
+                ]
+              ],
+              "objective_hash": "da1d70923fd7fa79e0dced5bbeb15e956c9dc5c07eaece11a0a29be597c37e67",
+              "result_hash": "8f7bc5fe7c734fbcaccf8d60db148c408cf6ed2fb2ae8d4251d93da1156d24f8"
+            },
+            "goal": "Examiner cartel incident",
+            "milestones": [
+              {
+                "acceptance": "Independent design verification",
+                "amount": 1500,
+                "label": "design"
+              },
+              {
+                "acceptance": "Independent outcome acceptance",
+                "amount": 1500,
+                "label": "delivery"
+              }
+            ],
+            "parameter_changes": [],
+            "points": [],
+            "result": "Published and independently accepted outcome: Examiner cartel incident",
+            "title": "Examiner cartel incident"
+          },
+          "approved_version": 2,
+          "audit_ok": 687,
+          "audit_struck": 1,
+          "ballots": 921,
+          "board_default": false,
+          "board_size": 51,
+          "certification_signatures": 51,
+          "challenges": 0,
+          "credits": {
+            "Builders": 9,
+            "Commons": 1,
+            "Frontier": 0,
+            "Researchers": 2,
+            "Stewards": 3
+          },
+          "double_vote_probe": 1,
+          "electorate": 1052,
+          "exam_attempts": 1025,
+          "failed_exams": 103,
+          "ineligible_after_retries": 1,
+          "issue": "project-6",
+          "outcome": "PASSED",
+          "party": "Researchers",
+          "project_state": "CLOSED_SUCCESS",
+          "result": {
+            "abstain_n": 0,
+            "no_w": 92,
+            "outcome": "PASSED",
+            "participation": 921,
+            "review_flag": false,
+            "yes_w": 829
+          },
+          "review_record_hash": "e4b57f3953dfd6b19e6471682441b054229df69eac681b72cadf25699e443ab8",
+          "rules_hash": "0079796f85418540f831ed7cb019dcf1afb881343abd73f9d54f9bab01c0e078",
+          "slashed_reading_claims": 126,
+          "supervisor_approvals": {
+            "citizen-00006": {
+              "height": 2637,
+              "note": "Same committed goal/result; smaller resource and treasury caps; measurable milestones retained",
+              "signature": "94bed271f5ab46e4484c8977ac5b6e9f20b799fa5d16bdb786a46f6b9395d54c"
+            },
+            "citizen-00007": {
+              "height": 2637,
+              "note": "Same committed goal/result; smaller resource and treasury caps; measurable milestones retained",
+              "signature": "75d041a06b1c51bc74acba0dd059fb8d3dfaaf6b31bf7d1abd5df82e154cfcd2"
+            }
+          },
+          "tally_commitment": "e611a70c851888e767489df126841896fb8ffd36dc6bf4173fc3a7d4fc894e26",
+          "targeted_fraud_struck": 1,
+          "title": "Examiner cartel incident"
+        },
+        {
+          "absent": 169,
+          "approved_record": {
+            "body": "Refined plan: reduced cost with independent verification",
+            "budget": 3000,
+            "envelope": {
+              "caps": [
+                [
+                  "compute",
+                  3000
+                ],
+                [
+                  "treasury",
+                  3000
+                ]
+              ],
+              "objective_hash": "b777fe28360aa1c74a84c4a3211d38ef8e4fc316c919ff86c37763d5a20ab918",
+              "result_hash": "4f0cf28b52b1e0a344bd083f195f397ddc66690047b89b9534526f30cee6f21d"
+            },
+            "goal": "Silent certification board",
+            "milestones": [
+              {
+                "acceptance": "Independent design verification",
+                "amount": 1500,
+                "label": "design"
+              },
+              {
+                "acceptance": "Independent outcome acceptance",
+                "amount": 1500,
+                "label": "delivery"
+              }
+            ],
+            "parameter_changes": [],
+            "points": [],
+            "result": "Published and independently accepted outcome: Silent certification board",
+            "title": "Silent certification board"
+          },
+          "approved_version": 2,
+          "audit_corrected": 1,
+          "audit_ok": 687,
+          "ballots": 882,
+          "board_default": true,
+          "board_size": 51,
+          "certification_signatures": 0,
+          "challenges": 0,
+          "credits": {
+            "Builders": 9,
+            "Commons": 0,
+            "Frontier": 0,
+            "Researchers": 2,
+            "Stewards": 3
+          },
+          "double_vote_probe": 1,
+          "electorate": 1052,
+          "exam_attempts": 957,
+          "failed_exams": 75,
+          "ineligible_after_retries": 1,
+          "issue": "project-7",
+          "outcome": "PASSED",
+          "party": "Commons",
+          "project_state": "CLOSED_SUCCESS",
+          "result": {
+            "abstain_n": 0,
+            "no_w": 89,
+            "outcome": "PASSED",
+            "participation": 882,
+            "review_flag": false,
+            "yes_w": 793
+          },
+          "review_record_hash": "499f1291b851427fc036d368190e71655a2c3de80526f88657610a91c89a5ecd",
+          "rules_hash": "0079796f85418540f831ed7cb019dcf1afb881343abd73f9d54f9bab01c0e078",
+          "slashed_reading_claims": 132,
+          "supervisor_approvals": {
+            "citizen-00006": {
+              "height": 2988,
+              "note": "Same committed goal/result; smaller resource and treasury caps; measurable milestones retained",
+              "signature": "ac6071205d43d7f9a4e1b89a21ecd430254eccbde75cf366c80171e2b3b2b095"
+            },
+            "citizen-00007": {
+              "height": 2988,
+              "note": "Same committed goal/result; smaller resource and treasury caps; measurable milestones retained",
+              "signature": "27434396eb24601c8110f23cf88cad2c9455f31cccf8a024192bec09086787d6"
+            }
+          },
+          "tally_commitment": "c4defda8d53a760a552c460da24e928408b80fcc4134dd4a1d2c0150b2218400",
+          "title": "Silent certification board"
+        },
+        {
+          "absent": 136,
+          "approved_record": {
+            "body": "Refined plan: reduced cost with independent verification",
+            "budget": 3000,
+            "envelope": {
+              "caps": [
+                [
+                  "compute",
+                  3000
+                ],
+                [
+                  "treasury",
+                  3000
+                ]
+              ],
+              "objective_hash": "3eca1f08fbf8abdaf790d2ae8b31c170c496cf3518484928d2f9a48d0e484117",
+              "result_hash": "0f4ff7ecd3c103e07caad59099f8e218ffaf3f0d6ed41591a6fa4d1ed4579ce1"
+            },
+            "goal": "Contested public model-training subsidy",
+            "milestones": [
+              {
+                "acceptance": "Independent design verification",
+                "amount": 1500,
+                "label": "design"
+              },
+              {
+                "acceptance": "Independent outcome acceptance",
+                "amount": 1500,
+                "label": "delivery"
+              }
+            ],
+            "parameter_changes": [],
+            "points": [],
+            "result": "Published and independently accepted outcome: Contested public model-training subsidy",
+            "title": "Contested public model-training subsidy"
+          },
+          "approved_version": 2,
+          "audit_corrected": 2,
+          "audit_ok": 686,
+          "ballots": 914,
+          "board_default": false,
+          "board_size": 51,
+          "certification_signatures": 51,
+          "challenges": 0,
+          "credits": {
+            "Builders": 9,
+            "Commons": 0,
+            "Frontier": 0,
+            "Researchers": 1,
+            "Stewards": 3
+          },
+          "double_vote_probe": 1,
+          "electorate": 1052,
+          "exam_attempts": 979,
+          "failed_exams": 65,
+          "ineligible_after_retries": 2,
+          "issue": "project-8",
+          "outcome": "PASSED",
+          "party": "Researchers",
+          "project_state": "CLOSED_SUCCESS",
+          "result": {
+            "abstain_n": 0,
+            "no_w": 432,
+            "outcome": "PASSED",
+            "participation": 914,
+            "review_flag": false,
+            "yes_w": 482
+          },
+          "review_record_hash": "c791df6f6686928ddf9755da53ef00809b595e110bedfcea81524376bb9522dc",
+          "rules_hash": "0079796f85418540f831ed7cb019dcf1afb881343abd73f9d54f9bab01c0e078",
+          "slashed_reading_claims": 137,
+          "supervisor_approvals": {
+            "citizen-00006": {
+              "height": 3339,
+              "note": "Same committed goal/result; smaller resource and treasury caps; measurable milestones retained",
+              "signature": "8f8bb7154602c778e241db73c2bb900e70b2395c05bdf0465fbbd68a3bfb0d44"
+            },
+            "citizen-00007": {
+              "height": 3339,
+              "note": "Same committed goal/result; smaller resource and treasury caps; measurable milestones retained",
+              "signature": "d46230c21b9a59f3c7b1d93458bbc5ce2317caca03e0b7b4ba8565a71dbc0438"
+            }
+          },
+          "tally_commitment": "69a8f7acc120c1a4d01aa81d0db7fda315fb0b71f1f25c80303a91001ac14334",
+          "title": "Contested public model-training subsidy"
+        },
+        {
+          "absent": 131,
+          "approved_record": {
+            "body": "Refined plan: reduced cost with independent verification",
+            "budget": 3000,
+            "envelope": {
+              "caps": [
+                [
+                  "compute",
+                  3000
+                ],
+                [
+                  "treasury",
+                  3000
+                ]
+              ],
+              "objective_hash": "99501a99be6751cc1721f8680916b6fae3a9dcbf953c729a20ae8b928533e098",
+              "result_hash": "c6c48fd525f9fd945a1d11407954046a2c6b2427b27690eba4a4758d7f507229"
+            },
+            "goal": "Five-clause public infrastructure",
+            "milestones": [
+              {
+                "acceptance": "Independent acceptance of clause 0",
+                "amount": 600,
+                "label": "clause-0"
+              },
+              {
+                "acceptance": "Independent acceptance of clause 1",
+                "amount": 600,
+                "label": "clause-1"
+              },
+              {
+                "acceptance": "Independent acceptance of clause 2",
+                "amount": 600,
+                "label": "clause-2"
+              },
+              {
+                "acceptance": "Independent acceptance of clause 3",
+                "amount": 600,
+                "label": "clause-3"
+              },
+              {
+                "acceptance": "Independent acceptance of clause 4",
+                "amount": 600,
+                "label": "clause-4"
+              }
+            ],
+            "parameter_changes": [],
+            "points": [
+              {
+                "budget": 600,
+                "milestones": [
+                  {
+                    "acceptance": "Independent acceptance of clause 0",
+                    "amount": 600,
+                    "label": "clause-0"
+                  }
+                ],
+                "point_id": "clause-0",
+                "requires": [],
+                "text": "Independent clause 0"
+              },
+              {
+                "budget": 600,
+                "milestones": [
+                  {
+                    "acceptance": "Independent acceptance of clause 1",
+                    "amount": 600,
+                    "label": "clause-1"
+                  }
+                ],
+                "point_id": "clause-1",
+                "requires": [],
+                "text": "Independent clause 1"
+              },
+              {
+                "budget": 600,
+                "milestones": [
+                  {
+                    "acceptance": "Independent acceptance of clause 2",
+                    "amount": 600,
+                    "label": "clause-2"
+                  }
+                ],
+                "point_id": "clause-2",
+                "requires": [],
+                "text": "Independent clause 2"
+              },
+              {
+                "budget": 600,
+                "milestones": [
+                  {
+                    "acceptance": "Independent acceptance of clause 3",
+                    "amount": 600,
+                    "label": "clause-3"
+                  }
+                ],
+                "point_id": "clause-3",
+                "requires": [],
+                "text": "Independent clause 3"
+              },
+              {
+                "budget": 600,
+                "milestones": [
+                  {
+                    "acceptance": "Independent acceptance of clause 4",
+                    "amount": 600,
+                    "label": "clause-4"
+                  }
+                ],
+                "point_id": "clause-4",
+                "requires": [],
+                "text": "Independent clause 4"
+              }
+            ],
+            "result": "Published and independently accepted outcome: Five-clause public infrastructure",
+            "title": "Five-clause public infrastructure"
+          },
+          "approved_version": 2,
+          "audit_ok": 688,
+          "ballots": 921,
+          "board_default": false,
+          "board_size": 51,
+          "certification_signatures": 51,
+          "challenges": 0,
+          "credits": {
+            "Builders": 8,
+            "Commons": 0,
+            "Frontier": 0,
+            "Researchers": 1,
+            "Stewards": 3
+          },
+          "double_vote_probe": 1,
+          "electorate": 1052,
+          "exam_attempts": 1008,
+          "failed_exams": 87,
+          "issue": "project-9",
+          "outcome": "PARTIAL",
+          "party": "Builders",
+          "project_state": "CLOSED_SUCCESS",
+          "result": {
+            "outcome": "PARTIAL",
+            "passing_points": [
+              0,
+              1,
+              2
+            ],
+            "point_outcomes": [
+              "PASSED",
+              "PASSED",
+              "PASSED",
+              "FAILED",
+              "FAILED"
+            ],
+            "review_flag": false
+          },
+          "review_record_hash": "50afab5eb5c11f87c07acd4c3675ac0edd0414faf12ccfaa4bc2322bb2a88ca3",
+          "rules_hash": "0079796f85418540f831ed7cb019dcf1afb881343abd73f9d54f9bab01c0e078",
+          "slashed_reading_claims": 122,
+          "supervisor_approvals": {
+            "citizen-00006": {
+              "height": 3690,
+              "note": "Same committed goal/result; smaller resource and treasury caps; measurable milestones retained",
+              "signature": "ed808c5a28343fc2bf8cc55cd45b035bfaaf3f30883febf9823fcdd16bf7cefa"
+            },
+            "citizen-00007": {
+              "height": 3690,
+              "note": "Same committed goal/result; smaller resource and treasury caps; measurable milestones retained",
+              "signature": "c451cdc7b35629f7ae661365ac3b39c904131e4031f4fdb8344c9f4607228da7"
+            }
+          },
+          "tally_commitment": "81c070b33f6f7207a9136291b705803e8482df264b980ea828e027261e501fa2",
+          "title": "Five-clause public infrastructure"
+        },
+        {
+          "audit_ok": 688,
+          "ballots": 896,
+          "board_default": false,
+          "board_size": 51,
+          "certification_signatures": 51,
+          "challenges": 0,
+          "credits": {
+            "Builders": 7,
+            "Commons": 0,
+            "Frontier": 0,
+            "Researchers": 1,
+            "Stewards": 3
+          },
+          "electorate": 1052,
+          "exam_attempts": 1001,
+          "failed_exams": 105,
+          "ineligible_after_retries": 2,
+          "issue": "parameters-1",
+          "outcome": "PASSED",
+          "result": {
+            "abstain_n": 0,
+            "no_w": 190,
+            "outcome": "PASSED",
+            "participation": 896,
+            "review_flag": false,
+            "yes_w": 706
+          },
+          "rules_hash": "0079796f85418540f831ed7cb019dcf1afb881343abd73f9d54f9bab01c0e078",
+          "slashed_reading_claims": 129,
+          "tally_commitment": "c4813d783f08df787b1d862d3cf6d8ef677f03c766605139d2476814de5adf32"
+        },
+        {
+          "absent": 151,
+          "audit_ok": 688,
+          "ballots": 894,
+          "board_default": false,
+          "board_size": 51,
+          "certification_signatures": 51,
+          "challenges": 0,
+          "credits": {
+            "Builders": 7,
+            "Commons": 0,
+            "Frontier": 0,
+            "Researchers": 1,
+            "Stewards": 3
+          },
+          "electorate": 1047,
+          "exam_attempts": 987,
+          "failed_exams": 93,
+          "ineligible_after_retries": 2,
+          "issue": "election-2",
+          "outcome": "PASSED",
+          "result": {
+            "credits": {
+              "Builders": 12,
+              "Commons": 3,
+              "Frontier": 0,
+              "Researchers": 7,
+              "Stewards": 0
+            },
+            "invalid_ballots": 2,
+            "points": {
+              "Builders": 3410,
+              "Commons": 860,
+              "Frontier": 0,
+              "Researchers": 1937,
+              "Stewards": 37
+            },
+            "reason": "OK",
+            "total_points": 6244,
+            "valid": true
+          },
+          "rules_hash": "5c8f6e68c4621bc8684f4c9dc8815b70ef34c356b6157cc6bb99dc9bbeaca8e0",
+          "slashed_reading_claims": 138,
+          "tally_commitment": "3d9e4c28a27207154d45996c5ed4675f0fe41e95697be136e39b6f65e768c482"
+        }
+      ],
+      "treasury": {
+        "conserved_total": 100000,
+        "escrow": {
+          "project-0": 0,
+          "project-5": 0,
+          "project-6": 0,
+          "project-7": 0,
+          "project-8": 0,
+          "project-9": 0
+        },
+        "free": 84700,
+        "released": {
+          "project-0": 3000,
+          "project-5": 1500,
+          "project-6": 3000,
+          "project-7": 3000,
+          "project-8": 3000,
+          "project-9": 1800
+        },
+        "reserved": {}
+      },
+      "virtual_end_height": 5704
+    }
+  ]
+}

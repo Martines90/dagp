@@ -6,7 +6,7 @@ chain reference modules/tests, public protocol/API pages, and Wrangler configura
 | Area | Actual state | Remaining work |
 |---|---|---|
 | Protocol | SPEC, DECISIONS, THREATS and concept note exist | Formal models, parameter evidence, constitutional review |
-| Governance reference | Python model; 326 tests pass with Python 3.14 | Port to production keepers and prove equivalence |
+| Governance reference | Python model; 328 tests pass with Python 3.14 | Port to production keepers and prove equivalence |
 | Consensus/network | Go CometBFT G0 network with seven local validator configurations | Independent operators, validator policy, fault/censorship drills |
 | Transactions | Real Ed25519 signatures, chain binding, sequences, height expiry, strict JSON | Versioned protobuf/CBOR, resource quotas, key lifecycle |
 | State | Durable snapshots, deterministic hash, committed-state queries | Scalable database, Merkle proofs, snapshots/state sync |
@@ -120,3 +120,7 @@ The reference now enforces a 20% minimum turnout, strict 5%-step credit allocati
 The v5 community scenario adds monthly renewals, a five-clause 3/5 partial approval and its 1,800-unit grant, plus a 66%-threshold referendum changing the credit step from 500 to 400 basis points before the March election. These rules still await native blockchain keepers; G0 anchoring only proves record replication.
 
 Verification: 326 reference tests and six simulation tests pass. Paired seed-7 runs contain 24,324 events and replay exactly. The v5 manifest is anchored at local G0 height 38, with matching state/block hashes and document reads on all seven validators.
+
+Constitutional clarification: `Kind.CONSTITUTIONAL` requires at least 66.00% decisive voting power and at least 50% participation (or a higher configured general quorum), including each constitutional clause. The parameter referendum cannot lower these protected thresholds.
+
+Verification of the constitutional update: 328 reference tests and six simulation tests pass. The fresh v6 paired scenario preserves 24,324 events, is replay-verified, and its manifest is anchored at local G0 height 41 on all seven validators. Native governance enforcement remains pending.
