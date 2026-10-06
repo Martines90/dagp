@@ -1,12 +1,12 @@
 # Implementation status
 
-Updated 2026-10-05. Sources reviewed: repository Markdown, the DOCX concept note,
+Updated 2026-10-06. Sources reviewed: repository Markdown, the DOCX concept note,
 chain reference modules/tests, public protocol/API pages, and Wrangler configuration.
 
 | Area | Actual state | Remaining work |
 |---|---|---|
 | Protocol | SPEC, DECISIONS, THREATS and concept note exist | Formal models, parameter evidence, constitutional review |
-| Governance reference | Python model; 209 tests pass with Python 3.14 | Port to production keepers and prove equivalence |
+| Governance reference | Python model; 326 tests pass with Python 3.14 | Port to production keepers and prove equivalence |
 | Consensus/network | Go CometBFT G0 network with seven local validator configurations | Independent operators, validator policy, fault/censorship drills |
 | Transactions | Real Ed25519 signatures, chain binding, sequences, height expiry, strict JSON | Versioned protobuf/CBOR, resource quotas, key lifecycle |
 | State | Durable snapshots, deterministic hash, committed-state queries | Scalable database, Merkle proofs, snapshots/state sync |
@@ -112,3 +112,11 @@ locking and exact milestone budgets. All nine community proposals use this contr
 pass. Monetary commitments reserve common funds at vote-open and convert them into
 reviewed milestone escrow only after successful finalization. Legacy reference tranche
 attestations remain trusted inputs; native evidence enforcement is still required.
+
+## Monthly policy and clause voting (2026-10-06)
+
+The reference now enforces a 20% minimum turnout, strict 5%-step credit allocation, calendar-month replacement without carryover, and debt/old-month-refund protections. Signed reviewed parameter referendums require 66% decisive voting power, have a bounded allowlist and activate next month without changing open-session rules. Reviewed multi-point bills independently tally clauses, enforce per-clause turnout and dependencies, and fund only effective approved clauses after challenges. See [security/POLICY_POINTS.md](security/POLICY_POINTS.md).
+
+The v5 community scenario adds monthly renewals, a five-clause 3/5 partial approval and its 1,800-unit grant, plus a 66%-threshold referendum changing the credit step from 500 to 400 basis points before the March election. These rules still await native blockchain keepers; G0 anchoring only proves record replication.
+
+Verification: 326 reference tests and six simulation tests pass. Paired seed-7 runs contain 24,324 events and replay exactly. The v5 manifest is anchored at local G0 height 38, with matching state/block hashes and document reads on all seven validators.

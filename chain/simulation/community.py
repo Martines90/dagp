@@ -6,7 +6,7 @@ units and heights are simulated. The G0 network can anchor the output separately
 from __future__ import annotations
 import argparse
 from collections import Counter
-from dataclasses import asdict, dataclass
+from dataclasses import asdict, dataclass, replace
 import hashlib
 import json
 from pathlib import Path
@@ -20,12 +20,13 @@ from dagp_ref.crypto_sim import SimKeyring, H, hx
 from dagp_ref.election import endorsement_requirement, qualify_parties, run_election
 from dagp_ref.emergency import Emergency
 from dagp_ref.params import Params
+from dagp_ref.policy import MonthlyCredits, ParameterGovernance
 from dagp_ref.proposal import Envelope, FilingRegistry, Proposal, amendment_is_refinement
 from dagp_ref.roles import Actor, Role, RoleRegistry, Status
-from dagp_ref.review import ProposalReview,VotingDraft,Milestone
+from dagp_ref.review import ProposalReview,VotingDraft,Milestone,BillPoint
 from dagp_ref.session import ELECTION, Effects, VoteSession, Windows, snapshot_electorate
 from dagp_ref.sortition import draw, panel_size
-from dagp_ref.tally import Ballot, Kind, Outcome, tally
+from dagp_ref.tally import Ballot, Kind, Outcome, tally, tally_bill
 from dagp_ref.treasury import CreditLedger, RuleViolation, Treasury
 
 MODULE = Actor('MODULE', 'simulation-bootstrap')
@@ -60,6 +61,7 @@ class Community:
         self.reg, self.kr = RoleRegistry(self.p), SimKeyring()
         self.attempts=AttemptRegistry(self.p)
         self.tr, self.cr, self.filings = Treasury(free=100000), CreditLedger(), FilingRegistry(self.p.resubmit_cooldown)
+        self.monthly=MonthlyCredits(self.cr,self.reg);self.governance=ParameterGovernance(self.reg)
         self.ids=[f'citizen-{i:05}' for i in range(citizens)]+[f'leader-{i:03}' for i in range(leaders)]
         self.leaders=self.ids[citizens:]; self.citizens=self.ids[:citizens]
         self.profiles={a:Profile(a,PARTIES[min(4,int(self.u(a,'priority')*5))],
@@ -234,6 +236,9 @@ class Community:
         public=s.ballots_public()
         if s.kind==ELECTION:
             oracle=run_election([choice for choice,_ in public.values()],s.qualified,self.p)
+        elif s.point_ids:
+            oracle=tally_bill([[Ballot(a,c[i],w) for a,(c,w) in public.items() if c[i] is not None]
+                for i in range(len(s.point_ids))],s.size,s.kind,s.p)
         else:oracle=tally([Ballot(a,c,w) for a,(c,w) in public.items()],s.size,s.kind,self.p)
         self.check('independent direct tally agrees '+s.issue,oracle==s.result)
         if not board_silent:
@@ -292,9 +297,9 @@ class Community:
         outcome=self.finish(s,stats,truths)
         self.check('election certified '+str(cycle),outcome==Outcome.PASSED)
         credits=s.result.credits
-        # Election grants replace unspent cycle allowances, but outstanding debt survives.
-        self.cr.balance={p:0 for p in qualified}
-        for p,n in credits.items():self.cr.grant(p,n)
+        timestamp=1767225600 if cycle==1 else 1772323200  # 2026-01-01 / 2026-03-01 UTC
+        self.monthly.record_election(s,timestamp);self.monthly.tick(timestamp)
+        self.event("monthly-credit-reset",month=self.cr.month,balances=dict(self.cr.balance),debt=dict(self.cr.debt))
         self.reg.activate_family_cap(MODULE,self.height)
         ordered=sorted(s.result.points,key=lambda p:(-s.result.points[p],p))
         record=dict(cycle=cycle,points=s.result.points,credits=credits,agenda_order=ordered,
@@ -319,6 +324,10 @@ class Community:
         envelope=Envelope(hx('goal',goal),hx('result',result),(('compute',4000),('treasury',4000)))
         draft=VotingDraft(title,goal,result,'Initial plan; independent verification required',envelope,4000,
             (Milestone('design',2000,'Independent design verification'),Milestone('delivery',2000,'Independent outcome acceptance')))
+        if kind=='point-bill':
+            points=tuple(BillPoint(f'clause-{i}',f'Independent clause {i}',800,
+                (Milestone(f'clause-{i}',800,f'Independent acceptance of clause {i}'),)) for i in range(5))
+            draft=replace(draft,points=points,milestones=tuple(m for p in points for m in p.milestones))
         review=ProposalReview('dagp-reference',issue,owner,party,self.members,self.citizens[6:9],draft,
                               self.reg,self.kr,self.height,self.height+20,credits=self.cr)
         for round_n in range(1,4):
@@ -334,6 +343,9 @@ class Community:
         refined=Envelope(envelope.objective_hash,envelope.result_hash,(('compute',3000),('treasury',3000)))
         amendment=VotingDraft(title,goal,result,'Refined plan: reduced cost with independent verification',refined,3000,
             (Milestone('design',1500,'Independent design verification'),Milestone('delivery',1500,'Independent outcome acceptance')))
+        if kind=='point-bill':
+            points=tuple(replace(p,budget=600,milestones=(replace(p.milestones[0],amount=600),)) for p in draft.points)
+            amendment=replace(amendment,points=points,milestones=tuple(m for p in points for m in p.milestones))
         review.amend(owner,amendment,'refine-1',self.height,self.kr.sign(owner,review.amendment_message(amendment,'refine-1')))
         self.refused('bait-and-switch rejected '+issue,lambda:review.amend(owner,
             VotingDraft(title,'Other goal',result,'Changed project',refined,3000,amendment.milestones),'bad',self.height,'invalid'))
@@ -354,7 +366,7 @@ class Community:
         if kind=='outage':s.extend(MODULE,30);stats['halt_compensation_heights']=30
         for a in voters:
             profile=self.profiles.get(a,self.profiles[self.citizens[0]])
-            turnout=.22 if kind=='low-turnout' else profile.reliability
+            turnout=.12 if kind=='low-turnout' else profile.reliability
             if self.u(issue,a,'turnout')>turnout:stats['absent']+=1;continue
             # Favorable projects vs risk-laden proposals are deliberate stress distributions.
             benefit=.9 if kind!='reckless' else .12
@@ -363,6 +375,7 @@ class Community:
             if kind=='incoherent' and uncertainty<.65:choice='A'
             elif uncertainty<benefit:choice='Y'
             else:choice='N'
+            if kind=='point-bill':choice=('Y','Y','Y','N','N')
             force_fraud=kind=='fraud-probe' and a==voters[0]
             result=self.cast(s,a,choice,stats,force_fraud)
             if result:
@@ -380,7 +393,9 @@ class Community:
         outcome=self.finish(s,stats,truths,challenge=kind=='process-challenge',board_silent=kind=='board-default')
         prop.move('CHALLENGE_WINDOW')
         if outcome=='VOIDED':prop.move('VOIDED');self.check('void credit refunded '+issue,self.cr.balance[party]==before_credit+1)
-        elif outcome==Outcome.PASSED:
+        elif outcome in (Outcome.PASSED,Outcome.PARTIAL):
+            if kind=="point-bill":
+                self.check("three approved clauses and only their funds",s.effective_points==("clause-0","clause-1","clause-2") and self.tr.granted[issue]==1800)
             prop.move('APPROVED');prop.move('FUNDED');prop.move('EXECUTING')
             self.check('executor cannot self-attest '+issue,not self.reg.can(self.leaders[0],'VERIFY',self.height,
                 dict(executors={self.leaders[0]}))[0])
@@ -405,7 +420,8 @@ class Community:
                 self.event('project-failed',issue=issue,party=party,returned=returned,paid=self.tr.released[issue],
                            credit_penalty=self.p.failure_penalty,review='scripted missed measurable milestone')
             else:
-                self.tr.release_next(issue,3,3,self.height);prop.move('COMPLETED');prop.move('OUTCOME_REVIEW');prop.move('CLOSED_SUCCESS')
+                while self.tr.paid_idx[issue]<len(self.tr.tranches[issue]):self.tr.release_next(issue,3,3,self.height)
+                prop.move('COMPLETED');prop.move('OUTCOME_REVIEW');prop.move('CLOSED_SUCCESS')
                 self.reputation[party]+=1;self.event('project-delivered',issue=issue,party=party,paid=self.tr.released[issue],
                     result='synthetic verified deliverable; no real compute or funds consumed')
         else:
@@ -416,6 +432,29 @@ class Community:
             approved_version=review.snapshot()['version'],supervisor_approvals=review.snapshot()['approvals'])
         self.event('project-closed',issue=issue,state=prop.state,treasury_total=self.tr.total())
 
+    def parameter_referendum(self):
+        issue='parameters-1';party='Builders';owner=sorted(self.members[party])[0]
+        goal='Adjust monthly proposal-credit step';result='Four percent of election points per credit'
+        draft=VotingDraft('Credit rule referendum',goal,result,'Change 500 to 400 basis points; preserve turnout floor',
+            Envelope(hx('goal',goal),hx('result',result),()),parameter_changes=(('credit_step_bps',400),))
+        review=ProposalReview('dagp-reference',issue,owner,party,self.members,self.citizens[6:9],draft,
+            self.reg,self.kr,self.height,self.height+20,credits=self.cr)
+        for supervisor in self.citizens[6:8]:
+            note='Bounded numerical update; turnout and administrative protections remain intact'
+            review.approve(supervisor,note,self.height,self.kr.sign(supervisor,H(review.approval_message(),note)))
+        self.height+=20;review.lock(owner,self.height,self.kr.sign(owner,review.lock_message()))
+        s=self.open(issue,kind=Kind.PARAMETER,party=party,review=review);stats=Counter();truths={}
+        for a in self.electorate_voters(s):
+            if self.u(issue,a,'turnout')>.85:continue
+            result=self.cast(s,a,'Y' if self.u(issue,a,'approval')<.8 else 'N',stats)
+            if result:truths[result[0].ticket]=result[1]
+        self.check('66 percent parameter referendum passes',self.finish(s,stats,truths)==Outcome.PASSED)
+        activation=self.governance.schedule(s,1769904000)  # finalized during February
+        self.check('parameter update waits until March',activation==(2026,3) and self.reg.p.credit_step_bps==500)
+        self.p=self.governance.tick(1772323200)
+        self.check('existing referendum keeps original rules',s.p.credit_step_bps==500 and self.p.credit_step_bps==400)
+        self.event('parameter-update-activated',issue=issue,month=activation,changes=s.parameter_changes,rules_hash=self.p.snapshot_hash())
+
     def run(self):
         self.bootstrap();order=self.election(1)
         # Parties spend actual earned credits; choose funded candidates while respecting recusal.
@@ -423,13 +462,17 @@ class Community:
             ('Optional archive migration','low-turnout'),('Undefined collective mission','incoherent'),
             ('Storage availability dispute','process-challenge'),('Faulty compute procurement','execution-failure'),
             ('Examiner cartel incident','fraud-probe'),('Silent certification board','board-default'),
-            ('Contested public model-training subsidy','contested')]
+            ('Contested public model-training subsidy','contested'),('Five-clause public infrastructure','point-bill')]
         for i,(title,kind) in enumerate(stories):
+            if i==5:
+                self.monthly.tick(1769904000)  # 2026-02-01 UTC, no carryover
+                self.event('monthly-credit-reset',month=self.cr.month,balances=dict(self.cr.balance),debt=dict(self.cr.debt))
             funded=[p for p in order if self.cr.balance.get(p,0)>0]
             party=funded[i%len(funded)]
             self.proposal(i,title,kind,party)
         for p in self.elections[0]['zero_credit_parties']:
             self.refused('zero-credit party cannot file '+p,lambda p=p:self.cr.spend(p,1))
+        self.parameter_referendum()
         # A dormant slice is removed from the next electorate, without deleting identities.
         self.height+=self.p.liveness_period+1
         sleepers=self.citizens[-max(10,len(self.citizens)//40):]
@@ -491,7 +534,7 @@ def main():
             differences=[dict(issue=a['issue'],weighted=a['outcome'],flat=b['outcome'])
                 for a,b in zip(pair['WEIGHTED']['sessions'],pair['FLAT']['sessions']) if a['outcome']!=b['outcome']]
             comparisons.append(dict(seed=seed,outcome_differences=differences))
-    report=dict(format='dagp-community-simulation-v4',execution='reference-governance-with-optional-G0-result-anchoring',
+    report=dict(format='dagp-community-simulation-v5',execution='reference-governance-with-optional-G0-result-anchoring',
         limitations=['Synthetic policies, not AGI or LLM agents','Reference signatures are HMAC stand-ins',
         'HTTP challenge admission is not implemented','Court semantics and milestone evidence are scripted',
         'G0 chain records result commitment, does not enforce governance','Seven validators share one host'],

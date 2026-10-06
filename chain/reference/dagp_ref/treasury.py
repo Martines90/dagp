@@ -25,6 +25,7 @@ def _budget(tranches):
 class CreditLedger:
     balance: dict = field(default_factory=dict)
     debt: dict = field(default_factory=dict)
+    month: tuple | None = None
 
     def grant(self, party: str, n: int) -> None:
         _integer(n)

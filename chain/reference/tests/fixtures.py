@@ -9,7 +9,7 @@ from dagp_ref.session import Effects, VoteSession, Windows, snapshot_electorate
 from dagp_ref.tally import Kind
 
 MODULE = Actor("MODULE", "test")
-P = Params(min_citizen_age=10, exam_items=3, sample_articles=2, challenge_window=20, exam_panel=3)
+P = Params(quorum_bps=5000,min_citizen_age=10, exam_items=3, sample_articles=2, challenge_window=20, exam_panel=3)
 ARTICLES = ("a1", "a2", "a3", "a4")
 CLUSTERS = {"a1": "c1", "a2": "c2", "a3": "c3", "a4": "c3"}   # a3/a4 are near-duplicates
 

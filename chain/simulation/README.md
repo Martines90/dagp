@@ -16,10 +16,10 @@ Use Python 3.10 or newer:
 
 ```sh
 python3 -m unittest discover -s chain/simulation/tests -v
-python3 chain/simulation/community.py --seeds 7 19 43 --output chain/simulation/results/review-budget
-python3 chain/simulation/verify.py chain/simulation/results/review-budget --replay
-python3 chain/simulation/community.py --citizens 10000 --seeds 7 --output chain/simulation/results/large-v4
-python3 chain/simulation/verify.py chain/simulation/results/large-v4
+python3 chain/simulation/community.py --seeds 7 19 43 --output chain/simulation/results/policy-points
+python3 chain/simulation/verify.py chain/simulation/results/policy-points --replay
+python3 chain/simulation/community.py --citizens 10000 --seeds 7 --output chain/simulation/results/large-v5
+python3 chain/simulation/verify.py chain/simulation/results/large-v5
 ```
 
 Each seed runs WEIGHTED and FLAT modes, using the same keyed random draws for
@@ -34,8 +34,8 @@ exist. Then publish a report manifest:
 ```sh
 cd chain/node
 python3 scripts/devnet.py anchor \
-  --document ../simulation/results/review-budget/manifest.json \
-  --receipt ../simulation/results/review-budget/anchor-receipt.json
+  --document ../simulation/results/policy-points/manifest.json \
+  --receipt ../simulation/results/policy-points/anchor-receipt.json
 ```
 
 The command starts the seven existing validators, publishes the signed manifest,
@@ -150,7 +150,11 @@ into `results/self-protection`. Keep the committed report, combined manifest,
 insider report and receipt together; regenerating a manifest creates a new document
 that requires its own anchor receipt.
 
-Current exports now use v4 reviewed proposals. Historical v3 requires `7140ed9`.
+Historical v4 exports introduced reviewed proposals; historical v3 requires `7140ed9`.
 Run the current scenario into `results/review-budget` and see
 [review and budget rules](../security/REVIEW_BUDGET.md) for signed comment threads,
 fresh supervisor approval of edits and finalized milestone escrow.
+
+## Current v5 policy scenario
+
+Current exports use v5. Historical v4 requires `56ce3b9` for replay; artifact hashes can still be checked without replay. The current run includes ten project proposals and a reviewed parameter referendum, with January, February and March credit allowances. A five-clause proposal approves exactly three clauses and funds/releases only their 1,800 units. A successful parameter referendum changes the credit step to 4% at the March boundary, while keeping the original referendum snapshot and 20% minimum turnout. See [POLICY_POINTS.md](../security/POLICY_POINTS.md) for defaults and safeguards.

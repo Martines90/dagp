@@ -26,6 +26,12 @@ class CommunityStory(unittest.TestCase):
         self.assertEqual(by_title['Faulty compute procurement']['project_state'],'CLOSED_FAILURE')
         self.assertEqual(by_title['Examiner cartel incident']['targeted_fraud_struck'],1)
         self.assertTrue(by_title['Silent certification board']['board_default'])
+        point=by_title['Five-clause public infrastructure']
+        self.assertEqual(point['outcome'],'PARTIAL')
+        self.assertEqual(r['treasury']['released'][point['issue']],1800)
+        self.assertEqual(r['model_parameters']['credit_step_bps'],400)
+        events=[json.loads(line) for line in self.events.splitlines()]
+        self.assertEqual([e['data']['month'] for e in events if e['kind']=='monthly-credit-reset'],[[2026,1],[2026,2],[2026,3]])
         self.assertEqual(r['treasury']['conserved_total'],100000)
         self.assertFalse(r['treasury']['reserved'])
     def test_reproducibility(self):

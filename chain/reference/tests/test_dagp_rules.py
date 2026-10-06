@@ -9,7 +9,7 @@ from dagp_ref.tally import (ABSTAIN, NO, YES, Ballot, Kind, Outcome, tally, tall
                             weight)
 from dagp_ref.treasury import CreditLedger, RuleViolation, Treasury
 
-P = Params()
+P = Params(quorum_bps=5000,bill_mode="PACKAGE",min_total_credits=3)
 
 
 def bs(y=0, n=0, a=0, w=3):
@@ -134,7 +134,7 @@ class DiscoveredEdgeCases(unittest.TestCase):
         self.assertEqual(tally_bill([ok, ok, tie, tie], 1000, Kind.ORDINARY, P).outcome, Outcome.PASSED)
         # 3 ties + 1 pass: NOT_PASSED => fails; NO_MAJORITY => tie is not "No majority" => survives.
         self.assertEqual(tally_bill([ok, tie, tie, tie], 1000, Kind.ORDINARY, P).outcome, Outcome.FAILED)
-        lax = Params(package_fail_basis="NO_MAJORITY")
+        lax = Params(quorum_bps=5000,bill_mode="PACKAGE",package_fail_basis="NO_MAJORITY")
         self.assertEqual(tally_bill([ok, tie, tie, tie], 1000, Kind.ORDINARY, lax).outcome, Outcome.PASSED)
 
     def test_multi_party_member_and_overendorser_excluded(self):

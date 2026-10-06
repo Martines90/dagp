@@ -23,7 +23,7 @@ from .roles import Actor, Role, RoleRegistry, Status
 from .sortition import audit_sample_size, draw
 from .scale import (Electorate, ElectionShard, ShardSummary, election_from_shards, shard_count,
                     shard_of, summarize_election_shard, summarize_shard, tally_sharded)
-from .tally import Ballot, Kind, Outcome, TallyResult, weight
+from .tally import Ballot, BillResult, Kind, Outcome, TallyResult, weight,tally_bill,YES,NO,ABSTAIN
 from .treasury import CreditLedger, RuleViolation, Treasury
 
 ELECTION = "ELECTION"
@@ -63,6 +63,10 @@ class Effects:
     tranches: list = field(default_factory=list)
     proposer_party: str = ""
     milestones: tuple = ()
+    credit_month: tuple | None = None
+    point_budgets: tuple = ()
+    point_tranches: tuple = ()
+    point_milestones: tuple = ()
 
 
 @dataclass
@@ -78,7 +82,7 @@ class VoteSession:
                  attempts: AttemptRegistry, beacon: bytes, open_height: int, windows: Windows,
                  recused: frozenset = frozenset(), effects: Effects | None = None,
                  qualified_parties: list | None = None, scoreboard: Scoreboard | None = None,
-                 pool: list | None = None, approved_record_hash: str = ""):
+                 pool: list | None = None, approved_record_hash: str = "",point_ids: tuple = (),point_dependencies: tuple = (),parameter_changes: tuple = ()):
         if electorate_size <= 0:
             raise RuleViolation("empty electorate")
         if kind == ELECTION and not qualified_parties:
@@ -90,6 +94,13 @@ class VoteSession:
         self.open_height, self.w = open_height, windows
         self.recused = recused
         self.effects = replace(effects, tranches=list(effects.tranches)) if effects else Effects()
+        self.point_ids=tuple(point_ids);self.point_dependencies=tuple(point_dependencies)
+        if self.point_ids and (not approved_record_hash or kind==ELECTION or len(self.point_ids)>p.max_bill_points
+                               or len(set(self.point_ids))!=len(self.point_ids)
+                               or len(self.point_dependencies)!=len(self.point_ids)):
+            raise RuleViolation('point ballots require a valid locked review')
+        self.parameter_changes=tuple(parameter_changes)
+        self.effective_points=()
         self.approved_record_hash = approved_record_hash
         self._effects_hash = self._effect_commitment()
         if self.effects.ceiling:
@@ -129,7 +140,7 @@ class VoteSession:
 
     def _effect_commitment(self):
         e=self.effects
-        return hx("vote-effects",e.project,e.ceiling,e.tranches,e.proposer_party,e.milestones)
+        return hx("vote-effects",e.project,e.ceiling,e.tranches,e.proposer_party,e.milestones,e.credit_month,e.point_budgets,e.point_tranches,e.point_milestones,self.point_ids,self.point_dependencies,self.parameter_changes)
 
     def _check_review_effects(self):
         if self.approved_record_hash and self._effect_commitment()!=self._effects_hash:
@@ -244,6 +255,10 @@ class VoteSession:
                 raise RuleViolation("unrecorded eligibility token")
             # Valid old signatures cannot undo a board's authoritative downward correction.
             w = weight(min(token.R, recorded[0].R), self.p)
+        if self.point_ids and (type(choice) is not tuple or len(choice)!=len(self.point_ids)
+                               or any(c not in (YES,NO,ABSTAIN,None) for c in choice)
+                               or all(c is None for c in choice)):
+            raise RuleViolation('point ballot must match the locked point list')
         self._sealed[voter] = (choice, w)
         self.commits[voter] = hx("ballot-commit", voter, self.issue, str(choice), w)
 
@@ -303,6 +318,8 @@ class VoteSession:
         r = self.result
         if isinstance(r, ElectionResult):
             return f"{r.valid}:{sorted(r.credits.items())}"
+        if isinstance(r,BillResult):
+            return f"{r.outcome.value}:{r.point_outcomes}:{r.passing_points}"
         return f"{r.outcome.value}:{r.yes_w}:{r.no_w}:{r.abstain_n}:{r.participation}"
 
     def close(self, height: int) -> None:
@@ -314,12 +331,28 @@ class VoteSession:
         if self.rules_hash != self.p.snapshot_hash():
             raise RuleViolation("rules changed during vote")
         shards = shard_count(self.size, self.p)
-        if self.kind == ELECTION:
+        if self.point_ids:
+            columns=[[Ballot(v,choices[i],w) for v,(choices,w) in self._sealed.items() if choices[i] is not None]
+                     for i in range(len(self.point_ids))]
+            result=tally_bill(columns,self.size,self.kind,self.p)
+            passing=set(result.passing_points)
+            indexes={q:i for i,q in enumerate(self.point_ids)}
+            while True:
+                retained={i for i in passing if all(indexes[q] in passing for q in self.point_dependencies[i])}
+                if retained==passing:break
+                passing=retained
+            outcome=(Outcome.PASSED if len(passing)==len(self.point_ids) else Outcome.PARTIAL if passing else
+                     result.outcome if result.outcome not in (Outcome.PASSED,Outcome.PARTIAL) else Outcome.FAILED)
+            self.result=BillResult(outcome,result.point_outcomes,tuple(sorted(passing)),result.review_flag)
+            self.commitment=H(b'point-ballots',self.issue,self.point_ids,sorted(self._sealed.items()),self._outcome_label())
+        elif self.kind == ELECTION:
             groups: list[dict] = [dict() for _ in range(shards)]
             for v, (choice, _) in self._sealed.items():
                 groups[shard_of(v, shards)][v] = choice
             es = [summarize_election_shard(g, self.qualified, self.p) for g in groups]
             self.result = election_from_shards(es, self.qualified, self.p)
+            if sum(e.count-e.invalid for e in es)*10000<self.size*self.p.quorum_bps:
+                self.result=ElectionResult(False,'NO_QUORUM',self.result.points,self.result.total_points,{},self.result.invalid_ballots)
             self.commitment = H(b"election", sorted(self.result.points.items()), self.result.reason)
         else:
             groups_b: list[list[Ballot]] = [[] for _ in range(shards)]
@@ -418,13 +451,20 @@ class VoteSession:
         r = self.result
         if isinstance(r, ElectionResult):
             self.phase = Phase.FINAL
-            self.outcome = Outcome.PASSED if r.valid else Outcome.FAILED
+            self.outcome = Outcome.PASSED if r.valid else Outcome.NO_QUORUM if r.reason=='NO_QUORUM' else Outcome.FAILED
             return self.outcome
         e = self.effects
-        if r.outcome is Outcome.PASSED:
+        if r.outcome in (Outcome.PASSED,Outcome.PARTIAL):
             if e.treasury and e.ceiling:
-                e.treasury.commit_reserved(e.project, e.tranches)
-                e.treasury.milestone_conditions[e.project] = tuple(e.milestones)
+                tranches=e.tranches;milestones=e.milestones
+                if isinstance(r,BillResult):
+                    tranches=[amount for i in r.passing_points for amount in e.point_tranches[i]]
+                    milestones=tuple(m for i in r.passing_points for m in e.point_milestones[i])
+                if tranches:
+                    e.treasury.commit_reserved(e.project,tranches)
+                    e.treasury.milestone_conditions[e.project]=tuple(milestones)
+                else:e.treasury.release_reservation(e.project)
+            if isinstance(r,BillResult):self.effective_points=tuple(self.point_ids[i] for i in r.passing_points)
         else:
             self._unwind(refund=(r.outcome is Outcome.NO_QUORUM and self.p.refund_on_no_quorum))
         self.phase, self.outcome = Phase.FINAL, r.outcome
@@ -434,5 +474,5 @@ class VoteSession:
         e = self.effects
         if e.treasury and e.ceiling and e.project in e.treasury.reserved:
             e.treasury.release_reservation(e.project)
-        if refund and e.credits and e.proposer_party:
+        if refund and e.credits and e.proposer_party and e.credits.month==e.credit_month:
             e.credits.grant(e.proposer_party, self.p.proposal_cost)   # D-12

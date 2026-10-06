@@ -1,5 +1,6 @@
 """Edge paths that the feature suites do not reach: each asserts a fail-closed behavior."""
 import unittest
+from dataclasses import replace
 
 from dagp_ref.election import qualify_parties, run_election
 from dagp_ref.ledger import Ledger
@@ -31,7 +32,7 @@ class TallyEdges(unittest.TestCase):
         ok = bs(y=300, n=200)
         dup = [Ballot("x", YES, 3), Ballot("x", NO, 3)]
         self.assertEqual(tally_bill([ok, dup], 1000, Kind.ORDINARY, P).outcome, Outcome.INVALID)
-        self.assertEqual(tally_bill([ok, bs(y=10)], 1000, Kind.ORDINARY, P).outcome, Outcome.NO_QUORUM)
+        self.assertEqual(tally_bill([ok, bs(y=10)], 1000, Kind.ORDINARY, replace(P,bill_mode="PACKAGE")).outcome, Outcome.NO_QUORUM)
         self.assertEqual(tally_bill([], 1000, Kind.ORDINARY, P).outcome, Outcome.INVALID)
 
     def test_bill_with_no_passing_point_fails(self):

@@ -223,7 +223,7 @@ class Sealing(unittest.TestCase):
     def test_rules_locked_at_open(self):
         soc = Society()
         s = soc.session()
-        s.p = replace(s.p, quorum_bps=1)                                          # someone "changes the law"
+        s.p = replace(s.p, quorum_bps=2000)                                          # someone "changes the law"
         with self.assertRaises(RuleViolation):
             s.close(s.w.vote_end)
 
@@ -392,7 +392,7 @@ class ElectionSession(unittest.TestCase):
         soc.run_to_final(s)
         self.assertFalse(s.result.valid)
         self.assertEqual(s.result.invalid_ballots, 2)
-        self.assertEqual(s.outcome, Outcome.FAILED)
+        self.assertEqual(s.outcome, Outcome.NO_QUORUM)
 
 
 class ScaleInSession(unittest.TestCase):

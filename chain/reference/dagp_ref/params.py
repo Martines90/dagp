@@ -2,7 +2,7 @@
 
 A Params object is frozen and hashed into a RuleSnapshot when a vote opens, so a
 tally always runs against the rules that were in force when voting began.
-Defaults encode the decisions recorded in DECISIONS.md (D-01 .. D-18).
+Defaults encode current DECISIONS.md and security/POLICY_POINTS.md rules.
 Time is an abstract monotonically increasing `height` (blocks); EPOCH heights = 1 epoch.
 """
 from __future__ import annotations
@@ -17,7 +17,7 @@ BPS = 10_000
 @dataclass(frozen=True)
 class Params:
     # --- voting (exact fractions as (numerator, denominator)) ---
-    quorum_bps: int = 5_000              # participation >= 50% of snapshot electorate
+    quorum_bps: int = 2_000              # participation >= 20% of snapshot electorate
     ordinary: tuple = (1, 2)             # Yw/(Yw+Nw) strictly greater than
     supermajority: tuple = (2, 3)        # at least (D-13: "66 percent" read as two-thirds)
     core: tuple = (3, 4)                 # T0 entrenched core (each of two votes)
@@ -26,6 +26,8 @@ class Params:
     weight_mode: str = "WEIGHTED"        # or "FLAT" (D-18: weighted by default, flat is a T3 switch)
     max_articles_counted: int = 10       # cap on R so W <= base_weight + 10
     max_bill_points: int = 10
+    bill_mode: str = "INDEPENDENT"
+    parameter_approval_bps: int = 6_600
     package_fail_basis: str = "NOT_PASSED"  # D-03 (alt: "NO_MAJORITY")
     # --- elections ---
     ballot_picks: tuple = (4, 2, 1)
@@ -36,7 +38,7 @@ class Params:
     min_party_members: int = 10
     endorse_bps: int = 910               # frozen to an absolute number per cycle (D-05, ceil)
     endorsements_per_agent: int = 2
-    min_total_credits: int = 3           # D-04: agenda-starvation floor ON
+    min_total_credits: int = 0           # strict 5% allocation; no automatic floor
     floor_credits_each: int = 1
     # --- credits ---
     proposal_cost: int = 1
@@ -99,6 +101,18 @@ class Params:
     shard_target: int = 10_000           # ballots per tally shard (scale, constant work per shard)
 
     def __post_init__(self):
+        if type(self.quorum_bps) is not int or not 2000<=self.quorum_bps<=BPS:
+            raise ValueError("citizen participation cannot fall below 20 percent")
+        if self.parameter_approval_bps!=6600 or type(self.parameter_approval_bps) is not int:
+            raise ValueError("parameter changes require at least 66 percent approval")
+        if self.bill_mode not in ("INDEPENDENT","PACKAGE"):
+            raise ValueError("unknown bill mode")
+        if (type(self.credit_step_bps) is not int or not 1<=self.credit_step_bps<=BPS
+                or type(self.credit_ceiling_bps) is not int or not self.credit_step_bps<=self.credit_ceiling_bps<=BPS
+                or type(self.party_threshold_bps) is not int or not 0<=self.party_threshold_bps<=BPS
+                or type(self.max_bill_points) is not int or not 1<=self.max_bill_points<=100):
+            raise ValueError("invalid credit or point limits")
+
         positive = (self.protection_day_blocks,self.sanction_actor_limit,self.sanction_operator_limit,
                     self.sanction_global_limit,self.sanction_population_floor,self.ban_global_limit,
                     self.admission_actor_limit,self.admission_global_limit,self.pause_actor_limit,

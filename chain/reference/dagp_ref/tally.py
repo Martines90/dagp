@@ -15,6 +15,7 @@ YES, NO, ABSTAIN = "Y", "N", "A"
 
 class Outcome(str, Enum):
     PASSED = "PASSED"
+    PARTIAL = "PARTIAL"
     FAILED = "FAILED"
     NO_QUORUM = "NO_QUORUM"
     NO_DECISIVE_VOTES = "NO_DECISIVE_VOTES"  # only abstentions (Yw + Nw == 0)
@@ -22,6 +23,7 @@ class Outcome(str, Enum):
 
 
 class Kind(str, Enum):
+    PARAMETER = "PARAMETER"
     ORDINARY = "ORDINARY"
     CONSTITUTIONAL = "CONSTITUTIONAL"
     EARLY_ELECTION = "EARLY_ELECTION"
@@ -64,6 +66,8 @@ def min_weight(p: Params) -> int:
 
 def _threshold(kind: Kind, p: Params) -> tuple[tuple[int, int], bool]:
     """Returns ((num, den), strict). Ordinary is strictly-greater; the others are at-least."""
+    if kind is Kind.PARAMETER:
+        return (p.parameter_approval_bps,BPS),False
     if kind is Kind.ORDINARY:
         return p.ordinary, True
     if kind is Kind.CORE:
@@ -106,27 +110,33 @@ def tally(ballots: list[Ballot], electorate: int, kind: Kind, p: Params) -> Tall
 class BillResult:
     outcome: Outcome
     point_outcomes: tuple
-    passing_points: tuple  # indices that take effect (empty unless bill passes)
+    passing_points: tuple  # indices eligible to take effect after finalization
+    review_flag: bool = False
 
 
 def tally_bill(point_ballots: list[list[Ballot]], electorate: int, kind: Kind,
                p: Params) -> BillResult:
-    """Multi-point bill. Each point is tallied separately; the package fails if MORE than half
-    of the points fail. A package in which no point passes also fails (degenerate case)."""
+    """Tally independent clauses, or an explicitly configured legacy package."""
     n = len(point_ballots)
     if n == 0 or n > p.max_bill_points:
         return BillResult(Outcome.INVALID, (), ())
     results = [tally(b, electorate, kind, p) for b in point_ballots]
     outs = tuple(r.outcome for r in results)
+    review = any(r.review_flag for r in results)
     if any(r.outcome is Outcome.INVALID for r in results):
-        return BillResult(Outcome.INVALID, outs, ())
+        return BillResult(Outcome.INVALID, outs, (), review)
+    if p.bill_mode == "INDEPENDENT":
+        passed=tuple(i for i,r in enumerate(results) if r.outcome is Outcome.PASSED)
+        outcome = (Outcome.PASSED if len(passed)==n else Outcome.PARTIAL if passed else
+                   Outcome.NO_QUORUM if all(r.outcome is Outcome.NO_QUORUM for r in results) else Outcome.FAILED)
+        return BillResult(outcome,outs,passed,review)
     if any(r.outcome is Outcome.NO_QUORUM for r in results):
-        return BillResult(Outcome.NO_QUORUM, outs, ())
+        return BillResult(Outcome.NO_QUORUM, outs, (), review)
     passed = [i for i, r in enumerate(results) if r.outcome is Outcome.PASSED]
     if p.package_fail_basis == "NO_MAJORITY":
         failing = sum(1 for r in results if r.no_w > r.yes_w)
     else:
         failing = n - len(passed)
     if 2 * failing > n or not passed:
-        return BillResult(Outcome.FAILED, outs, ())
-    return BillResult(Outcome.PASSED, outs, tuple(passed))
+        return BillResult(Outcome.FAILED, outs, (), review)
+    return BillResult(Outcome.PASSED, outs, tuple(passed), review)
