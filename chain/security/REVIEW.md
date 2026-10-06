@@ -88,4 +88,25 @@ exact replay of those v1 artifacts requires commit `6a87852`.
 - Dependency scan: **zero reachable findings**, five module-only advisories.
 
 These are local correctness and attack-regression results, not proof against all
-adversaries. No crash/partition/equivocation chaos campaign was performed here.
+adversaries. The subsequent crash-only campaign passed: two of seven validators offline
+continued consensus; three halted it; restored quorum resumed transactions and
+matching application state. Partitions and Byzantine equivocation remain untested.
+
+## Second-pass protections
+
+See [security contract](PROTOCOL.md). Authenticated milestone payments now have a
+separate reference controller with frozen strict-majority policies, explicit
+beneficiary exclusions, live role/operator checks and signatures bound to chain,
+project, tranche, amount, evidence and expiry. Legacy numeric treasury methods
+remain trusted test primitives; this controller is not yet native governance.
+Recovery rechecks operator independence both at request and activation, refuses
+changes to guardians during pending operations, and cancels activation for inactive
+owners. Proposal refinement rejects duplicate, negative and boolean resource caps.
+Emergency timings reject non-integer inputs. Regression cases live in
+`../reference/tests/test_protocols.py`.
+
+Second-pass validation: **252 reference tests** and **six simulator tests passed**,
+including the million-ballot sharded tally. Fourteen new protocol regressions cover
+signed milestone authorization, replay, conflicts, pauses, recovery and caps. The
+crash campaign committed documents at heights 23 and 27 before/after quorum loss,
+verified seven matching states and refused replay.

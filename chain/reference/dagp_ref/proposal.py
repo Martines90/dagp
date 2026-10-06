@@ -39,6 +39,11 @@ def amendment_is_refinement(orig: Envelope, amended: Envelope) -> bool:
     still 'means the same project' is a semantic question decided by a jury on challenge."""
     if orig.objective_hash != amended.objective_hash or orig.result_hash != amended.result_hash:
         return False
+    for envelope in (orig, amended):
+        if (len({k for k, _ in envelope.caps}) != len(envelope.caps)
+                or any(not isinstance(k,str) or not k or type(v) is not int or v < 0
+                       for k,v in envelope.caps)):
+            return False
     o = dict(orig.caps)
     return all(k in o and v <= o[k] for k, v in amended.caps)
 

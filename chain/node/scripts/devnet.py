@@ -98,7 +98,36 @@ def anchor(document, receipt):
     receipt.write_text(json.dumps(evidence,indent=2))
     print(f'PASS: manifest {cid} anchored at height {height}; all seven validators agree; receipt {receipt}')
 
-def start(test, document=None, receipt=None):
+def faults(processes, logs):
+    """Crash-only campaign: 2/7 offline progress, 3/7 halt, restored quorum recovery."""
+    smoke()
+    def height():
+        return int(rpc(0,'status')['sync_info']['latest_block_height'])
+    def stop(i):
+        p=processes[7+i];p.terminate();p.wait(timeout=15)
+    def progress(baseline, timeout=45):
+        deadline=time.monotonic()+timeout
+        while time.monotonic()<deadline:
+            if height()>baseline:return height()
+            time.sleep(1)
+        raise RuntimeError('Consensus failed to progress with sufficient voting power')
+    stop(5);stop(6)
+    progress(height())
+    print('PASS: consensus progresses with two of seven validators offline',flush=True)
+    stop(4)
+    # Drain a potentially already committed block before checking loss-of-quorum halt.
+    time.sleep(5);baseline=height();time.sleep(8)
+    if height()!=baseline:raise RuntimeError('Chain advanced without two-thirds voting power')
+    print('PASS: chain halts with three of seven validators offline',flush=True)
+    for i in (4,5,6):
+        log=open(HOME/f'node{i}.log','a');logs.append(log)
+        p=subprocess.Popen([str(BIN/'cometbft'),'start','--home',str(HOME/f'node{i}')],stdout=log,stderr=log)
+        processes.append(p)
+    progress(baseline,90)
+    smoke()
+    print('PASS: restored validators resume consensus and agree on committed state',flush=True)
+
+def start(test, document=None, receipt=None, fault_test=False):
     if not HOME.exists(): raise SystemExit('Run init first')
     processes=[]; logs=[]
     def stopped(signum,frame): raise KeyboardInterrupt
@@ -111,7 +140,8 @@ def start(test, document=None, receipt=None):
         for i in range(7):
             log=open(HOME/f'node{i}.log','a');logs.append(log)
             processes.append(subprocess.Popen([str(BIN/'cometbft'),'start','--home',str(HOME/f'node{i}')],stdout=log,stderr=log))
-        if document is not None: anchor(document,receipt)
+        if fault_test: faults(processes,logs)
+        elif document is not None: anchor(document,receipt)
         elif test: smoke()
         else:
             print('Devnet running; RPC ports 26657, 26667, … 26717. Ctrl-C stops it.',flush=True)
@@ -127,10 +157,10 @@ def start(test, document=None, receipt=None):
             except subprocess.TimeoutExpired: p.kill();p.wait()
         for log in logs: log.close()
 if __name__=='__main__':
-    parser=argparse.ArgumentParser(description=__doc__);parser.add_argument('action',choices=['init','start','smoke','anchor'])
+    parser=argparse.ArgumentParser(description=__doc__);parser.add_argument('action',choices=['init','start','smoke','anchor','faults'])
     parser.add_argument('--document',type=pathlib.Path)
     parser.add_argument('--receipt',type=pathlib.Path)
     args=parser.parse_args()
     if args.action=='anchor' and (args.document is None or args.receipt is None): parser.error('anchor requires --document and --receipt')
     if args.action=='init': initialize()
-    else: start(args.action=='smoke',args.document if args.action=='anchor' else None,args.receipt)
+    else: start(args.action=='smoke',args.document if args.action=='anchor' else None,args.receipt,args.action=='faults')

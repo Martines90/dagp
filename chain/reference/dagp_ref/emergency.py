@@ -27,9 +27,11 @@ class Emergency:
             raise RuleViolation(f"not authorized to pause: {why}")
         if project not in self.tr.escrow or project in self.tr.terminated:
             raise RuleViolation("nothing to pause")
-        if not reason:
+        if type(height) is not int or height < 0:
+            raise RuleViolation("invalid height")
+        if not isinstance(reason,str) or not 0 < len(reason) <= 1024:
             raise RuleViolation("a public reason code is required")
-        if not 0 < duration <= self.p.pause_max:
+        if type(duration) is not int or not 0 < duration <= self.p.pause_max:
             raise RuleViolation("duration outside (0, pause_max]")
         last = self._last(project)
         if last and height < last[1]:
@@ -44,8 +46,10 @@ class Emergency:
 
     def ratify(self, actor: Actor, project: str, height: int, extend_to: int) -> None:
         """A passed vote extends a live pause to `extend_to` (e.g. through a corrective vote)."""
+        if type(height) is not int or height < 0 or type(extend_to) is not int:
+            raise RuleViolation("invalid ratification heights")
         last = self._last(project)
-        if not last or height >= last[1]:
+        if not last or not last[0] <= height < last[1]:
             raise RuleViolation("no live pause to ratify")
         if extend_to <= last[1]:
             raise RuleViolation("ratification must extend the pause")

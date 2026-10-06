@@ -79,3 +79,5 @@ This publishes a document commitment and saves seven matching validator RPC
 observations. Governance remains in the Python reference; the node does not
 validate the report contents. Existing content is not republished: keep the
 receipt for an already anchored manifest. See `../simulation/README.md`.
+
+Run `python3 scripts/devnet.py faults` for the crash-only quorum campaign: two offline validators permit progress, three cause a halt, and restored quorum resumes replicated transactions. See [security contract](../security/PROTOCOL.md).

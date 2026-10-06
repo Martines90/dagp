@@ -73,3 +73,10 @@ Governance remains a reference model; these fixes do not implement native keeper
 Go 1.26.8 / gRPC 1.83.2 remove all reachable findings in the official dependency scan.
 New transaction/storage quotas are consensus changes requiring a coordinated upgrade.
 Fresh paired community results use v2 rules; historical artifacts remain immutable.
+
+Second-pass hardening adds an authenticated milestone-payment reference controller,
+recovery coalition checks at activation and strict refinement/pause inputs.
+252 reference tests and six simulator tests pass. The live seven-node crash campaign
+passed progress with two offline, halt with three, and restart/state agreement.
+[Security contract](security/PROTOCOL.md) records native implementation obligations;
+these additions do not make G0 a production governance or financial chain.

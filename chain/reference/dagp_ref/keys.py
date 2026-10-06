@@ -27,6 +27,7 @@ class Pending:
     new_key: str
     effective: int
     nonce: str
+    guardians: tuple = ()
 
 
 @dataclass
@@ -87,6 +88,18 @@ class KeyManager:
         for agent, st in sorted(self.state.items()):
             p = st.pending
             if p and height >= p.effective:
+                if self.reg.get(agent).status is not Status.ACTIVE:
+                    st.pending = None
+                    self.reg._log(height, Actor("MODULE", "keys"), "KEYOP_BLOCKED", agent)
+                    continue
+                if p.kind == "RECOVER":
+                    eligible = [g for g in p.guardians if self.reg.get(g).status is Status.ACTIVE]
+                    operators = {self.reg.get(g).operator for g in eligible}
+                    if (len(eligible) < st.k or len(operators) != len(eligible)
+                            or self.reg.get(agent).operator in operators):
+                        st.pending = None
+                        self.reg._log(height, Actor("MODULE", "keys"), "RECOVERY_BLOCKED", agent)
+                        continue
                 st.active, st.version = p.new_key, st.version + 1
                 if p.kind == "RECOVER":
                     for s in st.sessions.values():
@@ -146,10 +159,12 @@ class KeyManager:
     def set_guardians(self, agent: str, guardians: tuple, k: int, nonce: str, sig: str,
                       height: int) -> None:
         st = self._live(agent, height)
+        if st.pending:
+            raise RuleViolation("cannot replace guardians during a pending key operation")
         owner_op = self.reg.get(agent).operator
         if len(set(guardians)) != len(guardians) or len(guardians) < self.p.min_guardians:
             raise RuleViolation("need distinct guardians (>= min_guardians)")
-        if not 2 <= k <= len(guardians) or 2 * k <= len(guardians):
+        if type(k) is not int or not 2 <= k <= len(guardians) or 2 * k <= len(guardians):
             raise RuleViolation("k must be a strict majority of guardians and >= 2")
         if len({self.reg.get(g).operator for g in guardians}) != len(guardians):
             raise RuleViolation("guardians must have distinct operators")
@@ -180,10 +195,12 @@ class KeyManager:
         good = {g for g, s in guardian_sigs.items()
                 if g in st.guardians and self.reg.get(g).status is Status.ACTIVE
                 and self.kr.verify(self._guardian_key(g), msg, s)}
-        if len(good) < st.k:
+        operators = {self.reg.get(g).operator for g in good}
+        if (len(good) < st.k or len(operators) != len(good)
+                or self.reg.get(agent).operator in operators):
             raise RuleViolation("not enough valid guardian signatures")
         st.used_nonces.add(nonce)
-        st.pending = Pending("RECOVER", new_key, height + self.p.recovery_delay, nonce)
+        st.pending = Pending("RECOVER", new_key, height + self.p.recovery_delay, nonce, tuple(sorted(good)))
         self.reg._log(height, Actor("MODULE", "keys"), "RECOVER_BEGIN", agent, new_key)
         return st.pending.effective
 
