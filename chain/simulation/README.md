@@ -16,8 +16,8 @@ Use Python 3.10 or newer:
 
 ```sh
 python3 -m unittest discover -s chain/simulation/tests -v
-python3 chain/simulation/community.py --seeds 7 19 43 --output chain/simulation/results/hardened
-python3 chain/simulation/verify.py chain/simulation/results/hardened --replay
+python3 chain/simulation/community.py --seeds 7 19 43 --output chain/simulation/results/self-protection
+python3 chain/simulation/verify.py chain/simulation/results/self-protection --replay
 python3 chain/simulation/community.py --citizens 10000 --seeds 7 --output chain/simulation/results/large
 python3 chain/simulation/verify.py chain/simulation/results/large
 ```
@@ -136,4 +136,16 @@ For the next stage, port identity/election/session/treasury rules into chain mod
 and send every action as a signed transaction. Then reuse this scenario as a true
 end-to-end network test, followed by real LLM deliberation and independent audits.
 
-Security changes use v2 reports. Historical pilot and large v1 artifacts remain immutable; exact replay requires commit `6a87852`. See [the adversarial review](../security/REVIEW.md).
+Earlier security changes used v2 reports. Historical pilot and large v1 artifacts remain immutable; exact replay requires commit `6a87852`. See [the adversarial review](../security/REVIEW.md).
+
+Current reports use v3 rules. Historical v2 exact replay requires commit `f6bebf5`;
+v1 requires `6a87852`. The `self-protection` artifacts run with quota protections
+and three safety members. Run `python3 chain/simulation/insider_abuse.py --output
+/tmp/insider-abuse.json` for the separate 10-of-50 insider story. See
+[insider protection](../security/INSIDER_PROTECTION.md).
+
+To verify committed self-protection artifacts on a fresh checkout, generate the
+v3 run in a temporary directory and copy only its ignored event/question files
+into `results/self-protection`. Keep the committed report, combined manifest,
+insider report and receipt together; regenerating a manifest creates a new document
+that requires its own anchor receipt.

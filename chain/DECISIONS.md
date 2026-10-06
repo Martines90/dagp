@@ -52,3 +52,19 @@ remain necessary against denial of service. Reference default grace is 100 block
 All rejected money, key, grade and block operations validate before mutation.
 Eligibility requires an issued token record, and audits may only reduce recorded
 reading. Native keepers must preserve these invariants. See `security/REVIEW.md`.
+
+## Coordinated insider refinement — 2026-10-06 (reference)
+
+Admin peers may contain operational powers at 50% of a frozen elected council;
+permanent citizen bans remain judicial. Containment preserves citizenship and
+validator duties, is temporary, evidence-bound and independently reviewable.
+Separate bounded review budgets prevent hostile quota exhaustion from blocking
+dismissal. Restrictive actions share rolling per-official, per-operator and global
+budgets. Quotas must use consensus time in native code; reference time is height.
+Operator-wide exclusion additionally requires public ratification. Cluster sanctions
+are atomic and individual validator sanctions preserve quorum and minimum size.
+Full defaults and trust assumptions are in `security/INSIDER_PROTECTION.md`.
+
+Registrar spam freezes preserve civic voting, endorsement, case-filing and key-custody
+rights. Courts may impose full suspensions; a registrar cannot determine eligibility
+through a unilateral short freeze. This intentionally refines the earlier D-01 rule.

@@ -80,3 +80,25 @@ recovery coalition checks at activation and strict refinement/pause inputs.
 passed progress with two offline, halt with three, and restart/state agreement.
 [Security contract](security/PROTOCOL.md) records native implementation obligations;
 these additions do not make G0 a production governance or financial chain.
+
+## Coordinated insider protection (reference)
+
+The [insider protocol](security/INSIDER_PROTECTION.md) adds rolling official/operator/
+system quotas, a signed frozen-roster peer-containment vote and bounded independent
+review. Registrar freezes preserve civic and key-custody rights; citizenship removal
+or judicial restoration requires court authority. Operator-wide bans also require
+public ratification. Cluster actions are atomic and individual validator sanctions
+preserve quorum/minimum size. These are reference rules awaiting native keepers.
+
+The [insider scenario](simulation/results/self-protection/insider-abuse.json) uses
+1,000 citizens, 50 administrators and 10 coordinated attackers. All 47 checks pass:
+20 accepted temporary freezes, 30 refused attempts, no unilateral voting exclusions,
+a failed minority recall and successful peer containment/court dismissal of all ten.
+Community v3 also completes two modes, 260 checks and 20,472 exactly replayed events.
+Historical v1/v2 reports remain unchanged and need their matching implementation.
+
+Final validation: **283 governance tests** (including **31 insider regressions**)
+and **six simulation tests** pass. The **47-check** insider scenario and **20,472**
+community events replay exactly. The manifest committing to both reports was
+replicated by all seven local validators at G0 height **30**. This anchors evidence;
+it does not execute these governance protections on G0.

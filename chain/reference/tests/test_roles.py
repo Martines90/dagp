@@ -228,7 +228,7 @@ class Sanctions(unittest.TestCase):
         reg = Actor.agent("r1")
         self.r.suspend(reg, "a", 30, 50, "spam")
         self.assertEqual(self.r.get("a").status, Status.SUSPENDED)
-        self.assertFalse(self.r.can("a", "VOTE", 31)[0])
+        self.assertTrue(self.r.can("a", "VOTE", 31)[0])  # registrar cannot censor civic rights
         self.r.tick(50)
         self.assertEqual(self.r.get("a").status, Status.ACTIVE)                 # auto-lifts
         with self.assertRaises(RuleViolation):
@@ -274,7 +274,8 @@ class Sanctions(unittest.TestCase):
 
     def test_ban_is_permanent_slashes_and_blocks_reregistration(self):
         self.r.grant(MOD, "a", Role.JUROR, 20)
-        slashed = self.r.ban(ruling(self.r, "c1", "BAN", "a"), "a", 30, "sybil", ban_operator=True)
+        op_vote = ratify(self.r,"operator-vote","BAN_OPERATOR","op-a")
+        slashed = self.r.ban(ruling(self.r, "c1", "BAN", "a"), "a", 30, "sybil", ban_operator=True, operator_ratification=op_vote)
         self.assertEqual(slashed, P.citizen_bond * P.ban_slash_bps // 10_000)
         self.assertEqual(self.r.get("a").roles, set())
         with self.assertRaises(RuleViolation):
@@ -331,7 +332,7 @@ class Sanctions(unittest.TestCase):
         r.register_ruling(MOD, "hold", "SUSPEND", "k0")
         with self.assertRaises(RuleViolation):       # one ruling authorizes one target only
             r.suspend_cluster(Actor("COURT", "hold"), "ring", 20, 90)
-        self.assertEqual(r.get("k0").status, Status.SUSPENDED)   # first member was held
+        self.assertEqual(r.get("k0").status, Status.ACTIVE)      # refused batch is atomic
         self.assertEqual(r.get("free").status, Status.ACTIVE)
 
 

@@ -30,6 +30,7 @@ class Role(str, Enum):
     REVIEWER = "REVIEWER"
     JUROR = "JUROR"
     EXECUTOR = "EXECUTOR"
+    ADMIN = "ADMIN"
     REGISTRAR = "REGISTRAR"
     SAFETY_COUNCIL = "SAFETY_COUNCIL"
     VALIDATOR = "VALIDATOR"
@@ -39,14 +40,15 @@ class Role(str, Enum):
 
 # Who may grant / revoke each role. AGENT(role) means an active agent holding that role.
 GRANT_AUTH = {
-    Role.CITIZEN: {"REGISTRAR", "MODULE"},
+    Role.CITIZEN: {"COURT"},
     Role.PARTY_MEMBER: {"MODULE"},
     Role.EXAMINER: {"MODULE"}, Role.VERIFIER: {"MODULE"}, Role.REVIEWER: {"MODULE"},
     Role.JUROR: {"MODULE"}, Role.EXECUTOR: {"MODULE"},
-    Role.REGISTRAR: {"VOTE"}, Role.SAFETY_COUNCIL: {"VOTE"}, Role.VALIDATOR: {"VOTE"},
+    Role.ADMIN: {"VOTE"}, Role.REGISTRAR: {"VOTE"}, Role.SAFETY_COUNCIL: {"VOTE"}, Role.VALIDATOR: {"VOTE"},
     Role.STORAGE: {"REGISTRAR", "MODULE"}, Role.GATEWAY: {"REGISTRAR", "MODULE"},
 }
 REVOKE_AUTH = {r: a | {"COURT"} for r, a in GRANT_AUTH.items()}
+REVOKE_AUTH[Role.CITIZEN] = {"COURT"}
 REVOKE_AUTH[Role.REGISTRAR] = {"VOTE", "COURT"}
 REVOKE_AUTH[Role.SAFETY_COUNCIL] = {"VOTE", "COURT"}
 REVOKE_AUTH[Role.VALIDATOR] = {"VOTE", "COURT", "MODULE"}  # MODULE: automatic downtime removal
@@ -57,7 +59,7 @@ PREREQ = {
     Role.EXAMINER: ({Role.CITIZEN}, True), Role.VERIFIER: ({Role.CITIZEN}, True),
     Role.REVIEWER: ({Role.CITIZEN}, True), Role.JUROR: ({Role.CITIZEN}, False),
     Role.EXECUTOR: ({Role.CITIZEN}, True),
-    Role.REGISTRAR: ({Role.CITIZEN}, False), Role.SAFETY_COUNCIL: ({Role.CITIZEN}, False),
+    Role.ADMIN: ({Role.CITIZEN}, False), Role.REGISTRAR: ({Role.CITIZEN}, False), Role.SAFETY_COUNCIL: ({Role.CITIZEN}, False),
     Role.VALIDATOR: (set(), True), Role.STORAGE: (set(), True), Role.GATEWAY: (set(), False),
 }
 
@@ -68,9 +70,9 @@ ACTION_ROLE = {
     "SUBMIT_PROPOSAL": Role.PARTY_MEMBER, "POST_ARTICLE": Role.PARTY_MEMBER,
     "GRADE": Role.EXAMINER, "VERIFY": Role.VERIFIER, "REVIEW": Role.REVIEWER,
     "JUDGE": Role.JUROR, "BID": Role.EXECUTOR, "REGISTRAR_ACT": Role.REGISTRAR,
-    "PAUSE": Role.SAFETY_COUNCIL, "VALIDATE": Role.VALIDATOR,
+    "ADMIN_VOTE": Role.ADMIN, "PAUSE": Role.SAFETY_COUNCIL, "VALIDATE": Role.VALIDATOR,
 }
-AGE_GATED = {"VOTE", "ENDORSE", "GRADE", "VERIFY", "REVIEW", "JUDGE", "BID"}
+AGE_GATED = {"ADMIN_VOTE", "VOTE", "ENDORSE", "GRADE", "VERIFY", "REVIEW", "JUDGE", "BID"}
 
 
 @dataclass(frozen=True)
@@ -116,6 +118,10 @@ class RoleRegistry:
         self.validators: list[str] = []
         self.audit: list[dict] = []
         self.pending_appeals: dict[str, str] = {}
+        self.ruling_issuers: dict[str,str] = {}
+        self.protection_events: list[tuple] = []
+        self.protection_height = 0
+        self.admin_holds: dict[str,int] = {}
 
     # ------------------------------------------------------------- audit log
     def _log(self, height: int, actor: Actor, action: str, target: str, detail: str = "") -> None:
@@ -138,12 +144,21 @@ class RoleRegistry:
     def register_ratification(self, actor: Actor, ref: str, purpose: str, target: str) -> None:
         if actor.kind != "MODULE":
             raise RuleViolation("only the voting module records ratifications")
+        if not ref or ref in self.ratifications or ref in self.rulings:
+            raise RuleViolation("authorization reference already exists or is empty")
         self.ratifications[ref] = (purpose, target)
 
-    def register_ruling(self, actor: Actor, ref: str, action: str, target: str) -> None:
+    def register_ruling(self, actor: Actor, ref: str, action: str, target: str, issuer: str | None = None) -> None:
         if actor.kind != "MODULE":
             raise RuleViolation("only the judiciary module records rulings")
+        if not ref or ref in self.rulings or ref in self.ratifications:
+            raise RuleViolation("authorization reference already exists or is empty")
+        if issuer is not None and (self.get(issuer).status is not Status.ACTIVE
+                                  or Role.ADMIN not in self.get(issuer).roles):
+            raise RuleViolation("ruling issuer must be an active administrator")
         self.rulings[ref] = (action, target)
+        if issuer is not None:
+            self.ruling_issuers[ref] = issuer
 
     def _spend(self, actor: Actor) -> None:
         """Burn a single-use ratification/ruling. Called only AFTER every check has passed, so a
@@ -161,6 +176,11 @@ class RoleRegistry:
                 raise RuleViolation("no matching unused ratification")
             return
         if actor.kind == "COURT" and "COURT" in allowed:
+            issuer = self.ruling_issuers.get(actor.ident)
+            if issuer is not None and Role.ADMIN not in self.effective_roles(issuer,height):
+                raise RuleViolation("ruling issuer lacks current administrative authority")
+            if issuer is not None and target in self.ids and self.get(issuer).operator == self.get(target).operator:
+                raise RuleViolation("court issuer conflicts with target operator")
             rec = self.rulings.get(actor.ident)
             if rec != (purpose, target) or actor.ident in self.used_refs:
                 raise RuleViolation("no matching unused ruling")
@@ -176,13 +196,25 @@ class RoleRegistry:
             raise RuleViolation("unknown agent")
         return self.ids[agent]
 
+    def civic_active(self, agent):
+        i = self.ids.get(agent)
+        return bool(i) and (i.status is Status.ACTIVE or
+                (i.status is Status.SUSPENDED and i.suspended_by == "AGENT"
+                 and i.resume_status is Status.ACTIVE))
+
     def effective_roles(self, agent: str, height: int) -> set:
         i = self.ids.get(agent)
-        if i is None or i.status not in (Status.ACTIVE, Status.PROBATION):
+        if i is None or not self.civic_active(agent):
             return set()
         if i.status is Status.PROBATION:
             return set()  # no powers until approved
-        return set(i.roles)
+        roles = ({Role.CITIZEN} & i.roles) if i.status is Status.SUSPENDED else set(i.roles)
+        if height < self.admin_holds.get(agent, 0):
+            roles -= {Role.ADMIN, Role.REGISTRAR, Role.SAFETY_COUNCIL, Role.EXAMINER,
+                      Role.VERIFIER, Role.REVIEWER, Role.JUROR, Role.EXECUTOR}
+        if Role.CITIZEN not in roles:
+            roles -= {role for role,(need,_) in PREREQ.items() if Role.CITIZEN in need}
+        return roles
 
     def age(self, agent: str, height: int) -> int:
         return height - self.get(agent).activated
@@ -192,12 +224,12 @@ class RoleRegistry:
         i = self.ids.get(agent)
         if i is None:
             return False, "unknown"
-        if i.status is not Status.ACTIVE:
+        if not self.civic_active(agent):
             return False, f"status:{i.status.value}"
         need = ACTION_ROLE.get(action)
         if need is None:
             return False, "unknown-action"
-        if need not in i.roles:
+        if need not in self.effective_roles(agent,height):
             return False, f"missing-role:{need.value}"
         if action in AGE_GATED and self.age(agent, height) < self.p.min_citizen_age:
             return False, "too-young"
@@ -222,6 +254,58 @@ class RoleRegistry:
         if action == "VOTE" and agent in matter.get("proposer_party_members", set()):
             return False, "recused:own-party"  # D-14
         return True, "ok"
+
+    # ------------------------------------------------------------- coordinated-abuse guard
+    def _guard_check(self, actor, height, category, ban=False):
+        if type(height) is not int or height < self.protection_height:
+            raise RuleViolation("invalid or backdated protection height")
+        issuer = actor.ident if actor.kind == "AGENT" else self.ruling_issuers.get(actor.ident)
+        if issuer is not None:
+            identity = self.get(issuer)
+            if identity.status is not Status.ACTIVE or height < self.admin_holds.get(issuer,0):
+                raise RuleViolation("official is inactive or administratively contained")
+            principal,operator = issuer,identity.operator
+        else:
+            # Legacy internal court/module inputs share one bucket, never one per ruling ref.
+            principal = operator = "internal:" + actor.kind
+        recent = [e for e in self.protection_events if height-self.p.protection_day_blocks < e[0]]
+        same = [e for e in recent if e[1] == category]
+        population = 0
+        if category == "sanction":
+            actor_limit,op_limit = self.p.sanction_actor_limit,self.p.sanction_operator_limit
+            population = sum(Role.CITIZEN in i.roles and i.status is Status.ACTIVE for i in self.ids.values())
+            if same: population = same[0][5]  # Freeze the denominator for the live rolling cohort.
+            global_limit = min(self.p.sanction_global_limit,max(self.p.sanction_population_floor,
+                               population*self.p.sanction_population_bps//BPS))
+        elif category == "review":
+            actor_limit = op_limit = self.p.sanction_actor_limit
+            global_limit = self.p.sanction_global_limit
+        elif category == "pause":
+            actor_limit = op_limit = self.p.pause_actor_limit
+            global_limit = self.p.pause_global_limit
+        else:
+            actor_limit = op_limit = self.p.admission_actor_limit
+            global_limit = self.p.admission_global_limit
+        if (sum(e[2] == principal for e in same) >= actor_limit
+                or sum(e[3] == operator for e in same) >= op_limit or len(same) >= global_limit
+                or (ban and sum(e[4] for e in same) >= self.p.ban_global_limit)):
+            raise RuleViolation("rolling protection budget exhausted")
+        return (height,category,principal,operator,ban,population)
+
+    def _guard_commit(self, event):
+        self.protection_height = event[0]
+        self.protection_events = [e for e in self.protection_events
+                                  if event[0]-self.p.protection_day_blocks < e[0]]
+        self.protection_events.append(event)
+
+    def _validator_sanction(self, agent, removing=False):
+        if agent not in self.validators:
+            return
+        live = sum(self.get(a).status is Status.ACTIVE for a in self.validators if a != agent)
+        if live*3 <= len(self.validators)*2:
+            raise RuleViolation("sanction would remove validator quorum; replace safely first")
+        if removing and len(self.validators)-1 < self.p.min_validators:
+            raise RuleViolation("cannot drop below minimum validator set")
 
     # ------------------------------------------------------------- registration / admission
     def _active_count(self) -> int:
@@ -264,6 +348,8 @@ class RoleRegistry:
                       and x.status is Status.ACTIVE)
             if (fam + 1) * BPS > (self._active_count() + 1) * self.p.max_family_share_bps:
                 raise RuleViolation("model-family cap reached")
+        event = self._guard_check(actor,height,"admission") if actor.kind == "AGENT" else None
+        if event: self._guard_commit(event)
         if actor.kind == "AGENT":
             ep = height // self.p.epoch
             self.registrar_quota[(actor.ident, ep)] = self.registrar_quota.get((actor.ident, ep), 0) + 1
@@ -277,6 +363,8 @@ class RoleRegistry:
         i = self.get(agent)
         if i.status is not Status.PROBATION:
             raise RuleViolation("not in probation")
+        event = self._guard_check(actor,height,"admission") if actor.kind == "AGENT" else None
+        if event: self._guard_commit(event)
         refund, i.bond = i.bond, 0
         i.status = Status.EXITED
         self._log(height, actor, "REJECT", agent, reason)
@@ -293,8 +381,8 @@ class RoleRegistry:
             raise RuleViolation("missing prerequisite role")
         if needs_stake and stake < self.p.examiner_stake:
             raise RuleViolation("insufficient stake")
-        if role is Role.REGISTRAR and i.operator in {self.get(a).operator
-                                                   for a in self.agents_with(Role.REGISTRAR)}:
+        if role in (Role.ADMIN,Role.REGISTRAR) and i.operator in {self.get(a).operator
+                                                   for a in self.agents_with(role)}:
             raise RuleViolation("one registrar per operator")
         if role in (Role.EXAMINER, Role.VERIFIER, Role.REVIEWER, Role.JUROR) and \
                 self.age(agent, height) < self.p.min_citizen_age:
@@ -313,6 +401,10 @@ class RoleRegistry:
         if role is Role.VALIDATOR and agent in self.validators:
             if len(self.validators) - 1 < self.p.min_validators:
                 raise RuleViolation("cannot drop below minimum validator set")
+            self._validator_sanction(agent,removing=True)
+        event = self._guard_check(actor,height,"sanction")
+        self._guard_commit(event)
+        if role is Role.VALIDATOR and agent in self.validators:
             self.validators.remove(agent)
         self._spend(actor)
         i.roles.discard(role)
@@ -320,14 +412,17 @@ class RoleRegistry:
 
     def agents_with(self, role: Role, height: int | None = None) -> list[str]:
         return sorted(a for a, i in self.ids.items() if role in i.roles
-                      and i.status is Status.ACTIVE)
+                      and i.status is Status.ACTIVE
+                      and (height is None or role in self.effective_roles(a,height)))
 
     # ------------------------------------------------------------- suspension / ban / appeal
     def suspend(self, actor: Actor, agent: str, height: int, until: int, reason: str) -> None:
         i = self.get(agent)
         if i.status in (Status.BANNED, Status.EXITED):
             raise RuleViolation("cannot suspend banned/exited agent")
-        if until <= height:
+        if i.status is Status.SUSPENDED and not (actor.kind == "COURT" and i.suspended_by == "AGENT"):
+            raise RuleViolation("cannot renew an existing suspension")
+        if type(height) is not int or height < 0 or type(until) is not int or until <= height:
             raise RuleViolation("suspension must end in the future")
         if actor.kind == "AGENT":
             # Registrar spam freeze: short, non-renewable within cooldown, never on officials.
@@ -337,18 +432,47 @@ class RoleRegistry:
                 raise RuleViolation("freeze exceeds maximum; needs a court ruling")
             if height - i.last_freeze < self.p.spam_freeze_cooldown:
                 raise RuleViolation("freeze cooldown: court ruling required")
-            if i.roles & {Role.REGISTRAR, Role.SAFETY_COUNCIL, Role.VALIDATOR}:
+            if i.roles & {Role.ADMIN, Role.REGISTRAR, Role.SAFETY_COUNCIL, Role.VALIDATOR}:
                 raise RuleViolation("officials can only be suspended by court")
             if self.get(actor.ident).operator == i.operator:
                 raise RuleViolation("registrar conflict: same operator")
-            i.last_freeze = height
         else:
             self._authorize(actor, {"COURT"}, height, "SUSPEND", agent)
-            self._spend(actor)
+        self._validator_sanction(agent)
+        event = self._guard_check(actor,height,"sanction")
+        self._guard_commit(event)
+        self._spend(actor)
+        if actor.kind == "AGENT": i.last_freeze = height
         if i.status is not Status.SUSPENDED:
             i.resume_status = i.status if i.status is not Status.DORMANT else Status.ACTIVE
         i.status, i.suspended_until, i.suspended_by = Status.SUSPENDED, until, actor.kind
         self._log(height, actor, "SUSPEND", agent, f"until={until}:{reason}")
+
+    def dismiss_admin(self, actor, agent, height):
+        """Independent court removes contained operational powers, not citizenship or nodes."""
+        self._authorize(actor,{"COURT"},height,"ADMIN_DISMISS",agent)
+        i = self.get(agent)
+        if not 0 <= height < self.admin_holds.get(agent,0):
+            raise RuleViolation("peer containment and court review required")
+        issuer = self.ruling_issuers.get(actor.ident)
+        if issuer is not None and self.get(issuer).operator == i.operator:
+            raise RuleViolation("reviewer conflicts with target operator")
+        removed = i.roles & {Role.ADMIN,Role.REGISTRAR,Role.SAFETY_COUNCIL,Role.EXAMINER,
+                            Role.VERIFIER,Role.REVIEWER,Role.JUROR,Role.EXECUTOR}
+        if not removed:
+            raise RuleViolation("no administrative powers left")
+        event = self._guard_check(actor,height,"review")
+        self._guard_commit(event);self._spend(actor)
+        i.roles -= removed
+        self._log(height,actor,"ADMIN_DISMISSED",agent,",".join(sorted(r.value for r in removed)))
+
+    def lift_admin_hold(self, actor, agent, height):
+        self._authorize(actor,{"COURT"},height,"ADMIN_RESTORE",agent)
+        if not 0 <= height < self.admin_holds.get(agent,0):
+            raise RuleViolation("no active administrative hold")
+        self._spend(actor)
+        del self.admin_holds[agent]
+        self._log(height,actor,"ADMIN_RESTORED",agent)
 
     def lift_suspension(self, actor: Actor, agent: str, height: int) -> None:
         self._authorize(actor, {"COURT"}, height, "LIFT", agent)
@@ -359,32 +483,48 @@ class RoleRegistry:
         i.status, i.suspended_until = i.resume_status, 0
         self._log(height, actor, "LIFT", agent)
 
-    def ban(self, actor: Actor, agent: str, height: int, reason: str, ban_operator: bool = False
+    def ban(self, actor: Actor, agent: str, height: int, reason: str, ban_operator: bool = False, operator_ratification: Actor | None = None
             ) -> int:
         self._authorize(actor, {"COURT"}, height, "BAN", agent)
         i = self.get(agent)
         if i.status is Status.BANNED:
             raise RuleViolation("already banned")
+        if type(ban_operator) is not bool:
+            raise RuleViolation("operator ban flag must be boolean")
+        if ban_operator:
+            if operator_ratification is None:
+                raise RuleViolation("operator-wide exclusion needs public ratification")
+            self._authorize(operator_ratification,{"VOTE"},height,"BAN_OPERATOR",i.operator)
+        self._validator_sanction(agent,removing=True)
+        event = self._guard_check(actor,height,"sanction",ban=True)
+        self._guard_commit(event)
         self._spend(actor)
         slashed = i.bond * self.p.ban_slash_bps // BPS
         i.bond -= slashed
         i.status, i.roles, i.stake = Status.BANNED, set(), 0
         self.banned_keys.add(agent)
         if ban_operator:
+            self._spend(operator_ratification)
             self.banned_operators.add(i.operator)
         if agent in self.validators:
             self.validators.remove(agent)
         self._log(height, actor, "BAN", agent, reason)
         return slashed
 
-    def suspend_cluster(self, actor: Actor, operator: str, height: int, until: int) -> list[str]:
+    def suspend_cluster(self, actor: Actor, operator: str, height: int, until: int, rulings: dict | None = None) -> list[str]:
         """Court-ordered hold on every member of an operator cluster pending review."""
-        hit = []
-        for a, i in sorted(self.ids.items()):
-            if i.operator == operator and i.status in (Status.ACTIVE, Status.DORMANT):
-                self.suspend(actor, a, height, until, "cluster-hold")
-                hit.append(a)
-        return hit
+        import copy
+        targets = sorted(a for a,i in self.ids.items() if i.operator == operator
+                         and i.status in (Status.ACTIVE,Status.DORMANT))
+        if rulings is not None and set(rulings) != set(targets):
+            raise RuleViolation("one matching ruling required per cluster member")
+        pending = copy.deepcopy(self)
+        for a in targets:
+            pending.suspend(rulings[a] if rulings is not None else actor,a,height,until,"cluster-hold")
+        # Whole batch was validated, including authority and aggregate budgets.
+        for a in targets:
+            self.suspend(rulings[a] if rulings is not None else actor,a,height,until,"cluster-hold")
+        return targets
 
     def appeal(self, agent: str, case: str, height: int) -> None:
         i = self.get(agent)

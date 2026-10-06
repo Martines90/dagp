@@ -71,7 +71,7 @@ class MilestonePayments:
         for member,sig in signatures.items():
             identity=self.registry.get(member)
             if (member not in members or identity.status is not Status.ACTIVE
-                    or Role.VERIFIER not in identity.roles
+                    or not self.registry.can(member,"VERIFY",height)[0]
                     or identity.operator in excluded or identity.operator in operators
                     or not isinstance(sig,str)
                     or not self.keyring.verify(member,approval.message(),sig)):

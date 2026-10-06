@@ -38,6 +38,13 @@ class Emergency:
             raise RuleViolation("already paused")
         if last and not last[2] and height < last[1] + self.p.pause_max:
             raise RuleViolation("re-pause cooldown: needs a ratifying vote")
+        funded = [a for a,amount in self.tr.escrow.items() if amount > 0 and a not in self.tr.terminated]
+        concurrent = sum(height < self.tr.paused_until.get(a,0) for a in funded)
+        cap = max(1,(len(funded)*self.p.pause_concurrent_bps+9999)//10000)
+        if concurrent >= cap:
+            raise RuleViolation("concurrent pause circuit breaker; use public governance")
+        event = self.reg._guard_check(Actor.agent(agent),height,"pause")
+        self.reg._guard_commit(event)
         end = height + duration
         self.tr.paused_until[project] = end
         self.history.setdefault(project, []).append((height, end, False))

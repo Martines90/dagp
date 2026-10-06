@@ -72,6 +72,22 @@ class Params:
     board_fail_den: int = 1_000_000      # target P(hostile majority on a board) <= 1e-6
     canary_min_accuracy_bps: int = 8_000
     canary_min_samples: int = 20
+    # Rolling model-day windows; native keepers must use committed consensus time.
+    protection_day_blocks: int = 14_400
+    sanction_actor_limit: int = 2
+    sanction_operator_limit: int = 2
+    sanction_global_limit: int = 20
+    sanction_population_bps: int = 200
+    sanction_population_floor: int = 3
+    ban_global_limit: int = 5
+    admission_actor_limit: int = 50
+    admission_global_limit: int = 250
+    pause_actor_limit: int = 2
+    pause_global_limit: int = 10
+    pause_concurrent_bps: int = 2_000
+    admin_containment_duration: int = 300
+    admin_vote_window: int = 100
+    admin_min_council: int = 5
     challenge_resolution_grace: int = 100  # unresolved juries cannot lock funds forever
     challenge_window: int = 200
     rotation_delay: int = 50             # key rotation takes effect this long after the signed request
@@ -79,6 +95,20 @@ class Params:
     max_session_ttl: int = 500
     min_guardians: int = 3
     shard_target: int = 10_000           # ballots per tally shard (scale, constant work per shard)
+
+    def __post_init__(self):
+        positive = (self.protection_day_blocks,self.sanction_actor_limit,self.sanction_operator_limit,
+                    self.sanction_global_limit,self.sanction_population_floor,self.ban_global_limit,
+                    self.admission_actor_limit,self.admission_global_limit,self.pause_actor_limit,
+                    self.pause_global_limit,self.admin_containment_duration,self.admin_vote_window,
+                    self.admin_min_council)
+        if any(type(n) is not int or n <= 0 for n in positive):
+            raise ValueError("protection limits and windows must be positive integers")
+        if any(type(n) is not int or not 0 < n <= BPS for n in
+               (self.sanction_population_bps,self.pause_concurrent_bps)):
+            raise ValueError("protection fractions outside (0,10000]")
+        if self.admin_min_council < 3:
+            raise ValueError("admin council needs at least three members")
 
     def snapshot_hash(self) -> str:
         blob = json.dumps(asdict(self), sort_keys=True, separators=(",", ":")).encode()

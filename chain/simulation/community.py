@@ -112,7 +112,7 @@ class Community:
         for role,group in [(Role.VERIFIER,self.citizens[-30:-20]),(Role.REVIEWER,self.citizens[-20:-10]),
                            (Role.JUROR,self.citizens[-10:]),(Role.EXECUTOR,self.leaders[:10])]:
             for a in group:self.reg.grant(MODULE,a,role,self.height,stake=50)
-        self.appointed(self.citizens[3],Role.SAFETY_COUNCIL)
+        for a in self.citizens[3:6]: self.appointed(a,Role.SAFETY_COUNCIL)
         validators=self.citizens[3:10]
         for a in validators:self.appointed(a,Role.VALIDATOR)
         ref='bootstrap-validator-set'; self.reg.register_ratification(MODULE,ref,'VALIDATOR_SET',','.join(sorted(validators)))
@@ -356,7 +356,14 @@ class Community:
             self.check('independent verifier roles available '+issue,len(verifiers)>=3)
             self.refused('unattested release blocked '+issue,lambda:self.tr.release_next(issue,0,3,self.height))
             emergency=Emergency(self.p,self.reg,self.tr)
-            end=emergency.pause(self.citizens[3],issue,self.height,10,'MILESTONE_RECHECK')
+            # Independent council members share the workload; daily safeguards stay enabled.
+            council=self.reg.agents_with(Role.SAFETY_COUNCIL,self.height)
+            available=[]
+            for member in council:
+                try:self.reg._guard_check(Actor.agent(member),self.height,'pause');available.append(member)
+                except RuleViolation:pass
+            if not available:raise RuleViolation('no available council pause budget')
+            end=emergency.pause(available[0],issue,self.height,10,'MILESTONE_RECHECK')
             self.refused('emergency pause blocks payment '+issue,lambda:self.tr.release_next(issue,3,3,self.height))
             self.height=end
             self.tr.release_next(issue,3,3,self.height)
@@ -450,7 +457,7 @@ def main():
             differences=[dict(issue=a['issue'],weighted=a['outcome'],flat=b['outcome'])
                 for a,b in zip(pair['WEIGHTED']['sessions'],pair['FLAT']['sessions']) if a['outcome']!=b['outcome']]
             comparisons.append(dict(seed=seed,outcome_differences=differences))
-    report=dict(format='dagp-community-simulation-v2',execution='reference-governance-with-optional-G0-result-anchoring',
+    report=dict(format='dagp-community-simulation-v3',execution='reference-governance-with-optional-G0-result-anchoring',
         limitations=['Synthetic policies, not AGI or LLM agents','Reference signatures are HMAC stand-ins',
         'HTTP challenge admission is not implemented','Court semantics and milestone evidence are scripted',
         'G0 chain records result commitment, does not enforce governance','Seven validators share one host'],

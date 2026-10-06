@@ -144,15 +144,11 @@ class RoleEdges(unittest.TestCase):
             r.register(f"k{i}", "ring", "f", 10, 0)
             r.approve(MODULE, f"k{i}", 0)
         court = Actor("COURT", "hold")
-        calls = []
-        orig = r.suspend
-
-        def lenient(actor, agent, *a, **k):                      # one ruling per member in real use
-            r.register_ruling(MODULE, f"hold-{agent}", "SUSPEND", agent)
-            calls.append(agent)
-            return orig(Actor("COURT", f"hold-{agent}"), agent, *a, **k)
-        r.suspend = lenient
-        self.assertEqual(r.suspend_cluster(court, "ring", 20, 90), ["k0", "k1"])
+        rulings = {}
+        for agent in ("k0","k1"):
+            r.register_ruling(MODULE,f"hold-{agent}","SUSPEND",agent)
+            rulings[agent] = Actor("COURT",f"hold-{agent}")
+        self.assertEqual(r.suspend_cluster(court,"ring",20,90,rulings),["k0","k1"])
         self.assertTrue(all(r.get(a).status is Status.SUSPENDED for a in ("k0", "k1")))
 
 

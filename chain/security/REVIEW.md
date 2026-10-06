@@ -110,3 +110,18 @@ including the million-ballot sharded tally. Fourteen new protocol regressions co
 signed milestone authorization, replay, conflicts, pauses, recovery and caps. The
 crash campaign committed documents at heights 23 and 27 before/after quorum loss,
 verified seven matching states and refused replay.
+
+## Coordinated insider controls
+
+[Insider protection](INSIDER_PROTECTION.md) adds bounded rolling restrictions,
+operator/global budgets, signed 50%-council containment, independent dismissal,
+concurrent pause limits, immutable court references, ratified operator-wide exclusions
+and validator continuity checks. Registrar spam freezes now preserve civic and
+key-custody rights. Atomic cluster enforcement replaces the prior partial-batch
+behavior. Governance still executes in the reference, not G0 native keepers.
+
+Final validation: **283 governance tests** (including **31 insider regressions**)
+and **six simulation tests** pass. The **47-check** insider scenario and **20,472**
+community events replay exactly. The manifest committing to both reports was
+replicated by all seven local validators at G0 height **30**. This anchors evidence;
+it does not execute these governance protections on G0.

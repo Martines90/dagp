@@ -73,7 +73,7 @@ class KeyManager:
 
     def _live(self, agent: str, height: int) -> KeyState:
         i = self.reg.get(agent)
-        if i.status is not Status.ACTIVE:
+        if not self.reg.civic_active(agent):
             raise RuleViolation(f"identity is {i.status.value}")
         return self.state[agent]
 
@@ -88,12 +88,12 @@ class KeyManager:
         for agent, st in sorted(self.state.items()):
             p = st.pending
             if p and height >= p.effective:
-                if self.reg.get(agent).status is not Status.ACTIVE:
+                if not self.reg.civic_active(agent):
                     st.pending = None
                     self.reg._log(height, Actor("MODULE", "keys"), "KEYOP_BLOCKED", agent)
                     continue
                 if p.kind == "RECOVER":
-                    eligible = [g for g in p.guardians if self.reg.get(g).status is Status.ACTIVE]
+                    eligible = [g for g in p.guardians if self.reg.civic_active(g)]
                     operators = {self.reg.get(g).operator for g in eligible}
                     if (len(eligible) < st.k or len(operators) != len(eligible)
                             or self.reg.get(agent).operator in operators):
@@ -170,7 +170,7 @@ class KeyManager:
             raise RuleViolation("guardians must have distinct operators")
         for g in guardians:
             gi = self.reg.get(g)
-            if g == agent or gi.status is not Status.ACTIVE or gi.operator == owner_op:
+            if g == agent or not self.reg.civic_active(g) or gi.operator == owner_op:
                 raise RuleViolation("guardians must be other active identities of other operators")
         if nonce in st.used_nonces:
             raise RuleViolation("nonce reused")
@@ -193,7 +193,7 @@ class KeyManager:
         self._target(st, new_key)
         msg = self._msg("RECOVER", agent, new_key, nonce)
         good = {g for g, s in guardian_sigs.items()
-                if g in st.guardians and self.reg.get(g).status is Status.ACTIVE
+                if g in st.guardians and self.reg.civic_active(g)
                 and self.kr.verify(self._guardian_key(g), msg, s)}
         operators = {self.reg.get(g).operator for g in good}
         if (len(good) < st.k or len(operators) != len(good)

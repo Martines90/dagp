@@ -8,10 +8,18 @@ from community import Community
 def verify(directory, replay=False):
     raw=(directory/'report.json').read_bytes();report=json.loads(raw)
     manifest=json.loads((directory/'manifest.json').read_bytes())
-    if replay and report.get('format') != 'dagp-community-simulation-v2':
-        raise ValueError('Historical v1 rules changed during the security review; replay with commit 6a87852, or run the hardened v2 scenario')
+    if replay and report.get('format') != 'dagp-community-simulation-v3':
+        raise ValueError('Historical rules changed: v1 requires commit 6a87852; v2 requires f6bebf5. Generate a fresh v3 scenario for current rules')
     if hashlib.sha256(raw).hexdigest()!=manifest['report_sha256']:raise ValueError('report hash mismatch')
     if len(manifest['runs'])!=len(report['runs']):raise ValueError('manifest run count mismatch')
+    if 'insider_abuse_sha256' in manifest:
+        raw_insider=(directory/'insider-abuse.json').read_bytes()
+        if hashlib.sha256(raw_insider).hexdigest()!=manifest['insider_abuse_sha256']:
+            raise ValueError('insider scenario hash mismatch')
+        if replay:
+            from insider_abuse import run as run_insider
+            if json.loads(raw_insider)!=run_insider():
+                raise ValueError('insider scenario replay mismatch')
     count=0
     for run,entry in zip(report['runs'],manifest['runs']):
         if (run['seed'],run['mode'])!=(entry['seed'],entry['mode']):raise ValueError('manifest run mismatch')

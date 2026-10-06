@@ -91,3 +91,9 @@ verifier policies, independent infrastructure, verified state recovery, bounded-
 adversarial load tests, external security review and a staged capped-value launch.
 Each unresolved item must have an owner and a measurable acceptance test; increasing
 simulation population does not close a missing trust boundary.
+
+## Coordinated insider controls
+
+See [insider protection](INSIDER_PROTECTION.md) for enforced reference quotas, signed
+50% peer containment, separate review budgets, operator-wide ban ratification and
+validator continuity checks. These protections must be ported into native keepers.

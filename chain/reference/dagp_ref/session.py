@@ -30,11 +30,11 @@ ELECTION = "ELECTION"
 
 
 def snapshot_electorate(registry: RoleRegistry, height: int, exclude=frozenset()) -> Electorate:
-    """Eligible = ACTIVE citizens aged >= min_citizen_age, minus excluded (recused, board).
-    DORMANT, SUSPENDED, BANNED, PROBATION and EXITED never appear (D-01)."""
+    """Eligible = citizens with civic standing and minimum age, minus recused/board ids.
+    DORMANT, judicially SUSPENDED, BANNED, PROBATION and EXITED never appear.
+    Registrar spam freezes preserve civic eligibility to prevent unilateral censorship."""
     return Electorate(a for a, i in registry.ids.items()
-                      if i.status is Status.ACTIVE and Role.CITIZEN in i.roles
-                      and height - i.activated >= registry.p.min_citizen_age and a not in exclude)
+                      if registry.can(a,"VOTE",height)[0] and a not in exclude)
 
 
 class Phase(str, Enum):
