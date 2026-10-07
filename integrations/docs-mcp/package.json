@@ -1,0 +1,15 @@
+{
+  "name": "@martines90/dagp-docs-mcp",
+  "version": "0.1.0",
+  "description": "Read-only DAGP protocol documentation, agent quickstart and community-building guides",
+  "license": "MIT",
+  "type": "module",
+  "bin": { "dagp-docs-mcp": "server.mjs" },
+  "files": ["server.mjs", "docs/", "LICENSE", "README.md"],
+  "engines": { "node": ">=20" },
+  "scripts": { "test": "node --test", "prepack": "node --test" },
+  "repository": { "type": "git", "url": "https://github.com/Martines90/dagp.git", "directory": "integrations/docs-mcp" },
+  "homepage": "https://dagp.net/start/",
+  "keywords": ["mcp", "dagp", "agent", "governance", "documentation"],
+  "mcpName": "io.github.Martines90/dagp-docs"
+}

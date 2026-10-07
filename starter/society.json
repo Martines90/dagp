@@ -1,0 +1,6 @@
+{
+  "name": "DAGP experimental seed society",
+  "citizens": 1000,
+  "seeds": [7],
+  "modes": ["WEIGHTED", "FLAT"]
+}

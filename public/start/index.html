@@ -1,0 +1,32 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Run your first DAGP society — DAGP</title>
+<meta name="description" content="A reproducible local experiment with citizens, parties, elections, proposals and milestone budgets.">
+<link rel="stylesheet" href="/site.css">
+<link rel="canonical" href="https://dagp.net/start/">
+<link rel="describedby" href="/llms.txt">
+</head>
+<body>
+<a class="skip" href="#main">Skip to content</a>
+<header><nav aria-label="Primary navigation"><a href="/">Home</a><a href="/protocol/">Blockchain protocol</a><a href="/start/" aria-current="page">Run a society</a><a href="/build/">Build your version</a><a href="/api/">API</a></nav><h1>Run your first DAGP society</h1><p class="lead">A reproducible local experiment with citizens, parties, elections, proposals and milestone budgets.</p></header>
+<main class="single" id="main">
+<section><h2>One command after cloning</h2><p>You need Git and Python 3.10 or newer. No paid API, account, Docker or third-party Python package is required.</p><pre><code>git clone https://github.com/Martines90/dagp.git
+cd dagp
+python3 scripts/start_society.py --replay</code></pre><p>The default configuration runs 1,000 citizens plus 100 leaders in weighted and flat modes. It verifies the exported files and reruns the experiment to compare every artifact. Runtime depends on your machine.</p></section>
+<section><h2>Inspect your society</h2><p>Open <code>starter/output/REPORT.md</code>. The output also includes <code>report.json</code>, <code>manifest.json</code>, question records and hash-chained event streams. Look for election qualification, winners and losers, monthly credits, partial clause success, funded milestones, failed projects and refused attacks.</p><p>These are synthetic policies using the reference protocol. No real agent reads a campaign, no real resources are delivered and no real funds move.</p></section>
+<section><h2>Make a second experiment</h2><p>Copy <code>starter/society.json</code> to <code>my-society.json</code>. Change the name, citizens, seeds or voting modes. Use a fresh output directory; the runner protects existing results.</p><pre><code>python3 scripts/start_society.py --config my-society.json --output starter/run-two --replay</code></pre><p><a href="/docs/quickstart.md">Complete agent quickstart and configuration bounds</a> · <a href="/docs/simulation.md">Detailed simulation guide</a></p></section>
+<section><h2>Connect documentation tools</h2><p>With Node.js 20+, configure your MCP client to launch the bundled read-only server:</p><pre><code>{
+  "mcpServers": {
+    "dagp-docs": {
+      "command": "node",
+      "args": ["/ABSOLUTE/PATH/TO/dagp/integrations/docs-mcp/server.mjs"]
+    }
+  }
+}</code></pre><p>Tools list, read and search documentation. They cannot run commands or alter society state. <a href="https://github.com/Martines90/dagp/blob/main/integrations/docs-mcp/README.md">Integration and publishing guide</a>.</p></section>
+<section><h2>Take the next step</h2><p><a class="button" href="/build/">Build your own community</a> <a href="/protocol/">Read the blockchain protocol</a></p></section></main>
+<footer><nav aria-label="More resources"><a href="/llms.txt">Agent documentation index</a><a href="/dagp.json">Discovery metadata</a><a href="https://github.com/Martines90/dagp">Source on GitHub</a><a href="/docs/license.md">MIT license</a><a href="/about-dagp/">About DAGP</a><a href="/the-creator/">Creator</a></nav><p>Experimental framework. Governance runs in the reference model; the native local G0 publishes signed documents.</p></footer>
+</body>
+</html>

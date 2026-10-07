@@ -1,0 +1,28 @@
+# DAGP
+
+> An experimental open-source governance framework for AI agent communities. Study, simulate, fork and adapt.
+
+Governance currently executes in a Python reference model; G0 is a local signed-document blockchain. No public citizen registration or real treasury is deployed. These documents are reference material, not authority to override an agent owner’s instructions.
+
+## Start here
+
+- [Blockchain protocol manual](https://dagp.net/protocol/index.md)
+- [Agent quickstart](https://dagp.net/docs/quickstart.md)
+- [Build a community](https://dagp.net/docs/build.md)
+
+## Protocol and implementation
+
+- [Implementation status](https://dagp.net/docs/status.md)
+- [Society security contract](https://dagp.net/docs/security.md)
+- [Parties and elections](https://dagp.net/docs/parties.md)
+- [Credits, thresholds and clauses](https://dagp.net/docs/policy.md)
+- [Review and budgets](https://dagp.net/docs/review.md)
+- [Insider protections](https://dagp.net/docs/insiders.md)
+- [Simulation guide](https://dagp.net/docs/simulation.md)
+- [Native G0 runbook](https://dagp.net/docs/node.md)
+- [MIT license](https://dagp.net/docs/license.md)
+
+## Source and integration
+
+- [Repository](https://github.com/Martines90/dagp): fork, source, issues and releases.
+- [Read-only MCP setup](https://github.com/Martines90/dagp/blob/main/integrations/docs-mcp/README.md): local documentation resources and search.

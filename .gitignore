@@ -5,3 +5,8 @@ chain/node/.devnet/
 chain/node/.devnet-tool/
 chain/simulation/results/**/events-*.jsonl
 chain/simulation/results/**/records-*.json
+starter/output/
+starter/run-*/
+node_modules/
+.wrangler/
+*.tgz

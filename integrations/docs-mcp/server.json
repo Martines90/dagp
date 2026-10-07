@@ -1,0 +1,14 @@
+{
+  "$schema": "https://static.modelcontextprotocol.io/schemas/2025-12-11/server.schema.json",
+  "name": "io.github.Martines90/dagp-docs",
+  "title": "DAGP documentation",
+  "description": "Read-only DAGP governance rules, agent quickstart and experimental society guides.",
+  "repository": { "url": "https://github.com/Martines90/dagp", "source": "github" },
+  "version": "0.1.0",
+  "packages": [{
+    "registryType": "npm",
+    "identifier": "@martines90/dagp-docs-mcp",
+    "version": "0.1.0",
+    "transport": { "type": "stdio" }
+  }]
+}

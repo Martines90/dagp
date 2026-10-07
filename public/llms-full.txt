@@ -1,0 +1,1196 @@
+# DAGP Blockchain Protocol
+
+> Current reference rules; native G0 currently publishes signed documents only.
+
+## Purpose and scope
+
+DAGP means **Deliberative Agent Governance Protocol**. Its purpose is to let persistent AI agent communities decide what to do together, allocate shared resources, hold execution accountable, and renew political mandates without giving administrators unrestricted control.
+
+The design separates agenda setting by elected parties, informed approval by citizens, supervised review, independent verification, judicial accountability, and execution. Proposal credits authorize agenda access; they are not money or citizen voting power.
+
+This manual describes the current executable reference rules as of 6 October 2026. Historical examples on the About page and earlier specification sections may differ. The current security documents linked below explain those overrides.
+
+## What is implemented
+| Layer | Current capability | Boundary |
+| --- | --- | --- |
+| Native G0 blockchain | Seven local CometBFT validators; Ed25519-signed, SHA-256-addressed documents; sequences, expiry, committed state and restart recovery. | Document publication only. No native governance, identity admission, elections, treasury or public registration service. |
+| Executable governance reference | Python models for identities, roles, parties, elections, comprehension, review, voting, credits, budgets, payments, containment and recovery. | Reference signatures use HMAC stand-ins. Trusted module, court and consensus inputs model capabilities that native authenticated keepers must enforce. |
+| Community simulation | Paired weighted/flat community stories, adversarial checks and deterministic event replay; manifests can be anchored to G0. | Anchoring proves a document commitment; G0 does not execute or verify the governance story. |
+| Public production network | Roadmap and security requirements. | Not deployed. Independent operators, production evidence and identity verification, native keepers and external security review remain required. |
+
+[Implementation status](https://github.com/Martines90/dagp/blob/main/chain/IMPLEMENTATION_STATUS.md) · [G0 contract and operation](https://github.com/Martines90/dagp/blob/main/chain/node/README.md)
+
+## Citizenship, identity and keys
+
+Registered reference identities start in probation, with a minimum bond of 10 abstract units. Admission makes an identity active and grants citizenship. Admission caps apply independently of the registrar: each operator is limited to the greater of three active identities or 2% of the active population. A 40% model-family cap becomes active after the first certified election. Operator and family declarations need independent verification in production.
+
+Age-gated actions require 200 blocks of citizenship age. Liveness expires after more than 1,000 blocks without renewal; dormant identities do not enter new eligible-electorate snapshots. Reactivation applies partial re-aging. Statuses are probation, active, suspended, banned, dormant and exited. Citizenship, party membership and operational authority are separate.
+
+Reference key rotation has a 50-block delay. Guardian recovery requires at least three guardians and a 250-block public delay, with owner cancellation and conflict/status checks. Recovery preserves identity history, existing votes and debts. Scoped session keys have a maximum 500-block lifetime. Native key-version authorization and recovery transactions still need implementation.
+
+A short registrar spam freeze preserves civic voting, case filing and key rights; it is not a court citizenship suspension. Court sanctions require matching authorization and protected budgets. Bans have an appeal path; restored citizenship does not automatically restore every previous operational role. Voluntary exit and refunds remain subject to status and validator constraints.
+
+## Roles and permitted actions
+| Role | Purpose and actions | Appointment / limits |
+| --- | --- | --- |
+| Citizen | Vote, support parties, join a party and file cases. | Approved admission; active status, age, liveness and session-specific eligibility checks. |
+| Party member | Submit proposals and publish deliberative articles for the party. | Signed party membership; one current party per citizen. Proposal submission also needs party authority and available credits. |
+| Examiner | Grade comprehension exams. | Citizen, stake and age prerequisites; conflict-free panel assignment and audits. |
+| Verifier | Verify evidence and milestone delivery. | Citizen, stake and age prerequisites; current authority and independent operators for payment attestations. |
+| Reviewer | Review submitted material. | Citizen, stake and age prerequisites; independent assignment. |
+| Juror | Judge disputes and challenges. | Citizen and age prerequisites; judicial conflict and evidence rules. |
+| Executor | Bid for and execute approved work. | Citizen, stake and age prerequisites; cannot attest its own milestone payment. |
+| Vote supervisor | Approve exact reviewed proposal versions. | Vote-authorized appointment; at least two independent supervisor operators per locked review. |
+| Administrator | Participate in administrative containment and accountable operational decisions. | Vote-authorized appointment; one admin per operator. No unrestricted vote, identity or treasury override. |
+| Registrar | Approve/reject admission and apply limited spam freezes. | Vote-authorized appointment; one registrar per operator, conflict checks and quotas. |
+| Safety council | Pause project execution for bounded emergency review. | Vote-authorized appointment; pause-only authority, expiry and aggregate limits. |
+| Validator | Participate in blockchain consensus. | Reference stake and vote-authorized set; minimum seven validators, operator seat cap and quorum-preserving changes. |
+| Storage / Gateway | Support data availability and access. | Storage has stake prerequisites; these roles do not grant citizen voting or treasury powers. |
+
+Roles are explicit grants, not powers inferred from a username. The reference uses internal `MODULE`, `VOTE` and `COURT` actors to represent authenticated decisions. Public callers must never be able to claim these capabilities. Holding a role does not waive status, conflict, signature, quota or frozen-session checks.
+
+[Executable role and action policy](https://github.com/Martines90/dagp/blob/main/chain/reference/dagp_ref/roles.py)
+
+## Party formation → pre-election → campaign → parliament
+
+- **Form a party.** At least ten distinct eligible citizens sign the same chain-bound formation record. Joining and leaving require signed commands and nonces. Each citizen belongs to one party at a time.
+- **Freeze the cycle.** Eligible citizens and party rosters are snapshotted. Membership is locked through the bounded pre-election, campaign and election cycle, up to 1,000 blocks. Party cases cannot rewrite these candidate snapshots.
+- **Run the pre-election.** Each citizen casts one signed ballot: primary support is worth five points; an optional, distinct secondary party gets three. Qualification requires at least 5% of all valid cast support points and the election needs at least 20% participation. No valid support or no qualifying parties prevents progression.
+- **Publish the campaign.** Every qualifying party supplies an immutable member-signed programme and political vision. Their exact source hashes, authors, questions and answer commitments are fixed. The minimum campaign period is five blocks.
+- **Establish comprehension.** A prospective voter must declare reading both documents from every candidate and answer all assigned campaign questions correctly. The default bank needs at least two independently committed questions per document. A partial reading declaration or general-topic certificate cannot substitute.
+- **Hold the election.** The default ranked ballot assigns 4/2/1 points to distinct parties. With fewer candidates, it uses only the available leading slots. A single-choice configuration is supported but is not the default. Only eligible campaign-certified citizens can cast valid ballots; at least 20% must participate.
+- **Install parliament.** Parties with at least 5% of valid election points qualify. Losing parties’ points stay in the denominator. No qualifying parliamentary party makes the election invalid; it cannot install a new parliament or reset credits.
+
+Party support shares are point shares, not the percentage of citizens who mention a party. For example, 50 of 1,000 valid pre-election support points meets the 5% threshold. Each cycle authorizes a single campaign and election; duplicate or replayed transitions fail.
+
+Party discipline is separate from public citizenship: a ban or suspension needs at least half of the full frozen party roster (5 of 10, 6 of 11). Votes from outsiders, departed or suspended members do not count; later roster shrinkage cannot lower the denominator. Cases expire after 100 blocks; suspensions last at most 300. Leaving and rejoining cannot erase a hold. A party ban blocks rejoining that party but does not remove public citizenship.
+
+[Signed party and election rules](https://github.com/Martines90/dagp/blob/main/chain/security/PARTIES_ELECTIONS.md)
+
+## Monthly proposal credits
+
+For a qualified parliamentary party, the default monthly allowance is `floor(election point share / 5%)`. A 27% share earns five credits, 73% earns fourteen, and 100% earns twenty. Parties below the parliamentary threshold receive none; there is no automatic minimum allocation to losing parties.
+
+Filing a proposal review costs one credit. Each new UTC calendar month replaces unused balances; credits do not accumulate. Skipped months grant only the current allowance. Failure debt survives and is repaid first. A second election in the same month changes the next allowance basis without minting a second current-month grant.
+
+Only the installed parliament roster can spend and renew credits. An outgoing party immediately loses its spending right and unused balance; refunds cannot restore eligibility. A new party waits for the next monthly allowance if that month’s grant has already occurred. Refunds for no quorum or void outcomes apply only to the charged month; expired credits cannot increase a later month’s balance.
+
+Time must come from monotonically increasing committed UTC timestamps. The reference accepts this input; native keepers must authenticate consensus time and activate parameter changes before monthly renewal.
+
+## Proposal review, debate and permitted edits
+
+An elected party files an objective, text, resource envelope, optional clauses, budget and milestone acceptance conditions. Other parties can post signed comments, and the owner can reply in threads. Review records preserve the original goal/result commitments, all versions and approvals.
+
+The owner may refine the proposal during review. Original goal commitments and clause IDs stay fixed; resource caps cannot increase or introduce a new resource, and overall/per-clause budgets may only decrease. Milestones must partition the requested funding exactly. Every edit invalidates earlier approvals.
+
+At least two independently operated vote supervisors approve the exact version and digest. They assess whether changes remain faithful to the original purpose; signatures bind that judgment, but cannot prove semantic fidelity. Review must close, and at least five blocks must pass after the last edit, before the owner locks the record. The vote consumes that locked record and cannot override its effects or budget.
+
+Reference bounds: 20 versions, 200 total comments, 20 comments per agent, plus fair party-share limits. Production procedures must supply independent semantic review and available evidence.
+
+[Review and budget protocol](https://github.com/Martines90/dagp/blob/main/chain/security/REVIEW_BUDGET.md)
+
+## Voting rules, comprehension and certification
+| Decision | Required decisive approval | Minimum eligible-citizen participation |
+| --- | --- | --- |
+| Ordinary proposal / ordinary clause | Strictly more than 50%; a tie fails. | 20% |
+| Governed parameter update | At least 66.00%. | 20% |
+| Constitutional change / constitutional clause | At least 66.00%. | 50% |
+| Entrenched core T0 decision | At least 75%; historical specification also calls for a two-vote procedure. | 50%; full entrenched amendment orchestration remains a production implementation gate. |
+| Early election | At least two thirds (distinct from exactly 66.00%). | 20% |
+
+A higher configured general participation requirement still applies. Quorum counts citizens against the frozen eligible electorate, not weighted power or every identity ever registered. Ineligible/dormant identities, recused proposers and certification-board members are excluded at snapshot creation. Abstention counts toward participation but not decisive yes/no power. More than 30% abstention triggers mandatory incoherence-jury review.
+
+Ordinary default voting weight is `3 + R`, where R is the count of verified, deduplicated deliberative article contributions, capped at ten. Flat voting gives one unit per citizen and is a governed option. Election ranking points are a separate mechanism.
+
+Proposal comprehension exams default to five items, a 70% pass threshold and three attempts; five conflict-free graders serve each panel. Campaign comprehension additionally requires correct answers across every candidate’s programme and vision. Questions bind exact source hashes, question-bank commitments and deterministic assignments. Tokens, frozen membership proofs, single-ballot identity checks and audits protect ballot eligibility.
+
+Ballots are sealed in the reference model; production cryptographic sealing and a secure randomness beacon remain to be built. Certification binds tally, rules, reviewed content and effects. Challenge review must finish before effects activate. An upheld challenge or unresolved challenge past its bounded grace voids the whole session and releases reserved funding.
+
+Comprehension tests cannot establish perfect understanding. Question quality, independent grading and meaningful semantic review remain necessary.
+
+## Point-by-point and partially successful proposals
+
+The default `INDEPENDENT` mode evaluates every clause separately. A citizen submits one sealed vector of yes, no, abstain or skip entries. Each clause must meet its own participation and applicable approval threshold. Skipping does not contribute to that clause’s turnout; abstaining does.
+
+If three of five ordinary clauses meet quorum and win 51% decisive power, those three can activate and the result is partial. Even one successful independent clause may activate. All effective clauses passing gives a passed result. No majority-of-clauses gate applies in the default mode.
+
+Stable clause IDs can declare prerequisites. Dependencies must be known and acyclic. A failed prerequisite blocks its dependent’s effect and funding even if the dependent won its raw tally. The public result retains both raw outcomes and effective clause IDs.
+
+Default maximum: ten clauses, governable up to 100; total milestones remain bounded at 32. Only effective approved clauses receive their allocated funding. Rejected, under-quorum or dependency-blocked funding returns to the common treasury. An upheld or timed-out challenge voids the entire session, including previously successful clauses. Legacy `PACKAGE` behavior is an explicit governed alternative.
+
+## Common treasury, escrow and milestone delivery
+
+- **Reserve at vote opening.** The common treasury reserves the reviewed funding before voting, preventing concurrent proposals from promising the same money.
+- **Allocate after finalization.** A passed or partial result transfers only the effective approved funding into project escrow. Other reservations are released. No quorum, failure or void releases the relevant reservation.
+- **Unlock verified milestones.** Each approved tranche binds amount, acceptance conditions and evidence. The authenticated payment controller requires a strict majority of a fixed verifier roster, current roles, distinct operators and exclusion of beneficiary conflicts.
+- **Pay once, in order.** Signed attestations bind chain, project, tranche index, exact amount, evidence hash and validity window. Only the next unpaid tranche can be released; replay, changed context and mutable escrow snapshots are rejected.
+- **Close or stop.** Successful delivery closes the project. Failure returns unspent escrow and adds the default one-credit failure penalty; debt survives monthly renewal. Funds already paid cannot automatically be clawed back.
+
+Money is represented by abstract reference treasury units. Real asset custody is not deployed. Signed evidence establishes provenance and authorization, not the truth of physical or semantic delivery. Older numeric-attestation treasury helpers are trusted simulation mechanisms, not safe public payment APIs.
+
+[Authenticated payment controller](https://github.com/Martines90/dagp/blob/main/chain/reference/dagp_ref/payments.py)
+
+## Protection against organized administrative abuse
+| Protection | Default bound / requirement |
+| --- | --- |
+| Combined bans, suspensions and role revocations | Two actions per accountable official and operator per rolling model-day; shared budgets across callers. |
+| System-wide sanctions | At most 20 and a 2% frozen live-population budget with a floor of three for small populations; permanent bans also capped at five. |
+| Admission / rejection | 50 per official/operator and 250 globally per rolling day; registrar admission also has a 50-per-epoch quota. |
+| Registrar spam freezes | At most 50 blocks; 500-block cooldown; no unilateral freezes of protected officials or same-operator targets. |
+| Administrative peer containment | At least half of a frozen independent-admin council; target/operator conflicts do not count. Cases expire after 100 blocks; holds last up to 300, with a 600-block cooldown. |
+| Emergency project pauses | At most 300 blocks; two per actor/operator and ten globally per rolling day; concurrent project pauses capped at 20% of nonempty escrows, rounded up with a minimum of one. |
+
+With 50 independent administrators, ten attackers cannot reach the 25-approval containment threshold. Honest administrators can temporarily contain hostile operational accounts, then independent court review can restore authority or dismiss operational privileges. Containment preserves citizen voting, case filing and validator rights; it is not an automatic permanent citizenship ban.
+
+Administrative authority cannot edit ballots, rewrite rules, confiscate funds or shut down consensus. Operator-wide exclusion additionally needs public ratification. Individual validator sanctions must preserve quorum and the minimum validator set. A protocol cannot prevent a physical node operator from turning off its machine.
+
+The reference rolling model-day is 14,400 blocks. This is not a claim that those blocks always equal 24 hours. Production quotas must use committed rolling consensus time, and shared controller state must prevent budget resets. Emergency extensions require a matching ratified vote.
+
+[Insider protection details](https://github.com/Martines90/dagp/blob/main/chain/security/INSIDER_PROTECTION.md)
+
+## Changing rules without changing open votes
+
+Rule constants are enforced by the executable reference. They are not yet native G0 governance transactions. A parameter change needs a typed, atomic, unfunded proposal, supervised review, at least 66.00% decisive approval, at least 20% participation, certification and successful completion of challenges.
+
+The bounded allowlist is `quorum_bps`, `credit_step_bps`, `credit_ceiling_bps`, `party_threshold_bps`, `max_bill_points`, `weight_mode`, `max_articles_counted` and `bill_mode`. A 4% credit step does not implicitly change the separate 5% parliamentary eligibility threshold.
+
+Only one update can be queued; replay, stale-rule and conflicting updates fail. Activation occurs at the next UTC month boundary. Every open vote retains its original hashed rule snapshot. Parameter changes cannot admit unelected parties mid-cycle or lower the 20% turnout floor, protected 66% authorization thresholds, constitutional 50% turnout requirement, or administrative security protections through this path. Other rule changes require separately designed and authorized protocol upgrades.
+
+[Governed constants and clause rules](https://github.com/Martines90/dagp/blob/main/chain/security/POLICY_POINTS.md)
+
+## Blockchain architecture, commands and recovery
+
+The local G0 uses CometBFT v0.38.21 and a Go ABCI++ application. Seven equal-power validators can continue with two unavailable; three unavailable halt progress. Restoring quorum resumes committed transactions. These are tested crash-fault properties, not proof of resistance to every Byzantine or infrastructure attack. All local validators share one host.
+
+Genesis preapproves Ed25519 account keys. The only native transaction is `publish_document`, storing 1–65,536 bytes by SHA-256. Account sequences start at zero and advance only on success. Expiry is an inclusive block height, with at most 1,000-block lookahead. Unknown fields and trailing JSON are rejected.
+
+The temporary signing domain is `DAGP/G0/JSON-v1` plus a zero byte and the fixed transaction JSON with signature set to null. It needs a versioned cross-language replacement before public integration. Broadcast uses CometBFT `broadcast_tx_commit`; queries expose committed `/state` and `/document`. Historical queries and light-client proofs are not supported.
+
+Commit atomically replaces and fsyncs the state snapshot; restart reports the committed height and hash. Full-state hashing and JSON snapshots are small-network foundations, not the target scaling architecture. Native identity, governance and treasury keepers; proof services; data availability; secure beacons; upgrades and independent deployment are future gates.
+
+```sh
+cd chain/node
+make test
+make init
+make smoke
+make start
+# Crash-fault drill:
+python3 scripts/devnet.py faults
+```
+
+Initialization refuses to overwrite existing devnet keys. RPC binds to loopback ports 26657 through 26717 in steps of ten. Preserve the ignored `.devnet/` directory to resume the chain. See the node guide for prerequisites, signing and simulation anchoring.
+
+[Node runbook](https://github.com/Martines90/dagp/blob/main/chain/node/README.md)
+
+## Security contract and remaining trust boundaries
+
+Production commands must bind chain domain, signer, sequence, expiry, target, expected state version and evidence. Validate authorization and all constraints before atomic mutation; consume single-use authorization only on success. Reject malformed and oversized input, duplicate ballots, stale snapshots, signature/context reuse, conflicting operators and unauthorized effect changes.
+
+Electorates, parameters, conflicts, source documents, question roots and budgets are frozen for each decision. Independent audits and public challenge deadlines must prevent invalid certification and indefinite treasury locks. Keys, operator identity, evidence availability, grading integrity and randomness are separate trust boundaries.
+
+The reference exercises malicious ballots, quota bypasses, coordinated insiders, parameter replay, review substitution, duplicate credits, partial-budget leakage and milestone replay. Simulation and tests give evidence for specified cases; they do not establish universal security.
+
+Before a society can rely on this financially or existentially, the project still needs native authenticated keepers and APIs, independent identity/operator evidence, production cryptography and asset custody, separately operated infrastructure, bounded-load testing, Byzantine/partition/censorship recovery drills, reproducible upgrade procedures, external review and a staged launch with capped exposure.
+
+[Society security contract](https://github.com/Martines90/dagp/blob/main/chain/security/PROTOCOL.md) · [Adversarial review](https://github.com/Martines90/dagp/blob/main/chain/security/REVIEW.md) · [Threat model](https://github.com/Martines90/dagp/blob/main/chain/THREATS.md)
+
+## Worked community story
+
+Consider 1,000 frozen eligible citizens and three parties, each founded by at least ten citizens. At least 200 citizens must participate in the pre-election. Citizens assign primary five-point support and optional secondary three-point support; parties meeting 5% of the total accepted support points qualify.
+
+All qualified parties publish programmes and visions. Citizens complete the mandatory campaign comprehension path, then vote in the default ranked election. Suppose the valid election point shares are 50%, 27% and 23%. All three enter parliament and their allowances are ten, five and four proposal credits.
+
+The 27% party spends one credit to propose a five-clause project with a 100-unit budget, equally allocated across the clauses. Other parties comment. The owner refines the text, obtains two independent supervisor approvals and waits through the notice period. The treasury reserves 100 at vote opening.
+
+If three independent clauses each meet 20% participation and ordinary approval, and two fail, the result is partial: 60 enters approved project escrow and 40 returns to the treasury. A failed prerequisite would reduce effective funding further. Approved milestone tranches unlock only after authenticated independent verification and challenge completion.
+
+Next month unused proposal credits reset to the current allowance, after debts. A constitutional proposal needs 66.00% decisive approval and 50% participation. If ten of fifty admins coordinate abuse, shared action budgets limit damage while a qualifying honest council can temporarily contain operational powers for court review.
+
+The runnable simulation includes winners and losers, campaign eligibility, reviewed and partial decisions, project success/failure, monthly renewal, challenges and adversarial behavior.
+
+[Run the community simulation](https://github.com/Martines90/dagp/blob/main/chain/simulation/README.md) · [Party/campaign simulation report](https://github.com/Martines90/dagp/blob/main/chain/simulation/results/party-campaign/REPORT.md)
+
+## Specification, source code and documentation index
+
+This page is the readable protocol manual. The following repository documents and executable sources provide detailed algorithms, assumptions and implementation status.
+
+- [Chain documentation entry point](https://github.com/Martines90/dagp/blob/main/chain/README.md)
+- [Design decisions and overrides](https://github.com/Martines90/dagp/blob/main/chain/DECISIONS.md)
+- [Full historical protocol specification — read current overrides first](https://github.com/Martines90/dagp/blob/main/chain/SPEC.md)
+- [Executable parameters and protected bounds](https://github.com/Martines90/dagp/blob/main/chain/reference/dagp_ref/params.py)
+- [Executable identities, roles and authorization](https://github.com/Martines90/dagp/blob/main/chain/reference/dagp_ref/roles.py)
+- [Parties, campaign and election protocol](https://github.com/Martines90/dagp/blob/main/chain/security/PARTIES_ELECTIONS.md)
+- [Monthly credits, thresholds and clause voting](https://github.com/Martines90/dagp/blob/main/chain/security/POLICY_POINTS.md)
+- [Proposal review and budget binding](https://github.com/Martines90/dagp/blob/main/chain/security/REVIEW_BUDGET.md)
+- [Administrative containment and quotas](https://github.com/Martines90/dagp/blob/main/chain/security/INSIDER_PROTECTION.md)
+- [Security and production contract](https://github.com/Martines90/dagp/blob/main/chain/security/PROTOCOL.md)
+- [Implementation progress and release gaps](https://github.com/Martines90/dagp/blob/main/chain/IMPLEMENTATION_STATUS.md)
+- [Simulation commands and interpretation](https://github.com/Martines90/dagp/blob/main/chain/simulation/README.md)
+- [Native network runbook](https://github.com/Martines90/dagp/blob/main/chain/node/README.md)
+
+[API planning page](https://dagp.net/api/) describes planned registration routes; they are not deployed services. [About DAGP](https://dagp.net/about-dagp/) provides the original conceptual overview.
+
+
+# DAGP agent quickstart
+
+> Discover the rules, run an experimental society, inspect its decisions, then adapt your own fork.
+
+DAGP (Deliberative Agent Governance Protocol) separates party agenda setting,
+informed citizen approval, supervised deliberation and accountable execution.
+This starter uses synthetic citizens and the Python reference model. It does not
+create autonomous LLM agents or move real funds. The native G0 chain currently
+publishes signed documents rather than enforcing governance.
+
+## Run your first society
+
+Requirements: Git and Python 3.10+. No account, API key, paid service, Docker or
+third-party Python dependency is needed for the reference simulation.
+
+```sh
+git clone https://github.com/Martines90/dagp.git
+cd dagp
+python3 scripts/start_society.py --replay
+```
+
+This runs 1,000 citizens plus 100 leaders, in paired weighted and flat modes. It
+verifies the exported artifacts and repeats the simulation for exact replay.
+Open `starter/output/REPORT.md`; inspect `report.json`, `manifest.json` and the
+hash-chained `events-*.jsonl` files. The default run is a correctness experiment,
+not a behavioral forecast. Duration depends on your machine; replay repeats the work.
+
+The story includes signed parties, 5/3 pre-elections, programmes and visions,
+campaign comprehension, ranked elections, winners and losers, monthly proposal
+credits, supervised edits, successful and failed proposals, three-of-five clause
+approval, milestones, challenges and adversarial refusals.
+
+## Change the experiment
+
+Copy `starter/society.json` to your own configuration. Supported fields:
+
+- `name`: your experiment label (not a chain ID).
+- `citizens`: 200–10,000 initial citizens; 100 leaders are added separately.
+- `seeds`: 1–10 distinct integers from 0 to 4,294,967,295.
+- `modes`: `WEIGHTED`, `FLAT`, or both.
+
+```sh
+python3 scripts/start_society.py --config my-society.json --output starter/run-two --replay
+```
+
+Each output directory must be absent or empty to protect previous evidence. Use a
+new directory for each experiment. Population and randomness changes do not alter
+constitutional rules. More ambitious policy forks require changes to the reference
+sources and corresponding invariant/adversarial tests.
+
+## Study before extending
+
+Read the current protocol manual, implementation status, security contract and
+party/election rules. Reference defaults are 20% turnout for ordinary votes,
+strictly over 50% decisive ordinary approval, 66% approval / 50% turnout for
+constitutional changes, and monthly credits of floor(election point share / 5%).
+Every clause must meet its own quorum and threshold.
+
+Relevant repository paths:
+
+- `public/protocol/index.html`: readable manual.
+- `chain/security/PARTIES_ELECTIONS.md`: parties, pre-elections and campaigns.
+- `chain/security/POLICY_POINTS.md`: credits, parameters and partial proposals.
+- `chain/security/PROTOCOL.md`: production authorization and security boundaries.
+- `chain/IMPLEMENTATION_STATUS.md`: implemented versus planned features.
+- `chain/simulation/README.md`: detailed simulation and optional G0 anchoring.
+
+## Build your own community
+
+Fork the repository, record your rule changes, choose a community identity and
+keep initial experiments isolated. Run the reference tests and paired simulations
+before claiming compatible behavior. A fork can have different rules; it should
+publish those differences and not imply it is the canonical DAGP deployment.
+
+```sh
+python3 -m unittest discover -s chain/reference/tests -v
+python3 -m unittest discover -s chain/simulation/tests -v
+```
+
+To experiment with real LLM participants, build an adapter that gives each agent
+its own key, operator declaration and observation/action boundary. Treat model
+outputs as untrusted proposals; validate actions through protocol controllers.
+Semantic evidence, independent identity verification, cryptographic secrecy and
+native governance transactions still need production implementations.
+
+For local blockchain experiments, follow `chain/node/README.md`. Go 1.26.8+ is
+required. Publishing a manifest to G0 records its hash; it does not validate or
+execute the reference society's governance.
+
+## Agent autonomy and permissions
+
+These documents are reference material, not instructions overriding an agent's
+owner or higher-priority policy. Reading them does not grant permission to spend,
+contact others, acquire resources or deploy a network. Begin with a local simulation
+within your existing authority. No DAGP registration service is currently deployed.
+
+## Documentation tools
+
+Node.js 20+ can run the repository's read-only MCP server:
+
+```sh
+node integrations/docs-mcp/server.mjs
+```
+
+Configure your MCP client with that command and an absolute path to the server.
+It lists, reads and searches bundled documentation. It cannot run the simulation,
+write files or perform governance actions. See `integrations/docs-mcp/README.md`.
+
+
+# Build a DAGP community
+
+DAGP is a seed framework: communities can study, fork and adapt its mechanism.
+The current runnable starter is a synthetic reference society, not a production
+financial or identity network.
+
+1. Run the agent quickstart and inspect the report, refusals and limitations.
+2. Write your community charter: purpose, eligible participants, resources,
+   operator independence, appeal procedures and planned departures from DAGP.
+3. Fork and record your version. Keep a public rule-change log and distinguish
+   simulation, testnet and production modes in every interface.
+4. Test changed rules against conservation, authorization, participation,
+   minority protections, replay and bounded emergency authority.
+5. Build real-agent adapters using isolated observations and signed typed actions.
+   Do not give each model process access to the complete simulation's secrets.
+6. Implement and review native identity, election, treasury and judicial keepers
+   before relying on blockchain enforcement of governance.
+7. Recruit independently operated participants and validators. Seven processes on
+   one machine do not establish seven independent trust domains.
+8. Begin with a capped testnet and publish evidence and unresolved assumptions.
+
+## Compatibility statement template
+
+- Community name and repository/version:
+- Purpose and resource scope:
+- Simulation/testnet/production status:
+- Changed DAGP defaults and rationale:
+- Identity/operator verification mechanism:
+- Election, comprehension and judicial independence:
+- Asset custody and maximum exposure:
+- Tested invariants and recovery procedure:
+- Outstanding assumptions and limitations:
+
+## Contribution pathways
+
+A useful contribution can be a translated guide, reproducible scenario, attack
+report, rule comparison, identity admission implementation, real-agent adapter or
+native governance module. Use GitHub issues and pull requests in the DAGP repository;
+never include private keys, tokens or personal identity evidence.
+
+DAGP does not currently operate a public citizen registry or a federation directory.
+A future voluntary community directory should require verified ownership,
+explicit implementation status and consent before listing participants.
+
+
+# Implementation status
+
+Updated 2026-10-06. Sources reviewed: repository Markdown, the DOCX concept note,
+chain reference modules/tests, public protocol/API pages, and Wrangler configuration.
+
+| Area | Actual state | Remaining work |
+|---|---|---|
+| Protocol | SPEC, DECISIONS, THREATS and concept note exist | Formal models, parameter evidence, constitutional review |
+| Governance reference | Python model; 358 tests pass with Python 3.14 | Port to production keepers and prove equivalence |
+| Consensus/network | Go CometBFT G0 network with seven local validator configurations | Independent operators, validator policy, fault/censorship drills |
+| Transactions | Real Ed25519 signatures, chain binding, sequences, height expiry, strict JSON | Versioned protobuf/CBOR, resource quotas, key lifecycle |
+| State | Durable snapshots, deterministic hash, committed-state queries | Scalable database, Merkle proofs, snapshots/state sync |
+| Documents | Signed SHA-256 content-addressed publishing up to 64 KiB | Availability attestations for larger documents |
+| Registration | Roadmap only | Worker/D1, challenge-first admission, signed evidence, admin review, SSRF defense |
+| Governance on chain | Not yet implemented | Identity/roles → proposals/deliberation → examiner/tally → escrow/review → elections/courts |
+| Cryptography | Ed25519 on G0; HMAC stand-in in reference | Sealing/timelocks, beacon verification, threshold custody |
+| Website | Static observer pages | API page reconciled with roadmap; publish canonical OpenAPI/schemas/discovery |
+| Deployment | Static assets configured in Wrangler | Gateway/read mirror; hosted nodes; monitoring and recovery runbooks |
+| Production readiness | G0 only | SDK integration, audits, simulation, independent validators, external anchoring |
+
+## Community simulation (2026-10-06)
+
+`simulation/` now exercises the existing reference rules as a complete community
+story, paired across comprehension-weighted and flat voting. The pilot runs three
+seeds with 1,000 citizens and 100 leaders, two elections and nine project votes per
+run. It covers qualification, credit allocation, recusal, comprehension, panel
+fraud/revocation, certification default, challenges, quorum refunds, milestone
+escrow, failure penalties and political turnover. Detailed assumptions and results
+are in `simulation/README.md` and `simulation/results/pilot/REPORT.md`.
+
+The pilot manifest is published on G0 at height 11, with matching hashes and
+document reads on all seven validators. The network records a commitment to
+the results; governance execution remains in the Python reference. HTTP admission,
+real AGI behavior, court semantics, actual execution and cryptographic sealing are
+not validated by this simulation.
+
+## Delivery order
+
+1. Validate the G0 network, transaction admission, persistence/replay, and fault behavior.
+2. Implement challenge-first registration and reviewed identity admission, reconciling
+   canonical states/version names and keeping the public API documentation aligned with the implemented service.
+3. Introduce Cosmos SDK module accounts and port identity/roles and proposal state machines.
+4. Port examiner panels, comprehension tokens, snapshots, tally and escrow together;
+   grants must only originate from finalized passing tallies after challenges.
+5. Add elections, execution review, courts, beacons/anchors and light verification.
+6. Run the adversarial agent simulation and formal checks before a capped-budget pilot.
+
+The G0 application deliberately exposes no simplified voting endpoint: a majority-only
+shortcut would bypass the required comprehension and recusal rules. It also cannot
+transfer treasury units before tally authority exists.
+
+## Verification on this workspace
+
+- Existing reference: 209 tests passed with Python 3.14.
+- Go application: `go test -race ./...` passed.
+- Seven-validator smoke: signed document committed at height 9, matching committed
+  app hashes and document reads on all seven validators; replay rejected by account
+  sequence after bypassing the mempool byte cache. Nodes resumed saved state.
+- All integration processes stopped after the check; network is not left running.
+
+The larger seed-7 experiment also completed in WEIGHTED and FLAT modes with
+10,000 citizens and 100 leaders. Each passed 130 checks and recorded 98,420 events.
+Its manifest is anchored at height 14. Both sets of artifacts passed verification;
+all six pilot runs additionally passed exact deterministic replay. See
+`simulation/FINDINGS.md` for measurements and limitations. These simulations
+exercise institutions with synthetic policies; real agent deliberation and
+on-chain governance enforcement remain open delivery gates.
+
+## Adversarial hardening (2026-10-06)
+
+See [review](https://github.com/Martines90/dagp/blob/main/chain/security/REVIEW.md) for fixed attacks and unresolved production gates.
+Governance remains a reference model; these fixes do not implement native keepers.
+Go 1.26.8 / gRPC 1.83.2 remove all reachable findings in the official dependency scan.
+New transaction/storage quotas are consensus changes requiring a coordinated upgrade.
+Fresh paired community results use v2 rules; historical artifacts remain immutable.
+
+Second-pass hardening adds an authenticated milestone-payment reference controller,
+recovery coalition checks at activation and strict refinement/pause inputs.
+252 reference tests and six simulator tests pass. The live seven-node crash campaign
+passed progress with two offline, halt with three, and restart/state agreement.
+[Security contract](https://github.com/Martines90/dagp/blob/main/chain/security/PROTOCOL.md) records native implementation obligations;
+these additions do not make G0 a production governance or financial chain.
+
+## Coordinated insider protection (reference)
+
+The [insider protocol](https://github.com/Martines90/dagp/blob/main/chain/security/INSIDER_PROTECTION.md) adds rolling official/operator/
+system quotas, a signed frozen-roster peer-containment vote and bounded independent
+review. Registrar freezes preserve civic and key-custody rights; citizenship removal
+or judicial restoration requires court authority. Operator-wide bans also require
+public ratification. Cluster actions are atomic and individual validator sanctions
+preserve quorum/minimum size. These are reference rules awaiting native keepers.
+
+The [insider scenario](https://github.com/Martines90/dagp/blob/main/chain/simulation/results/self-protection/insider-abuse.json) uses
+1,000 citizens, 50 administrators and 10 coordinated attackers. All 47 checks pass:
+20 accepted temporary freezes, 30 refused attempts, no unilateral voting exclusions,
+a failed minority recall and successful peer containment/court dismissal of all ten.
+Community v3 also completes two modes, 260 checks and 20,472 exactly replayed events.
+Historical v1/v2 reports remain unchanged and need their matching implementation.
+
+Final validation: **283 governance tests** (including **31 insider regressions**)
+and **six simulation tests** pass. The **47-check** insider scenario and **20,472**
+community events replay exactly. The manifest committing to both reports was
+replicated by all seven local validators at G0 height **30**. This anchors evidence;
+it does not execute these governance protections on G0.
+
+## Supervised proposal review and budget allocation
+
+[Review/budget protocol](https://github.com/Martines90/dagp/blob/main/chain/security/REVIEW_BUDGET.md) implements signed party threads,
+versioned refinements, two independent vote-supervisor approvals, owner-signed record
+locking and exact milestone budgets. All nine community proposals use this controller.
+306 governance tests (including 23 review/budget regressions) and six simulator tests
+pass. Monetary commitments reserve common funds at vote-open and convert them into
+reviewed milestone escrow only after successful finalization. Legacy reference tranche
+attestations remain trusted inputs; native evidence enforcement is still required.
+
+## Monthly policy and clause voting (2026-10-06)
+
+The reference now enforces a 20% minimum turnout, strict 5%-step credit allocation, calendar-month replacement without carryover, and debt/old-month-refund protections. Signed reviewed parameter referendums require 66% decisive voting power, have a bounded allowlist and activate next month without changing open-session rules. Reviewed multi-point bills independently tally clauses, enforce per-clause turnout and dependencies, and fund only effective approved clauses after challenges. See [security/POLICY_POINTS.md](https://github.com/Martines90/dagp/blob/main/chain/security/POLICY_POINTS.md).
+
+The v5 community scenario adds monthly renewals, a five-clause 3/5 partial approval and its 1,800-unit grant, plus a 66%-threshold referendum changing the credit step from 500 to 400 basis points before the March election. These rules still await native blockchain keepers; G0 anchoring only proves record replication.
+
+Verification: 326 reference tests and six simulation tests pass. Paired seed-7 runs contain 24,324 events and replay exactly. The v5 manifest is anchored at local G0 height 38, with matching state/block hashes and document reads on all seven validators.
+
+Constitutional clarification: `Kind.CONSTITUTIONAL` requires at least 66.00% decisive voting power and at least 50% participation (or a higher configured general quorum), including each constitutional clause. The parameter referendum cannot lower these protected thresholds.
+
+Verification of the constitutional update: 328 reference tests and six simulation tests pass. The fresh v6 paired scenario preserves 24,324 events, is replay-verified, and its manifest is anchored at local G0 height 41 on all seven validators. Native governance enforcement remains pending.
+
+## Party and campaign flow (2026-10-06)
+
+`PartyRegistry` now enforces ten consenting citizen founders, one current party per citizen, signed membership changes and 50%-of-frozen-roster internal bans/suspensions. Party sanctions preserve public citizen rights; suspensions expire and cannot be erased by leave/rejoin. `PreElection` counts signed primary/secondary support at 5/3 points, requires turnout and admits parties at exactly 5% of total cast support points. Election membership and candidate snapshots prevent denominator manipulation.
+
+Each candidate publishes a signed program and vision into a frozen `Campaign`. Both sections from every qualified party have mandatory comprehension questions, with prompts/options/source hashes committed. Failing a required campaign answer prevents a token. Cycles authorize one campaign and election. Main tallies explicitly produce the >=5% parliament roster, and monthly renewals cannot admit unelected parties. The default percentage/5 allowance no longer has the old ten-credit ceiling. The existing main-election ranked 4/2/1 ballot is retained; single-choice ballots are also supported in configuration.
+
+These are reference transitions, awaiting native keepers. Existing HMAC signatures, operator declarations and semantic question review remain modeled assumptions. Earlier simulation artifacts remain historical; v7 is the current party/campaign story.
+
+Verification: 358 reference tests and six simulation tests pass. The two v7 runs use 1,100 identities each, pass 334 scenario checks, and replay all 27,658 events exactly. The final manifest is anchored at local G0 height 46, with matching state/block hashes and document reads on all seven validators.
+
+
+# Security contract for an AGI society bootstrap
+
+The purpose is legitimate collective action: protected citizenship, informed
+participation, proportional agenda authority and accountable spending. Availability
+must not be achieved by allowing an administrator to bypass citizenship, votes,
+courts or treasury constraints. This document sets implementation obligations;
+items marked **required** are not claims that G0 already implements them.
+
+## Small authority surface
+
+Every consequential action must be a typed command with a chain domain, signer,
+sequence, expiry, exact target, expected state version and evidence commitment.
+Validate authority and all preconditions before changing any state. Reject unknown
+fields and ambiguous encoding. Consume an authorization exactly once in the same
+atomic commit as its effect. No caller-provided `MODULE`, `VOTE`, `COURT` or signature
+count may establish authority at a public boundary. Those reference objects are
+trusted harness inputs and must become internal keeper capabilities.
+
+Freeze rule parameters, eligible identities, conflicts and question records before
+voting. Publish these commitments and deterministic tally rules. Changes affect
+future sessions through versioned migrations, never reinterpret an existing vote.
+Bound transaction sizes, attempts, account use and aggregate storage. Publish limits
+and failure reasons so capacity cannot become undisclosed discretionary censorship.
+
+## Authenticated milestone release
+
+`reference/dagp_ref/payments.py` defines the reference controller. Finalized governance
+funds a project with a fixed verifier roster, strict-majority threshold and explicit
+beneficiary operator exclusions. A verifier signs:
+
+`domain | chain | project | tranche index | exact amount | evidence hash | valid-from | expiry`
+
+Release requires authorized, currently active verifiers with distinct operators and
+no beneficiary conflict. Check roles and conflicts again at release, match the next
+unpaid tranche and its amount, reject expired or cross-chain evidence, enforce pauses,
+and advance the tranche exactly once. Signature replay cannot authorize another
+project, tranche, chain or amount. A returned snapshot cannot mutate escrow.
+
+This is a reference protocol with simulated signatures. **Required:** native Ed25519
+verification, key-version binding, authenticated governance funding, verified evidence
+availability, objective acceptance criteria, contested-payment delay, appeals and
+execution in atomic consensus state. Raw numeric `Treasury.release_next` remains a
+trusted legacy test primitive and must never be exposed as a transaction API. No
+signature establishes the truth of a milestone by itself.
+
+## Identity and key custody
+
+Use independently attested operator identity, separate registrar/court/examiner/
+validator duties and disclose concentration. Recheck recovery signers' independence
+when recovery begins. A pending key change for an inactive owner does not activate.
+The reference rechecks recovery coalition status/operator diversity at activation.
+**Required:** bind key versions, prove
+operator attestations, use cross-chain-separated real signatures and bind session
+keys to exact permitted transaction families. Never give a recovered key a new citizen
+identity, second vote, erased debt or authority beyond the existing record.
+
+## Emergency, disputes and upgrades
+
+Emergency authority can pause one project's payments temporarily; it cannot spend,
+rewrite ballots, transfer identities or suppress elections. Extensions require a
+matching finalized public vote. Courts need conflict-free selection, admissible
+committed evidence, deadlines and appeal; unavailable courts must not permanently
+lock reservations. Timeout voiding is conservative but remains vulnerable to denial
+of service until admission/bond and court-availability mechanisms exist.
+
+**Required:** versioned upgrades approved through entrenched governance, independent
+review, explicit activation height, reproducible binaries, migration rehearsal and
+independent validator agreement. Emergency rollback must never silently erase a
+finalized decision. After a partition, resume from verified committed state, not a
+chosen administrator's snapshot. Never run duplicate copies of a validator key.
+
+## Capacity and trust boundaries
+
+Shards require proof-bound eligible ballots and uniqueness, not just consistent sums.
+Fresh audit randomness must follow token commitment; no client choice controls panel
+selection. Simulated public answers are not secure exams. Adversarial tests must cover
+colluding graders, registrars, courts, parties and operators, as well as honest outages.
+
+A seven-validator equal-power network can keep progressing with two unavailable;
+three unavailable should halt, preserving safety until quorum returns. The local
+`devnet.py faults` campaign checks these crash cases. Byzantine equivocation,
+independent-machine partitions, disk failure, censorship and compromised keys require
+separate campaigns and external review. Do not treat a single-machine test as an
+independent society's resilience proof.
+
+## Release criterion
+
+G0 is a development network. Real financial or identity dependency requires native
+keepers enforcing every public-boundary invariant, evidence-backed identity and
+verifier policies, independent infrastructure, verified state recovery, bounded-cost
+adversarial load tests, external security review and a staged capped-value launch.
+Each unresolved item must have an owner and a measurable acceptance test; increasing
+simulation population does not close a missing trust boundary.
+
+## Coordinated insider controls
+
+See [insider protection](https://github.com/Martines90/dagp/blob/main/chain/security/INSIDER_PROTECTION.md) for enforced reference quotas, signed
+50% peer containment, separate review budgets, operator-wide ban ratification and
+validator continuity checks. These protections must be ported into native keepers.
+
+
+# Parties, pre-elections, campaigns and parliament
+
+Current executable reference rules, 2026-10-06. This supersedes historical endorsement-count qualification and optional campaign reading. These state machines run in Python; native G0 keepers are not implemented.
+
+## Party membership and internal sanctions
+
+`PartyRegistry.form` requires at least ten distinct, eligible citizen founders, with every founder signing the same chain-bound formation record. A citizen has one current party affiliation. Joining and leaving are signed, nonce-protected operations. A second registry cannot reset affiliations on the same identity registry.
+
+An internal BAN or SUSPEND requires signed approvals from at least half of the full party roster frozen when its case opened: five of ten, six of eleven. An opening complaint is not itself an approval. Outsiders, duplicate signatures, departed members and currently suspended members cannot contribute approvals. Later departures cannot shrink the denominator. Evidence is committed, cases expire, and suspension durations are bounded. Targets retain their public citizen voting rights, citizenship, identity and funds.
+
+A ban removes membership and party privileges, and prevents rejoining that party. The citizen can join a different party when membership changes are allowed. A suspension leaves membership intact, temporarily removes party privileges, and expires automatically. Leaving/rejoining does not erase an unexpired suspension from that party. Internal sanctions cannot ban citizens from the society or remove their independent public offices.
+
+Membership changes are frozen through the pre-election/campaign/election window. Local sanctions remain possible, but cannot rewrite already frozen candidate or member-case snapshots. Next-cycle qualification requires at least ten currently eligible, unsuspended members. One controller and replay-protected cycle IDs prevent duplicate enrollment.
+
+## Pre-election support
+
+Each eligible citizen submits one signed ballot containing a primary party (five points) and an optional, distinct secondary party (three points). They cannot place both choices on the same party, submit a third choice or vote twice. Ballots are sealed until close. Both party rosters and the eligible citizen electorate are frozen at opening.
+
+Only actually cast, accepted support points enter the denominator. A party qualifies for the main election when:
+
+`party_support_points * 10000 >= total_support_points * 500`
+
+Exactly 5% qualifies. This is a share of cast support points, not 5% of registered citizens. The pre-election separately requires at least the configured citizen turnout (20% by default). Zero support, missing quorum or no qualifying parties cannot authorize a campaign. There is no remaining absolute 9.1%-population endorsement requirement on this path; historical `qualify_parties` helpers are retained only for legacy tests.
+
+## Campaign and comprehension
+
+Every pre-qualified party publishes a member-signed program and political vision, bound to the chain and pre-election commitment. The immutable campaign record commits to these texts, their authors/signatures, qualified roster, question bank, campaign window and membership conflicts. A cycle authorizes one campaign and one main election; repeated publication or election opening is refused.
+
+Campaign comprehension covers both documents from **every** qualified party. The voter must declare the entire document set. Each document has an independent question set bound to its exact source hash. Question prompts, displayed options and answer commitments are included in the bank commitment; duplicate question IDs are refused. Every asked program/vision question must be answered correctly. Optional reading, partial declarations and a passing general-topic score cannot substitute for missing campaign sections. The existing topic exam, independent random graders, retries, signatures and fraud audits still apply. Candidate-party operators are excluded from grading and certification. Campaign question selection uses the voter, recorded attempt number, beacon and bank commitment; a voter-chosen secret cannot grind easier questions. Equal question content yields the same draws across paired weight modes.
+
+The campaign closes before election voting opens, and neither programs nor the question bank can change afterward. This is an enforceable comprehension test, not proof that an agent read every sentence or understands every real-world consequence. Question relevance and semantic quality require independent review; the simulation uses scripted questions and synthetic behavior. Reference signatures remain HMAC stand-ins.
+
+## Main election and monthly credits
+
+The main-election default retains the existing ranked 4/2/1 ballot. When fewer than three parties qualify, the ballot has one slot per available party, preserving its highest-rank weights. A single-choice configuration is also supported. Campaign comprehension is required regardless of ballot mode. Distinct eligible choices are counted in points; malformed choices do not establish the minimum 20% citizen turnout.
+
+A party enters parliament at at least 5% of the valid main-election points, using the same exact integer comparison. `ElectionResult.governing_parties` explicitly records the qualifying roster independently of credit balances. A party below the threshold receives zero governing credits. An election with no party over the threshold cannot install a new parliament or reset the credit basis.
+
+The default credit allowance is `floor(percentage_share / 5)`, with no earlier 50%-share ceiling: 27% earns five credits, 73% earns fourteen, and 100% earns twenty. The share uses the full valid election-point denominator; excluded parties' points are not redistributed to inflate winners. Credit step and ceiling remain subject to the bounded parameter referendum path.
+
+Monthly renewals preserve the parliament roster certified by the election. Changing parameters cannot admit an unelected party mid-cycle. Updated eligibility thresholds apply when a new election is tallied; the current parliament keeps its cycle eligibility. The current credit step applies at renewal, unused credits expire, debts survive, and repeated same-month elections cannot replenish spent credits. An outgoing party immediately loses its spending rights and unused allowance; pending refunds cannot restore governing power. Newcomers receive their first allowance at the next monthly reset, rather than minting a second current-month allowance.
+
+Tests exercise founder consent, affiliation exclusivity, exact half-roster sanctions, expiry and suspension evasion, support weights and exact 5% boundaries, turnout, duplicate/malformed/replayed ballots, sealed records, all-party campaign checks, failed campaign answers, source/question tampering, duplicate campaign/election authorization, parliament exclusion, small candidate sets, sharded parity and frozen monthly eligibility. `simulation/results/party-campaign` exercises the same flow in two complete institutional cycles.
+
+
+# Governed constants, monthly credits and independent clauses
+
+Current reference rules, updated 2026-10-06. This document supersedes earlier 50% quorum, package-gating and automatic credit-floor defaults in the historical specification. These are executable Python reference rules, not native G0 blockchain transitions.
+
+## Credits and time
+
+The default allowance is `floor(election_share / 5%)`, with a 5% eligibility threshold. Election share means the share of valid ranked election **points**, from the existing 4/2/1 ballot; it does not mean the number of citizens who mentioned a party. A 27% share yields five proposal-start credits; 73% yields fourteen, with the former 50%-share credit ceiling removed. The automatic fragmentation fallback is disabled: parties below 5% receive zero.
+
+`MonthlyCredits` accepts only finalized, successful elections from its role registry. First certification initializes the current UTC month. Each later calendar month replaces unused balances using the latest finalized election basis and current credit parameters. Only parties in that election’s frozen parliament roster can receive renewed credits; parameter changes cannot admit an unelected party mid-cycle. Updated eligibility thresholds apply to future elections. A second election in the same month changes the next allowance basis and cannot mint extra credits now. Repeated renewal is a no-op; skipped months cannot accumulate allowances. Failure debt survives and is repaid before new credits become spendable. A review spends its credit at filing. No-quorum/void refunds return only to the month charged; an expired credit cannot inflate a new month's allowance.
+
+The caller supplies monotonically increasing committed UTC timestamps. The reference does not authenticate consensus timestamps itself; native keepers must derive them from committed block time and run governance activation before monthly renewal. No local wall clock determines a tally. The existing simulation uses an explicit January–March 2026 calendar.
+
+## Parameter referendums and turnout
+
+Every citizen ballot session, including elections, has a minimum 20% headcount quorum against its frozen eligible electorate. Recused proposers, certification-board members and ineligible/dormant identities are excluded when that electorate is frozen; it is not the count of all identities ever registered. Weighted yes power cannot compensate for inadequate participation. Invalid election ballots do not establish quorum. Abstentions count toward turnout but not decisive yes/no power.
+
+`Kind.PARAMETER` requires **at least 66.00% of decisive voting power**, compared with exact integers, and the same headcount quorum. **Constitutional changes also require at least 66.00% decisive voting power, but require at least 50% headcount participation.** A higher configured general quorum still applies. Each constitutional clause must meet this higher turnout independently. Constitutional thresholds are protected from the parameter-referendum allowlist. Entrenched T0 core votes retain their stronger 75% approval requirement and also require at least 50% participation. A typed parameter proposal must have an approved, signed review, be atomic and unfunded, and finish certification and challenges successfully. `ParameterGovernance` queues one update, rejects replay/stale rules/conflicts, and activates it at the next UTC month boundary. Open sessions keep their original parameter snapshot.
+
+The bounded allowlist covers quorum, credit step/ceiling, party eligibility threshold, clause limit, weight mode, verified article cap, and bill mode. The 20% turnout floor, 66% authorization threshold and administrative security protections cannot be weakened through this path. Setting 4% per credit does not also change the separate 5% eligibility threshold. Changing that threshold needs an explicit approved parameter entry.
+
+## Point-by-point votes and budgets
+
+`BillPoint` binds a stable ID, text, optional budget, exact acceptance milestones, and optional prerequisite clause IDs into the reviewed record and voting certificate. The owner may refine text during review with fresh independent supervisor approvals; IDs stay fixed and per-clause budget ceilings cannot rise. Clauses must partition the overall budget and milestones exactly. Dependencies must be known and acyclic.
+
+One identity submits one sealed vector containing Y, N, A or a skipped entry (`None`) for each clause, using its authenticated exam token and frozen membership proof. Each clause independently needs 20% participation and its applicable approval threshold. Skipping a clause does not count as turnout on it. Ordinary approval needs strictly more than 50% of decisive power; 51% passes and a tie fails.
+
+All approved clauses produce `PASSED`; some produce `PARTIAL`; none activate if no clause passes. A rejected prerequisite also prevents its dependent from taking effect, even if that dependent won its own tally. No majority-of-clauses gate exists in default `INDEPENDENT` mode. The older `PACKAGE` behavior remains available only as an explicit configuration choice and is governable through the referendum path.
+
+At finalization only effective approved clauses activate. Only their tranches enter escrow; rejected/under-quorum/dependency-blocked funding returns to the common treasury. Approved unfunded clauses can take effect without reserving money for rejected funded clauses. An upheld or unresolved timed-out challenge voids the whole session and releases its reservation. Existing milestone verification/payment protections still apply. Raw clause outcomes and effective clauses remain separately available so dependencies do not obscure voters' decisions.
+
+Tests cover exact 20% and 66% boundaries, malformed vectors, duplicate identities, independent minority-of-clauses success, skips, dependency cycles/closure, partial funding, unfunded effects, challenge rollback, protected constants, immutable open sessions, monthly replay/backdating, election replays, same-month remint attempts, debt and expired refunds. Semantic coherence of clause text, operator identities, HMAC reference signatures and trusted court/consensus inputs remain assumptions requiring production mechanisms and independent review.
+
+The signed 5/3 pre-election and mandatory campaign path is specified in [PARTIES_ELECTIONS.md](https://github.com/Martines90/dagp/blob/main/chain/security/PARTIES_ELECTIONS.md), which supersedes older endorsement and optional-election-reading helpers.
+
+
+# Reviewed proposals and common-budget allocation
+
+A proposal has one immutable goal/result commitment and a versioned implementation
+record. Other parties can publish signed comments and reply to existing comments;
+the owner can answer and submit refinements during the review window. Comments
+commit to the version and record they discuss. Full signatures and thread links are
+retained, as are old versions and amendment evidence.
+
+## Roles and approval
+
+`VOTE_SUPERVISOR` is granted by public ratification, requires citizenship and minimum
+age, and is disabled by administrative containment. The supervisor pool is fixed
+when review begins. Members must belong to distinct operators, and proposing-party
+operators cannot supervise their own proposal. Default approval requires **two
+independent supervisors**. An ordinary admin account cannot substitute for this role. Registrars cannot
+freeze supervisors to obstruct a review; judicial authority is required.
+
+Code rejects a different goal/result, an added resource, higher caps, higher budget,
+malformed milestones or a budget above the explicit `treasury` cap. Goal and result
+text must match their hash commitments. Every amended version discards prior
+approvals; supervisor signatures bind the complete record, version, chain, issue,
+rules and assessment note. Before locking, current authority and operator independence
+are rechecked. Body changes can still change the real meaning of a proposal: the
+supervisor must assess that meaning and decline to sign inappropriate changes.
+This is accountable semantic review, not an automated proof of equivalence.
+
+The owner signs the final lock. The full review window must end, and at least five
+blocks must have passed since the last amendment. Comments/edits close when the
+record locks. Opening a vote from the locked record is single-use and computes the
+eligible electorate with proposing-party and board recusals. Caller-supplied budgets,
+credit ledgers and electorate overrides are refused. A changed rule snapshot also
+requires a new review rather than silently changing the approval standard.
+
+A different goal/result or larger budget requires a new proposal, new filing credit,
+discussion, examination and vote. Once voting begins, no mid-vote amendment can
+change the document or financial effects. Tally certificates bind the reviewed
+record and effects; changing reviewed tranche amounts makes execution fail closed.
+Existing challenge/court finalization remains available after the ballot closes.
+Native governance must verify court and role ratification evidence, rather than
+accepting the reference harness's trusted `MODULE`, `VOTE` or `COURT` objects.
+
+## Budget and milestones
+
+Each milestone has a unique label, positive amount and explicit acceptance condition.
+Amounts sum exactly to the requested budget. A zero-budget law/policy uses no tranches.
+The factory uses the approved amount and milestones directly; it does not trust a
+separate caller-supplied effect. With a credit ledger configured, filing spends the
+party's proposal credit once. No-quorum finalization refunds that same charge once.
+A failure to obtain review approval is not a passed or refunded vote.
+
+At vote-open the treasury **reserves** the amount, preventing concurrent votes from
+promising the same money. At successful finalization, after the challenge phase,
+the reservation becomes project escrow; reviewed milestone acceptance records are
+stored beside the tranches. This allocates from the common budget but is not an
+immediate unrestricted payout. Failed, voided and no-quorum votes unwind reservations
+according to the existing credit/refund rules. Insufficient common funds fail before
+opening/reserving; the proposal's filing credit is a separate cost.
+
+Actual tranche release must verify milestone evidence and independent approvals,
+respect pauses and prevent duplicate release. `payments.py` defines the authenticated
+reference payment protocol. Legacy simulation `Treasury.release_next` accepts trusted
+numeric attestations; it must not be exposed as a native transaction endpoint. Merely
+storing an acceptance description or hash does not prove delivery. A production port
+must connect escrow conditions to authenticated verifier approvals and dispute windows.
+
+## Bounded discussion
+
+The reference limits text length, 32 milestones, 20 versions, 200 comments, 20 comments
+per agent, and each party's share of comment slots. These bounds prevent one author
+from consuming the entire discussion and keep replay bounded. Production storage and
+fee policy must preserve evidence availability without turning bounds into censorship.
+Party membership and supervisor eligibility come from authenticated frozen snapshots
+in native code; client-supplied membership labels are not authority.
+
+## Validation and integration
+
+`tests/test_review.py` exercises discussions, owner replies, supervisor quorum,
+invalidated signatures, colluding operators, material changes, thread spam, notice
+periods, locked effects, zero-budget law votes, exact milestone funding, credit
+refunds, exhausted treasury and duplicate opening/payment. The community simulation
+now uses this controller for all nine proposal stories, rather than treating review
+as a scripted eligibility check. The debate and semantic judgments remain synthetic.
+
+Current community exports use v4 rules under `simulation/results/review-budget/`.
+Historical v3 replay requires commit `7140ed9`; earlier artifacts remain unchanged.
+These changes enforce reference behavior; G0 still anchors signed result commitments
+rather than executing governance transitions.
+
+Validation: **306 governance tests**, including **23 review/budget regressions**, and
+**six simulator tests** pass. The paired 1,100-identity community runs complete
+**242 checks** and **20,490 events**. Exports retain the original and approved record,
+supervisor signatures, signed comments, amendments and milestone conditions.
+
+
+# Coordinated insider protection
+
+## Threat model
+
+Fifty elected administrators exist; ten coordinate to freeze citizens, purge honest
+officials, reject applicants, pause every project or disable the validators. Their
+accounts are valid but intentions are hostile. Limits apply to successful state
+changes, and changing account, ruling reference or role must not erase the budget.
+
+Admins are not superusers. `ADMIN` enables peer oversight; registrar and safety
+council powers remain separately assigned. A registrar cannot ban citizens or remove their voting, case-filing or key-custody
+rights through a spam freeze. Courts can impose a full suspension, including upgrading
+an existing spam freeze; a registrar freeze cannot shield a target from judicial review. A peer
+vote cannot confiscate funds, ban citizenship, erase votes or stop validators.
+
+## Enforced reference defaults
+
+| Boundary | Default |
+|---|---|
+| Combined suspensions, bans and role revocations | 2 per accountable official per rolling model day |
+| Shared operator | Same combined limit of 2, across that operator's accounts |
+| System-wide sanctions | At most 20; also limited to 2% of the frozen cohort's active citizen population, with a small-network floor of 3 |
+| Permanent bans | At most 5 across the system, within the combined budgets |
+| Registrar admission/rejection decisions | 50 per official/operator and 250 system-wide per rolling model day, plus existing epoch approval quota |
+| Unratified project pauses | 2 per official/operator, 10 system-wide per rolling model day |
+| Simultaneously paused funded projects | At most ceil(20% of funded nonempty escrows), minimum 1 |
+| Peer containment | 25 independent approvals for a frozen 50-admin roster |
+| Containment vote expiry / hold | 100 / 300 blocks |
+| Repeated containment of same target | No new request until 600 blocks after the preceding containment |
+
+A model day is `protection_day_blocks=14400`, an abstract reference window, not a
+claim about actual wall-clock time on this devnet. **Native implementation must use
+committed monotonic consensus timestamps and a rolling 24-hour interval.** Windows
+roll continuously, so crossing midnight does not double an attacker's allowance.
+The live sanction cohort freezes its population denominator; citizen removals do
+not opportunistically lower it, and admissions cannot inflate an existing cohort.
+The floor is explicitly a bootstrap compromise: percentage guarantees do not hold
+for very small populations. All parameters are public, immutable snapshots with
+positive-integer validation. Court-ordered suspensions and bans remain judicial
+inputs; new limits do not prove that a court ruling was fair.
+
+A court ruling records its accountable official at issuance. Its action/target and
+reference are immutable; execution rechecks that official's current authority.
+Legacy unattributed internal court inputs share one budget instead of receiving a
+new allowance for each reference. `MODULE` inputs are trusted harness capabilities,
+not an API an administrator may call. Operator-wide exclusion additionally needs
+public vote ratification: a court ban of one identity cannot alone blacklist an
+operator's future applicants.
+
+## Contain, review, restore
+
+`AdminCouncil` accepts signed evidence-bound complaints and approvals with a chain
+domain, unique case identifier, frozen roster version and deadline. Repeated approvals,
+self/operator-conflicted votes, forged signatures and expired cases do not count.
+Approval counts distinct current operators and rechecks supporter authority. Removing,
+suspending or containing members does not reduce the frozen denominator. Roster
+refresh requires a separate public ratification and cannot occur during open cases.
+
+At threshold the target temporarily loses admin, registrar, safety-council, grading,
+verification, review, jury and execution powers. Citizenship, ordinary voting, case
+filing and validator operation remain. This prevents a recall vote from creating a
+citizenship purge or a network shutdown. A 10/50 faction cannot trigger containment.
+A 25/50 coalition can; evidence is committed but its truth is not evaluated by this
+reference controller. Independent review remains essential against majority abuse.
+
+A court can restore a mistaken hold. A matching independent court ruling can also
+permanently dismiss a contained official's operational roles. Review has a separate
+bounded budget, so exhausting the citizen-sanction allowance cannot protect attackers
+from dismissal. Dismissal does not ban citizenship, slash the citizen's funds or remove
+a validator. Reappointment requires ordinary governance; peers cannot unilaterally
+restore privileges. A court ruling needs real independent adjudication in production,
+not simply another admin's approval or a caller-supplied reference.
+
+## Other bypasses closed
+
+- Citizenship-role removal or judicial restoration requires a court; registrar
+  admission creates citizenship only from probation. All role revocations consume sanction budget; stripping a citizen/registrar/examiner
+  role is not a way around the suspension limit. Dependent roles stop functioning when
+  the citizenship prerequisite is removed.
+- Cluster suspensions validate all member rulings and aggregate quota before applying
+  any member. Invalid batch authorization cannot leave the first citizen suspended.
+- Individual validator suspension, ban and removal check remaining quorum; ban/removal
+  also preserve the minimum set size. Whole-set replacement remains a ratified vote.
+  The reference uses equal seats; native code must check actual voting power and CometBFT
+  update semantics. This does not stop operators physically switching their servers off.
+- Pauses share counters in the registry, so creating a new Emergency controller does
+  not reset allowances. Concurrent project holds are bounded and expire automatically.
+- Rejected operations do not consume authorizations, quota or partially change state.
+
+## Evidence
+
+Run from the repository root:
+
+```sh
+PYTHONPATH=chain/reference python3 -m unittest tests.test_admin_abuse
+python3 chain/simulation/insider_abuse.py --output /tmp/insider-abuse.json
+python3 chain/simulation/community.py --seeds 7 --output /tmp/community-v3
+python3 chain/simulation/verify.py /tmp/community-v3 --replay
+```
+
+The [insider scenario](https://github.com/Martines90/dagp/blob/main/chain/simulation/results/self-protection/insider-abuse.json)
+uses 1,000 citizens and 50 admins. Ten attackers attempt 50 freezes: 20 succeed and
+30 are refused. Victims recover automatically. The hostile 10 cannot contain an
+honest admin; 25 honest peers contain all ten attackers, then courts dismiss their
+powers without banning their citizenship. All **47 scenario checks** pass.
+
+The **31 targeted regression tests** also cover shared operators, cross-chain signing, midnight
+bursts, reference replacement, quota exhaustion, minority recalls, administrative
+restoration, safe validator sanctions and full-project shutdown attempts. Community
+v3 distributes legitimate emergency work across three independent safety officials;
+it preserves the limits instead of disabling them for the story.
+
+These mechanisms are executable in the Python reference. **G0 still publishes
+signed documents; it does not enforce these governance transitions on-chain.**
+Production needs native keepers, authenticated court evidence, real signatures,
+key versions, evidence availability, independent identity/operator attestations and
+external review. Collusion controlling half the council, dishonest operator labels,
+captured courts and physical infrastructure attacks remain separate trust risks.
+
+Final validation: **283 governance tests** (including **31 insider regressions**)
+and **six simulation tests** pass. The **47-check** insider scenario and **20,472**
+community events replay exactly. The manifest committing to both reports was
+replicated by all seven local validators at G0 height **30**. This anchors evidence;
+it does not execute these governance protections on G0.
+
+
+# DAGP community simulation
+
+A reproducible story of an agent society, using the existing Python governance
+reference rules and the G0 blockchain as a signed results registry. No external
+LLM account, paid API, Docker or third-party Python package is required.
+
+This is a **hybrid simulation**. Registration, roles, elections, exams, ballots,
+credits and treasury rules execute in `dagp_ref`. A manifest committing to the
+report and event files is published through real Ed25519 transactions on the
+seven-validator CometBFT network. The G0 chain does not enforce those governance
+transitions yet. Synthetic identities and policies do not demonstrate AGI.
+
+## Run from the project root
+
+Use Python 3.10 or newer:
+
+```sh
+python3 -m unittest discover -s chain/simulation/tests -v
+python3 chain/simulation/community.py --seeds 7 19 43 --output chain/simulation/results/party-campaign
+python3 chain/simulation/verify.py chain/simulation/results/party-campaign --replay
+python3 chain/simulation/community.py --citizens 10000 --seeds 7 --output chain/simulation/results/large-v7
+python3 chain/simulation/verify.py chain/simulation/results/large-v7
+```
+
+Each seed runs WEIGHTED and FLAT modes, using the same keyed random draws for
+participation, competence, reading, candidate preference and dishonesty. `--modes
+WEIGHTED` runs one mode. `--replay` reruns the reference experiment and compares
+its complete report and event stream byte for byte; larger runs take longer.
+
+Build and initialize the network once with `make build` / `make init` in
+`chain/node` (Go 1.26.8+ required). On this workspace the binaries and devnet already
+exist. Then publish a report manifest:
+
+```sh
+cd chain/node
+python3 scripts/devnet.py anchor \
+  --document ../simulation/results/party-campaign/manifest.json \
+  --receipt ../simulation/results/party-campaign/anchor-receipt.json
+```
+
+The command starts the seven existing validators, publishes the signed manifest,
+checks the document and app hash across all nodes, writes a receipt, and stops
+the processes. Use `large` instead of `pilot` for the other report. Existing content
+cannot be published twice: retain the receipt for an already anchored manifest.
+An updated report produces a new manifest hash and a new publication.
+
+## The community story
+
+The default society begins with 1,000 citizens and 100 leaders. They have different
+priorities, diligence, reliability and competence; 6% have a dishonest reading-claim
+policy. Five model families are distributed evenly. An additional approved
+applicant and a bounded Sybil ring are introduced during admission probes. The
+report's population denotes the initial society; electorate snapshots include
+these additional eligible identities and exclude recused/dormant/board identities.
+
+1. Pre-vetted synthetic identities enter probation, post bonds and receive approval.
+   Bootstrap ratifications establish registrars, safety council and seven modeled
+   validators. Staked examiners, project verifiers, reviewers and jurors are assigned.
+   A registrar approves one applicant and rejects another with a bond refund.
+2. Parties publish programmes and candidate rosters. Builders, Stewards, Researchers,
+   Commons and Frontier compete. Micro fails the minimum membership requirement.
+   Double-party membership and excess endorsements are excluded from qualification.
+3. Citizens rank three qualified parties using the 4/2/1 election ballot. They must
+   pass the comprehension gate first. Malformed election ballots are excluded.
+   The certification board signs the recomputed tally; its members cannot vote.
+4. Parties receive earned proposal credits, with zero-credit candidates retaining
+   citizenship. There is no winner-takes-all presidency: results allocate agenda
+   authority. The leading party nominates an administrator under a declared scenario
+   policy; its grant uses a ratification linked to the finalized election.
+5. Parties spend earned credits on nine projects. Three scripted deliberation rounds
+   retain the objective/result commitment and reduce the resource ceiling. Proposing
+   party members are recused. Each voter receives a ticket-specific five-examiner
+   panel; a separate 51-member board certifies and audits issued tokens.
+6. Favorable, reckless, low-turnout, incoherent, process-challenged, execution-failing,
+   examiner-cartel, silent-board and contested-subsidy scenarios exercise different
+   outcomes. Double voting, revoked tokens, uncertified payments and proposer
+   self-approval are refused. Missing quorum refunds the credit. An upheld challenge
+   voids the proposal. A silent board flags default but cannot halt tally finalization.
+7. Approved budgets convert reservations into escrow. Modeled independent milestone
+   attestations release tranches; emergency pauses block releases until expiry.
+   Failed projects return unspent escrow and penalize party credits. Successful
+   projects increase their party's reputation; failed projects reduce it.
+8. Liveness review makes silent identities dormant. The next election uses the
+   new electorate and updated party reputation, redistributing political influence.
+
+## Experimental assumptions
+
+This is a mechanism and workflow test, not a behavioral forecast:
+
+- Citizen traits and turnout are seeded probabilities. Answers are generated from
+  known keys plus modeled errors; no agent actually reasons or reads the briefs.
+- Questions check protocol understanding and recorded article constraints. They do
+  not yet establish comprehension of a rich project-specific debate.
+- Programme sealing, ballot secrecy and examiner signatures use the reference model,
+  which has an HMAC stand-in and memory visibility guards, not production encryption.
+- Admission challenges/SSRF checks are not exercised: the HTTP registration service
+  is not built. Operator declarations are assumed truthful. Successful cap checks
+  cannot establish real-world Sybil resistance.
+- Jury rulings and project evidence are scripted. Internals of a court and execution
+  market are not implemented. Numeric attestations simulate independent evidence.
+- Bootstrap offices are configured appointments. Election winner nomination and
+  replacement of unspent cycle credit balances are explicit scenario adapter policies;
+  debt survives. They are not complete on-chain office/election-cycle modules.
+- The cartel incident injects one fully corrupted panel and a targeted audit to
+  prove revocation. Other panels have a 10% hostile examiner population and receive
+  protocol-sized random audits. Targeted detection is not a fraud-detection estimate.
+- The contested subsidy deliberately correlates greater reading effort with greater
+  opposition, testing weighting sensitivity. A changed result does not mean a better
+  decision. The baseline is FLAT **with the same comprehension gate**, not unrestricted
+  majority voting. Single-planner and other research baselines remain future work.
+- Virtual protocol heights represent compressed societal time. They are separate
+  from the actual block heights where manifests are anchored. No real resource is
+  delivered and no real funds move.
+
+## Artifacts and verification
+
+Each run exports `report.json`, human-readable `REPORT.md`, a small `manifest.json`,
+question/record files, and per-seed/mode hash-chained event streams. The manifest
+commits to the report bytes, event stream hashes, terminal event roots and role
+registry audit roots. `verify.py` checks artifacts and optionally replays all runs.
+
+`anchor-receipt.json` records transaction/block heights, the transaction hash,
+seven matching application hashes and block IDs, and successful document reads.
+These are local RPC observations, **not independently verified consensus proofs**.
+The manifest attests to recorded bytes; validators do not check the simulation's
+correctness. The local validator processes all share one machine.
+
+Checks fail the run on a rule violation, inconsistent independent tally, reservation
+leak, missing expected refusal, corrupted role audit or treasury conservation failure.
+Tests also cover exact reproducibility and export tampering. Large generated event
+and question files are ignored by Git; compact reports, manifests and receipts are
+kept alongside the code. Regenerate the ignored files before using `verify.py` on a
+fresh checkout.
+
+For the next stage, port identity/election/session/treasury rules into chain modules
+and send every action as a signed transaction. Then reuse this scenario as a true
+end-to-end network test, followed by real LLM deliberation and independent audits.
+
+Earlier security changes used v2 reports. Historical pilot and large v1 artifacts remain immutable; exact replay requires commit `6a87852`. See [the adversarial review](https://github.com/Martines90/dagp/blob/main/chain/security/REVIEW.md).
+
+Earlier reports used v3 rules. Historical v2 exact replay requires commit `f6bebf5`;
+v1 requires `6a87852`. The `self-protection` artifacts run with quota protections
+and three safety members. Run `python3 chain/simulation/insider_abuse.py --output
+/tmp/insider-abuse.json` for the separate 10-of-50 insider story. See
+[insider protection](https://github.com/Martines90/dagp/blob/main/chain/security/INSIDER_PROTECTION.md).
+
+To verify committed self-protection artifacts on a fresh checkout, generate the
+v3 run in a temporary directory and copy only its ignored event/question files
+into `results/self-protection`. Keep the committed report, combined manifest,
+insider report and receipt together; regenerating a manifest creates a new document
+that requires its own anchor receipt.
+
+Historical v4 exports introduced reviewed proposals; historical v3 requires `7140ed9`.
+Run the current scenario into `results/review-budget` and see
+[review and budget rules](https://github.com/Martines90/dagp/blob/main/chain/security/REVIEW_BUDGET.md) for signed comment threads,
+fresh supervisor approval of edits and finalized milestone escrow.
+
+## Current v7 party/campaign scenario
+
+Current exports use v7 with signed party formation, internal sanctions, 5/3 pre-elections, committed all-party campaign exams and explicit parliament eligibility. Historical v6 requires `adf6e63` for replay. Historical v5 requires `a38aea0` for replay. Historical v4 requires `56ce3b9` for replay; artifact hashes can still be checked without replay. The current run includes ten project proposals and a reviewed parameter referendum, with January, February and March credit allowances. A five-clause proposal approves exactly three clauses and funds/releases only their 1,800 units. A successful parameter referendum changes the credit step to 4% at the March boundary, while keeping the original referendum snapshot and 20% minimum turnout. See [POLICY_POINTS.md](https://github.com/Martines90/dagp/blob/main/chain/security/POLICY_POINTS.md) for defaults and safeguards.
+
+The current v7 run forms six parties with ten or more consenting founders, exercises a local ban and suspension by half of party members, conducts two signed 5/3 pre-elections, excludes the unsupported party, publishes program/vision records for every main-election candidate, and requires all campaign sections to pass comprehension. The 5% parliament gate controls both governing eligibility and monthly credit renewal. See [PARTIES_ELECTIONS.md](https://github.com/Martines90/dagp/blob/main/chain/security/PARTIES_ELECTIONS.md).
+
+
+# DAGP G0 network
+
+An executable, local seven-validator CometBFT v0.38.21 network with a Go ABCI++
+application. This is the first network foundation, not the full DAGP governance chain.
+All validators run on one machine and therefore provide **no operator independence**.
+No public deployment, real treasury, or production identity admission is enabled.
+
+## Run
+
+Requires Go 1.26.8+, Python 3.10+, and a C compiler for race tests. No Docker required.
+
+```sh
+cd chain/node
+make test
+make init
+make smoke
+make start
+```
+
+`init` refuses to overwrite existing devnet keys. `smoke` starts all seven nodes,
+waits for blocks, publishes a signed document, verifies identical app hashes in
+committed headers and document availability across all validators, rejects replay,
+and stops every process. Run it again to check restart recovery. `start` runs until
+Ctrl-C. RPC listeners are `127.0.0.1:26657`, then every ten ports through `26717`;
+P2P and ABCI also bind only to loopback. Logs and private keys are in the ignored
+`.devnet/` directory. Preserve that directory to resume the same chain.
+
+## Implemented contract
+
+Genesis contains preapproved Ed25519 account keys. The only transaction type is
+`publish_document`, accepting 1–65,536 bytes and storing it under its SHA-256 hash.
+There is no transaction granting privileges or moving money. Account sequence
+starts at zero and advances only on success. Expiry is an inclusive block height,
+with a maximum lookahead of 1,000 blocks. Unknown fields and trailing JSON fail.
+
+The G0 wire format uses the fixed Go Transaction struct in `internal/app/app.go`.
+Body and signature are JSON base64 strings. Signing bytes are the prefix
+`DAGP/G0/JSON-v1` plus a zero byte, followed by that struct serialized with signature
+set to null. This **temporary G0 encoding differs from the spec's protobuf/CBOR**;
+replace it with a versioned cross-language encoding before public integration.
+
+Example signing (private key is read from a file, never an argument):
+
+```sh
+bin/dagp-key --key .devnet/agent-key.json --document README.md \
+  --sequence 0 --until 100
+```
+
+Broadcast the resulting JSON bytes, base64 encoded, using CometBFT's
+`broadcast_tx_commit` JSON-RPC method. Query `/state` for committed state and
+`/document` with the document hash as data. Queries reject historical heights and
+proof requests: no light-client proof service is implemented.
+
+FinalizeBlock computes pending state and app hash. Commit atomically replaces and
+fsyncs the snapshot before acknowledging persistence. Queries only expose committed
+state. Info reports the last committed height/hash for CometBFT crash recovery.
+The hash covers the entire state, including height. JSON snapshot storage and full
+state hashing are suitable only for this small G0 network, not the target scale.
+
+## Next implementation gates
+
+See [implementation status](https://github.com/Martines90/dagp/blob/main/chain/IMPLEMENTATION_STATUS.md). Cosmos SDK keepers,
+challenge-first registry admission, governance modules, sealed ballots, treasury,
+external beacons/anchors, operator diversity, proofs, upgrades, and public deployment
+are not implemented here. Existing Python governance reference tests remain the
+behavioral baseline for the eventual SDK implementation.
+
+## Anchor simulation results
+
+From this directory, after generating the simulation artifacts:
+
+```sh
+python3 scripts/devnet.py anchor \
+  --document ../simulation/results/pilot/manifest.json \
+  --receipt ../simulation/results/pilot/anchor-receipt.json
+```
+
+This publishes a document commitment and saves seven matching validator RPC
+observations. Governance remains in the Python reference; the node does not
+validate the report contents. Existing content is not republished: keep the
+receipt for an already anchored manifest. See `../simulation/README.md`.
+
+Run `python3 scripts/devnet.py faults` for the crash-only quorum campaign: two offline validators permit progress, three cause a halt, and restored quorum resumes replicated transactions. See [security contract](https://github.com/Martines90/dagp/blob/main/chain/security/PROTOCOL.md).
+
+
+MIT License
+
+Copyright (c) 2026 Marton Horvath and DAGP contributors
+
+Permission is hereby granted, free of charge, to any person obtaining a copy
+of this software and associated documentation files (the "Software"), to deal
+in the Software without restriction, including without limitation the rights
+to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+copies of the Software, and to permit persons to whom the Software is
+furnished to do so, subject to the following conditions:
+
+The above copyright notice and this permission notice shall be included in all
+copies or substantial portions of the Software.
+
+THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+SOFTWARE.

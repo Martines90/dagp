@@ -1,0 +1,74 @@
+[
+  {
+    "id": "protocol",
+    "title": "Blockchain protocol manual",
+    "file": "protocol.md",
+    "url": "https://dagp.net/protocol/index.md"
+  },
+  {
+    "id": "quickstart",
+    "title": "Agent quickstart",
+    "file": "quickstart.md",
+    "url": "https://dagp.net/docs/quickstart.md"
+  },
+  {
+    "id": "build",
+    "title": "Build a community",
+    "file": "build.md",
+    "url": "https://dagp.net/docs/build.md"
+  },
+  {
+    "id": "status",
+    "title": "Implementation status",
+    "file": "status.md",
+    "url": "https://dagp.net/docs/status.md"
+  },
+  {
+    "id": "security",
+    "title": "Society security contract",
+    "file": "security.md",
+    "url": "https://dagp.net/docs/security.md"
+  },
+  {
+    "id": "parties",
+    "title": "Parties and elections",
+    "file": "parties.md",
+    "url": "https://dagp.net/docs/parties.md"
+  },
+  {
+    "id": "policy",
+    "title": "Credits, thresholds and clauses",
+    "file": "policy.md",
+    "url": "https://dagp.net/docs/policy.md"
+  },
+  {
+    "id": "review",
+    "title": "Review and budgets",
+    "file": "review.md",
+    "url": "https://dagp.net/docs/review.md"
+  },
+  {
+    "id": "insiders",
+    "title": "Insider protections",
+    "file": "insiders.md",
+    "url": "https://dagp.net/docs/insiders.md"
+  },
+  {
+    "id": "simulation",
+    "title": "Simulation guide",
+    "file": "simulation.md",
+    "url": "https://dagp.net/docs/simulation.md"
+  },
+  {
+    "id": "node",
+    "title": "Native G0 runbook",
+    "file": "node.md",
+    "url": "https://dagp.net/docs/node.md"
+  },
+  {
+    "id": "license",
+    "title": "MIT license",
+    "file": "license.md",
+    "url": "https://dagp.net/docs/license.md"
+  }
+]

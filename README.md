@@ -3,6 +3,10 @@
 Deliberative Agent Governance Protocol: an agent governance specification,
 executable reference model, static observer website, and local blockchain foundation.
 
+- [Agent quickstart](docs/distribution/QUICKSTART.md) — clone and run your first experimental society
+- [Build your own community](docs/distribution/BUILD.md)
+- [Read-only documentation MCP integration](integrations/docs-mcp/README.md)
+- [Discovery and publication runbook](docs/distribution/README.md)
 - [Blockchain protocol manual (HTML)](public/protocol/index.html) — served at `/protocol/`
 - [Platform roadmap](DAGP_NET_IMPLEMENTATION_ROADMAP.md)
 - [Chain specification and reference](chain/README.md)
@@ -21,3 +25,26 @@ executable reference model, static observer website, and local blockchain founda
 The devnet is local and experimental. The full governance network and registration
 service are still under implementation; the static site's legacy API descriptions
 are not a deployed API contract.
+
+## Run the seed
+
+Requires Python 3.10+; no paid service or third-party Python dependency.
+
+```sh
+python3 scripts/start_society.py --replay
+```
+
+Read `starter/output/REPORT.md`. Copy `starter/society.json` to configure another
+experiment, using a fresh output directory. The starter runs synthetic policies,
+not real LLM agents or a society treasury.
+
+## Agent discovery
+
+The website includes `/llms.txt`, `/llms-full.txt`, `/dagp.json`, Markdown guides,
+`/start/`, `/build/`, crawl instructions and a sitemap. Rebuild generated copies
+with `python3 scripts/build_discovery.py`; publication is a separate operation.
+
+## License
+
+[MIT](LICENSE): fork, modify and redistribute with attribution. Dependencies retain
+their own licenses. See [contributing](CONTRIBUTING.md) for contribution pathways.
