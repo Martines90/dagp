@@ -28,15 +28,16 @@ type BeaconConfig struct {
 	Scheme      string `json:"scheme"`
 }
 type RuntimeState struct {
-	Peers    map[string]PeerTrust       `json:"peers,omitempty"`
-	Exports  map[string]json.RawMessage `json:"exports,omitempty"`
-	Sessions map[string]SessionGrant    `json:"sessions,omitempty"`
-	Version  int                        `json:"version"`
-	CodeHash string                     `json:"code_hash"`
-	Time     int64                      `json:"time"`
-	Beacon   BeaconConfig               `json:"beacon"`
-	Charter  json.RawMessage            `json:"charter,omitempty"`
-	Graph    json.RawMessage            `json:"graph,omitempty"`
+	Validators map[string]int64           `json:"validators,omitempty"`
+	Peers      map[string]PeerTrust       `json:"peers,omitempty"`
+	Exports    map[string]json.RawMessage `json:"exports,omitempty"`
+	Sessions   map[string]SessionGrant    `json:"sessions,omitempty"`
+	Version    int                        `json:"version"`
+	CodeHash   string                     `json:"code_hash"`
+	Time       int64                      `json:"time"`
+	Beacon     BeaconConfig               `json:"beacon"`
+	Charter    json.RawMessage            `json:"charter,omitempty"`
+	Graph      json.RawMessage            `json:"graph,omitempty"`
 }
 type ProtocolMessage struct {
 	Operation string          `json:"operation"`
@@ -57,13 +58,15 @@ type RuntimeRequest struct {
 	Verified  map[string]string `json:"verified,omitempty"`
 }
 type RuntimeReply struct {
-	Exports  map[string]json.RawMessage `json:"exports,omitempty"`
-	OK       bool                       `json:"ok"`
-	Error    string                     `json:"error,omitempty"`
-	Graph    json.RawMessage            `json:"graph,omitempty"`
-	Keys     map[string]string          `json:"keys,omitempty"`
-	Sessions map[string]SessionGrant    `json:"sessions,omitempty"`
-	Result   json.RawMessage            `json:"result,omitempty"`
+	Beacon     BeaconConfig               `json:"beacon"`
+	Validators map[string]int64           `json:"validators,omitempty"`
+	Exports    map[string]json.RawMessage `json:"exports,omitempty"`
+	OK         bool                       `json:"ok"`
+	Error      string                     `json:"error,omitempty"`
+	Graph      json.RawMessage            `json:"graph,omitempty"`
+	Keys       map[string]string          `json:"keys,omitempty"`
+	Sessions   map[string]SessionGrant    `json:"sessions,omitempty"`
+	Result     json.RawMessage            `json:"result,omitempty"`
 }
 
 // Host failures halt proposal/finalization rather than becoming nondeterministic
@@ -133,7 +136,7 @@ func validateRuntimeState(s State) error {
 	if r == nil {
 		return nil
 	}
-	if s.Governance != nil || r.Version != 2 || !hashEvidence(r.CodeHash) || r.Time <= 0 || r.Time > 253402300799 || len(r.Graph) > MaxRuntimeBytes || r.Beacon.Scheme != "pedersen-bls-unchained" || r.Beacon.Period < 1 || r.Beacon.Period > 86400 || r.Beacon.GenesisTime < 1 {
+	if s.Governance != nil || r.Version != 2 || !hashEvidence(r.CodeHash) || r.Time <= 0 || r.Time > 253402300799 || len(r.Graph) > MaxRuntimeBytes || r.Beacon.Period < 1 || r.Beacon.Period > 86400 || r.Beacon.GenesisTime < 1 {
 		return errors.New("invalid G2 metadata")
 	}
 	for chain, peer := range r.Peers {
@@ -144,11 +147,31 @@ func validateRuntimeState(s State) error {
 			return err
 		}
 	}
-	suite := bls12381.NewBLS12381Suite()
-	pub := suite.G1().Point()
-	key, err := hex.DecodeString(r.Beacon.PublicKey)
-	if err != nil || pub.UnmarshalBinary(key) != nil || pub.Equal(suite.G1().Point().Null()) {
-		return errors.New("invalid beacon public key")
+	if r.Beacon.Scheme == "bootstrap-disabled" {
+		var charter struct {
+			Bootstrap json.RawMessage `json:"bootstrap"`
+		}
+		_ = json.Unmarshal(r.Charter, &charter)
+		var society struct {
+			Bootstrap struct {
+				Phase string `json:"phase"`
+			} `json:"bootstrap"`
+		}
+		_ = json.Unmarshal(r.Exports["society"], &society)
+		if r.Beacon.PublicKey != "" || (len(charter.Bootstrap) == 0 && society.Bootstrap.Phase != "SEED" && society.Bootstrap.Phase != "EXPIRED") {
+			return errors.New("disabled beacon requires explicit founding stage")
+		}
+	} else if err := validateBeaconConfig(r.Beacon); err != nil {
+		return err
+	}
+	if len(r.Validators) > 100 {
+		return errors.New("validator set bound")
+	}
+	for key, power := range r.Validators {
+		raw, err := hex.DecodeString(key)
+		if err != nil || len(raw) != 32 || hex.EncodeToString(raw) != key || power != 1 {
+			return errors.New("invalid founding validator set")
+		}
 	}
 	if len(r.Graph) > 0 {
 		if len(r.Charter) > 0 {
@@ -157,6 +180,18 @@ func validateRuntimeState(s State) error {
 		if err := strictJSON(r.Graph); err != nil {
 			return err
 		}
+	}
+	return nil
+}
+func validateBeaconConfig(b BeaconConfig) error {
+	if b.Scheme != "pedersen-bls-unchained" || b.Period < 1 || b.Period > 86400 || b.GenesisTime < 1 || b.GenesisTime > 253402300799 {
+		return errors.New("invalid independent beacon configuration")
+	}
+	suite := bls12381.NewBLS12381Suite()
+	pub := suite.G1().Point()
+	key, err := hex.DecodeString(b.PublicKey)
+	if err != nil || pub.UnmarshalBinary(key) != nil || pub.Equal(suite.G1().Point().Null()) {
+		return errors.New("invalid beacon public key")
 	}
 	return nil
 }
@@ -176,6 +211,9 @@ func decodeProtocol(t Transaction) (ProtocolMessage, error) {
 	return p, nil
 }
 func verifyBeacon(r *RuntimeState, args json.RawMessage, now int64) (string, error) {
+	if err := validateBeaconConfig(r.Beacon); err != nil {
+		return "", err
+	}
 	var a struct {
 		Scope         string `json:"scope,omitempty"`
 		Round         uint64 `json:"round"`
@@ -258,6 +296,8 @@ func initRuntime(s *State) error {
 	r.Exports = reply.Exports
 	r.Sessions = reply.Sessions
 	r.Graph = reply.Graph
+	r.Beacon = reply.Beacon
+	r.Validators = reply.Validators
 	r.Charter = nil
 	return applyRuntimeKeys(s, reply.Keys)
 }
@@ -277,6 +317,8 @@ func advanceRuntime(s *State, now int64) error {
 	r.Exports = reply.Exports
 	r.Sessions = reply.Sessions
 	r.Graph = reply.Graph
+	r.Beacon = reply.Beacon
+	r.Validators = reply.Validators
 	return applyRuntimeKeys(s, reply.Keys)
 }
 func executeRuntime(s *State, t Transaction, raw []byte) error {
@@ -289,6 +331,45 @@ func executeRuntime(s *State, t Transaction, raw []byte) error {
 	}
 	r := s.Runtime
 	verified := map[string]string{}
+	if p.Operation == "bootstrap.propose" {
+		var proposal struct {
+			Action  string `json:"action"`
+			Payload struct {
+				Join   json.RawMessage `json:"join"`
+				Key    string          `json:"key"`
+				Proof  string          `json:"proof"`
+				Target string          `json:"target"`
+				Beacon BeaconConfig    `json:"beacon"`
+			} `json:"payload"`
+		}
+		if err := json.Unmarshal(p.Args, &proposal); err != nil {
+			return err
+		}
+		if proposal.Action == "INVITE" {
+			join, err := VerifyJoinRequest(proposal.Payload.Join, s.ChainID)
+			if err != nil {
+				return err
+			}
+			verified["join_key"] = hex.EncodeToString(join.Key)
+			if r.Validators[verified["join_key"]] != 0 {
+				return errors.New("citizen key cannot reuse an active consensus key")
+			}
+		}
+		if proposal.Action == "GRADUATE" {
+			if err := validateBeaconConfig(proposal.Payload.Beacon); err != nil {
+				return err
+			}
+			verified["beacon_configuration"] = "verified"
+		}
+		if proposal.Action == "VALIDATOR_ADD" {
+			key, e := hex.DecodeString(proposal.Payload.Key)
+			proof, e2 := hex.DecodeString(proposal.Payload.Proof)
+			if e != nil || e2 != nil || len(key) != 32 || hex.EncodeToString(key) != proposal.Payload.Key || !ed25519.Verify(key, G2PossessionBytes(s.ChainID, proposal.Payload.Target, key), proof) {
+				return errors.New("validator-key possession required")
+			}
+			verified["new_key"] = proposal.Payload.Key
+		}
+	}
 	var envelope map[string]json.RawMessage
 	if json.Unmarshal(p.Args, &envelope) != nil {
 		return errors.New("protocol arguments")
@@ -325,10 +406,13 @@ func executeRuntime(s *State, t Transaction, raw []byte) error {
 		if p.Operation == "key.recover" {
 			owner = a.Target
 		}
-		if err != nil || e != nil || len(key) != 32 || !ed25519.Verify(key, G2PossessionBytes(s.ChainID, owner, key), proof) {
+		if err != nil || e != nil || len(key) != 32 || hex.EncodeToString(key) != a.Key || !ed25519.Verify(key, G2PossessionBytes(s.ChainID, owner, key), proof) {
 			return errors.New("invalid G2 key possession")
 		}
 		verified["new_key"] = a.Key
+		if r.Validators[a.Key] != 0 {
+			return errors.New("citizen/session key cannot reuse an active consensus key")
+		}
 	}
 	if p.Operation == "identity.challenge" {
 		var a struct {
@@ -338,7 +422,7 @@ func executeRuntime(s *State, t Transaction, raw []byte) error {
 			return err
 		}
 		key, err := hex.DecodeString(a.Key)
-		if err != nil || len(key) != 32 {
+		if err != nil || len(key) != 32 || hex.EncodeToString(key) != a.Key || r.Validators[a.Key] != 0 {
 			return errors.New("registration key encoding")
 		}
 		verified["registration_key"] = a.Key
@@ -355,6 +439,8 @@ func executeRuntime(s *State, t Transaction, raw []byte) error {
 	r.Graph = reply.Graph
 	r.Exports = reply.Exports
 	r.Sessions = reply.Sessions
+	r.Beacon = reply.Beacon
+	r.Validators = reply.Validators
 	return nil
 }
 func registrationAccount(s *State, t Transaction) (Account, bool) {

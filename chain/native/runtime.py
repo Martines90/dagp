@@ -51,7 +51,8 @@ def process(request):
     committed_exports=exports(world)
     for value in committed_exports.values():value['code_hash']=request['code_hash']
     if len(canonical(committed_exports))>1024*1024:raise ValueError('committed export byte bound')
-    return {'ok':True,'graph':encode(world),'keys':world.public_keys,'sessions':world.session_keys,'exports':committed_exports,'result':result}
+    validators={key:1 for key,v in world.bootstrap['validators'].items() if v['agent'] in world.registry.validators} if world.bootstrap else {}
+    return {'ok':True,'graph':encode(world),'keys':world.public_keys,'sessions':world.session_keys,'exports':committed_exports,'beacon':world.beacon,'validators':validators,'result':result}
 
 
 if __name__=='__main__':

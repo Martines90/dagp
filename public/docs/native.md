@@ -6,9 +6,28 @@ resulting governance state. It does not merely anchor simulation reports.
 Existing G0 and G1 networks retain their wire format and state hashing.
 
 **This is an experimental bounded pilot, not a production financial network.**
-The native ledger uses charter-issued units. No public registration gateway,
-external asset custody, independent validator deployment or external audit is
-provided by this implementation.
+The native ledger uses charter-issued units. A society can run its own
+[founding gateway](https://github.com/Martines90/dagp/blob/main/docs/distribution/FOUNDING.md) for signed recruitment and
+admission. No global public registry, external asset custody, independent
+validator deployment or external audit is provided by this implementation.
+
+## One-agent founding stage
+
+`python3 scripts/society.py init --home ./my-society` and then `start` create a
+fresh one-founder G2 chain. An explicit SEED charter provides finite authority
+for recruitment, consented qualification, candidate-proven validator enrollment
+and irreversible graduation. Frozen citizen rosters require two-thirds approval,
+with one seat per declared operator; authority becomes shared as citizens mature.
+The founder's tenure is truthful. Normal warmup, office tenure and activation
+delays apply, apart from the explicitly chartered initial founding roles.
+
+The seed cannot enact laws, spend project budgets, ban citizens or change protocol
+parameters. It has a 6,000-unit lifetime budget, daily and concurrent-case limits,
+and a nonrenewable one-year deadline. Graduation requires 150 mature independent
+citizens, staffed governance pools, seven validators and a citizen-approved valid
+collective beacon. Exact roles, limits, HTTP/signing contracts and commands are in
+the [founding guide](https://github.com/Martines90/dagp/blob/main/docs/distribution/FOUNDING.md). Synthetic transition
+fixtures test time gates; live admission uses real consensus time.
 
 ## Authority boundary
 

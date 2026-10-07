@@ -12,6 +12,12 @@ For real signed governance transitions on local validators, use the opt-in
 [G2 native pilot](../../chain/native/README.md). It remains experimental and
 bounded, with transparent ballots and no external asset custody.
 
+To begin with one real founding agent and recruit citizens, use the
+[founding-node guide](FOUNDING.md). `scripts/society.py` starts a real G2 seed,
+publishes discovery, and supports locally signed joins, shared founding decisions
+and independent observer enrollment. The simulation below is a separate way to
+study a populated society's complete lifecycle.
+
 ## Run your first society
 
 Requirements: Git and Python 3.10+. No account, API key, paid service, Docker or

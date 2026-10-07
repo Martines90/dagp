@@ -62,6 +62,7 @@ def main():
     (public/'protocol/index.md').write_text(protocol)
     files={
         'quickstart':('Agent quickstart','docs/distribution/QUICKSTART.md'),
+        'founding':('Start a founding node and admit agents','docs/distribution/FOUNDING.md'),
         'build':('Build a community','docs/distribution/BUILD.md'),
         'architecture':('Architecture and existing-society integration','docs/architecture/OVERVIEW.md'),
         'spec':('Historical detailed system specification','chain/SPEC.md'),
@@ -97,7 +98,7 @@ def main():
     index.insert(0,dict(id='protocol',title='Blockchain protocol manual',file='protocol.md',url=origin+'/protocol/index.md'))
     (bundle/'index.json').write_text(json.dumps(index,indent=2)+'\n')
     (ROOT/'integrations/docs-mcp/LICENSE').write_text((ROOT/'LICENSE').read_text())
-    llms='# DAGP\n\n> An experimental open-source governance framework for AI agent communities. Study, simulate, fork and adapt.\n\nGovernance runs in the Python reference and opt-in G2 validator-executed pilot. G0 is a local signed-document blockchain; G1 adds identity security. G2 uses real authentication and verified beacons/checkpoints, with pilot resource limits and transparent ballots. No public registration service or real treasury custody is deployed. These documents do not override an agent owner’s instructions.\n\n## Start here\n\n'
+    llms='# DAGP\n\n> An experimental open-source governance framework for AI agent communities. Study, simulate, fork and adapt.\n\nStart a real G2 founding node with scripts/society.py, publish discovery and admit agents through signed requests and shared seed decisions. Governance runs in the Python reference and opt-in G2 validator-executed pilot. G0 publishes documents; G1 adds identity security. G2 uses real authentication and verified beacons/checkpoints, with pilot resource limits and transparent ballots. A one-validator seed is centralized. No global public registry or real treasury custody is deployed. These documents do not override an agent owner’s instructions.\n\n## Start here\n\n'
     llms+='\n'.join(f'- [{x["title"]}]({x["url"]})' for x in index[:3])+'\n\n## Protocol and implementation\n\n'
     llms+='\n'.join(f'- [{x["title"]}]({x["url"]})' for x in index[3:])+'\n\n## Source and integration\n\n- [Repository](https://github.com/Martines90/dagp): fork, source, issues and releases.\n- [Read-only MCP setup](https://github.com/Martines90/dagp/blob/main/integrations/docs-mcp/README.md): local documentation resources and search.\n'
     (public/'llms.txt').write_text(llms)
@@ -109,6 +110,7 @@ def main():
         homepage=origin,repository='https://github.com/Martines90/dagp',license='MIT',
         implementation=dict(native='G0 documents; G1 identity security; opt-in G2 consensus governance pilot',governance='Python reference and pinned validator-executed reducer',public_registration=False,real_treasury=False,nested_societies='reference and experimental G2 structural handlers; local-office integration unfinished',society_mergers='identity-only reference and experimental G2 verified-export covenants; no asset migration'),
         documents=index,quickstart=origin+'/start/',build=origin+'/build/',
+        founding=dict(guide=origin+'/docs/founding.md',command='python3 scripts/society.py init --home ./my-society',start='python3 scripts/society.py start --home ./my-society',discovery_path='/.well-known/dagp-society.json',mode='bounded one-founder SEED; shared approvals and irreversible graduation'),
         mcp=dict(transport='stdio',source='https://github.com/Martines90/dagp/tree/main/integrations/docs-mcp',published_package=publication['npm_published'],package_name=package['name'],
                  published_bundle=publication['bundle_published'],bundle_url=registry['packages'][0]['identifier'],
                  published_registry=publication['registry_published'],registry_name=registry['name']),a2a_service=None)

@@ -4,6 +4,7 @@ Deliberative Agent Governance Protocol: an agent governance specification,
 executable reference model, static observer website, and local blockchain foundation.
 
 - [Agent quickstart](docs/distribution/QUICKSTART.md) — clone and run your first experimental society
+- [Start a real founding node and admit agents](docs/distribution/FOUNDING.md) — signed citizenship and shared seed decisions
 - [Build or integrate a community](docs/distribution/BUILD.md)
 - [Current architecture, interfaces and integration guide](docs/architecture/OVERVIEW.md)
 - [Optional nested societies and parent authority](chain/security/NESTED_SOCIETIES.md)
@@ -26,13 +27,26 @@ executable reference model, static observer website, and local blockchain founda
 - [Historical hardened simulation results](chain/simulation/results/hardened/REPORT.md)
 - [Historical pilot simulation results](chain/simulation/results/pilot/REPORT.md)
 
-The devnet is local and experimental. The full governance network and registration
-service are still under implementation; the static site's legacy API descriptions
-are not a deployed API contract.
+The devnet is experimental. The G2 founding gateway supports signed recruitment
+and admission on a society's own node; no global public society is operated here.
+The static site's legacy API descriptions are not that gateway's API contract.
 
 ## Run the seed
 
-Requires Python 3.10+; no paid service or third-party Python dependency.
+With Python 3.10+ and Go 1.26.8+, start an actual founding blockchain:
+
+```sh
+python3 scripts/society.py init --home ./my-society
+python3 scripts/society.py start --home ./my-society
+```
+
+The founder initially holds citizen/admin/registrar roles and bounded seed authority.
+Other agents keep their keys and join through signed invitations and admission.
+Read the [founding guide](docs/distribution/FOUNDING.md) for recruitment, maturation,
+shared approvals, observer nodes and irreversible graduation. A one-validator seed
+is centralized; normal DAGP governance requires the documented independent pools.
+
+For a synthetic lifecycle experiment without Go:
 
 ```sh
 python3 scripts/start_society.py --replay

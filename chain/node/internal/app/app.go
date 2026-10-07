@@ -12,9 +12,11 @@ import (
 	"io"
 	"os"
 	"path/filepath"
+	"sort"
 	"sync"
 
 	abci "github.com/cometbft/cometbft/abci/types"
+	cmtcrypto "github.com/cometbft/cometbft/proto/tendermint/crypto"
 )
 
 type Account struct {
@@ -227,6 +229,16 @@ func (a *Application) InitChain(_ context.Context, r *abci.RequestInitChain) (*a
 	if err := initRuntime(&s); err != nil {
 		return nil, err
 	}
+	if s.Runtime != nil && len(s.Runtime.Validators) > 0 {
+		if len(r.Validators) != len(s.Runtime.Validators) {
+			return nil, errors.New("founding consensus validators do not match charter")
+		}
+		for _, v := range r.Validators {
+			if s.Runtime.Validators[hex.EncodeToString(v.PubKey.GetEd25519())] != v.Power {
+				return nil, errors.New("founding validator charter mismatch")
+			}
+		}
+	}
 	if err := a.persist(s); err != nil {
 		return nil, err
 	}
@@ -320,7 +332,39 @@ func (a *Application) FinalizeBlock(_ context.Context, r *abci.RequestFinalizeBl
 	}
 	s.Height = r.Height
 	a.pending = &s
-	return &abci.ResponseFinalizeBlock{TxResults: results, AppHash: Root(s)}, nil
+	return &abci.ResponseFinalizeBlock{TxResults: results, AppHash: Root(s), ValidatorUpdates: validatorChanges(a.committed.Runtime, s.Runtime)}, nil
+}
+
+func validatorChanges(previous, next *RuntimeState) []abci.ValidatorUpdate {
+	if next == nil || len(next.Validators) == 0 {
+		return nil
+	}
+	old := map[string]int64{}
+	if previous != nil {
+		old = previous.Validators
+	}
+	keys := map[string]bool{}
+	for key := range old {
+		keys[key] = true
+	}
+	for key := range next.Validators {
+		keys[key] = true
+	}
+	ordered := make([]string, 0, len(keys))
+	for key := range keys {
+		ordered = append(ordered, key)
+	}
+	sort.Strings(ordered)
+	var updates []abci.ValidatorUpdate
+	for _, key := range ordered {
+		power := next.Validators[key]
+		if old[key] == power {
+			continue
+		}
+		raw, _ := hex.DecodeString(key)
+		updates = append(updates, abci.ValidatorUpdate{PubKey: cmtcrypto.PublicKey{Sum: &cmtcrypto.PublicKey_Ed25519{Ed25519: raw}}, Power: power})
+	}
+	return updates
 }
 func (a *Application) persist(s State) error {
 	if err := os.MkdirAll(filepath.Dir(a.path), 0700); err != nil {

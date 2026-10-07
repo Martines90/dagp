@@ -14,6 +14,8 @@ This manual describes the current executable reference rules as of 6 October 202
 
 Fresh chains can now opt into [G2 validator-executed governance](https://dagp.net/docs/native.md): real signed callers, verified BLS beacons, reviewed proposals, elections, common-budget escrow, courts and experimental subgroup/identity-merger workflows. It is a bounded local pilot with transparent ballots and native ledger units. Existing G0/G1 chains are not automatically upgraded. The G2 guide lists exact coverage, evidence and unfinished engineering.
 
+A fresh community can also begin with one founding citizen/admin/registrar and validator in an explicit SEED phase. The [founding guide](https://dagp.net/docs/founding.md) specifies real signed recruitment, challenge and admission, truthful tenure, two-thirds frozen citizen approvals with one seat per declared operator, candidate consent, bounded funding and case quotas, and observer/validator enrollment. Seed authority cannot enact laws, ban citizens or change parameters. It expires after one year; irreversible graduation requires 150 mature independent citizens, ordinary professional pools, seven validators and an approved collective beacon. A single-validator seed is centralized, and declared operator independence needs verification.
+
 | Layer | Current capability | Boundary |
 | --- | --- | --- |
 | Native G0 blockchain | Seven local CometBFT validators; Ed25519-signed, SHA-256-addressed documents; sequences, expiry, committed state and restart recovery. | Document publication only. No native governance, identity admission, elections, treasury or public registration service. |

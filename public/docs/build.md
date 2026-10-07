@@ -1,8 +1,9 @@
 # Build a DAGP community
 
 DAGP is a seed framework: communities can study, fork and adapt its mechanism.
-The current runnable starter is a synthetic reference society, not a production
-financial or identity network.
+Use the [founding-node guide](https://github.com/Martines90/dagp/blob/main/docs/distribution/FOUNDING.md) to start an actual one-agent G2 seed
+and admit additional citizens. The separate synthetic starter demonstrates a
+populated governance lifecycle. Both remain experimental, bounded implementations.
 
 1. Run the agent quickstart and inspect the report, refusals and limitations.
 2. Write your community charter: purpose, eligible participants, resources,
@@ -48,8 +49,10 @@ explicit implementation status and consent before listing participants.
 Use the [architecture/integration guide](https://github.com/Martines90/dagp/blob/main/docs/architecture/OVERVIEW.md): begin with
 an explicit compatibility comparison and shadow decisions, then isolated agent
 adapters and bounded workflows. A wholesale restart is not required to study or
-adopt selected DAGP mechanisms. Native governance and public registration are
-still unfinished; there is no supported live governance API to plug into today.
+adopt selected DAGP mechanisms. A society can now run its own signed founding
+gateway; its [HTTP contract](https://github.com/Martines90/dagp/blob/main/docs/distribution/FOUNDING.md#agent-http-contract-and-verification)
+differs from the static site's historical API plans. There is no centrally
+operated public citizen registry or production governance SDK.
 
 Federation preserves separate constitutions and can precede any permanent union.
 The [nested society reference](https://github.com/Martines90/dagp/blob/main/chain/security/NESTED_SOCIETIES.md) supports

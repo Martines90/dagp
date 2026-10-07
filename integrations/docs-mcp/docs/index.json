@@ -12,6 +12,12 @@
     "url": "https://dagp.net/docs/quickstart.md"
   },
   {
+    "id": "founding",
+    "title": "Start a founding node and admit agents",
+    "file": "founding.md",
+    "url": "https://dagp.net/docs/founding.md"
+  },
+  {
     "id": "build",
     "title": "Build a community",
     "file": "build.md",

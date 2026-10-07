@@ -106,7 +106,7 @@ class Receipts:
 
 class World:
     def __init__(self,chain,now,charter,public_keys):
-        fields(charter,('identities','common_budget','balances','beacon','root','constraints'))
+        fields(charter,('identities','common_budget','balances','beacon','root','constraints'),('bootstrap',))
         self.chain=chain;self.now=number(now,1,253402300799)
         self.params=Params(protection_day_blocks=86400,min_citizen_age=3*86400,
             campaign_min_blocks=7*86400,max_election_cycle_blocks=90*86400,
@@ -127,8 +127,9 @@ class World:
             if Role.PARTY_MEMBER in roles or Role.VALIDATOR in roles:
                 raise RuleViolation('political membership/consensus validators cannot be charter roles')
             if roles and Role.CITIZEN not in roles:raise RuleViolation('charter roles require citizenship')
-            if roles and now-age<3*86400:raise RuleViolation('citizenship warmup required at genesis')
-            if roles&SENSITIVE_OFFICES and now-age<32*86400:raise RuleViolation('charter offices require mature tenure and activation')
+            founding=bool(charter.get('bootstrap')) and agent==charter['bootstrap'].get('founder') and age==now
+            if not founding and roles and now-age<3*86400:raise RuleViolation('citizenship warmup required at genesis')
+            if not founding and roles&SENSITIVE_OFFICES and now-age<32*86400:raise RuleViolation('charter offices require mature tenure and activation')
             stake=self.params.examiner_stake if roles & {Role.EXAMINER,Role.VERIFIER,Role.REVIEWER,Role.EXECUTOR} else 0
             bond=self.params.citizen_bond
             self.debit(agent,bond+stake)
@@ -147,11 +148,15 @@ class World:
         self.payments=MilestonePayments(chain,self.registry,self.receipts,0)
         self.payments._treasury=self.treasury
         self.payments._emergency.tr=self.treasury
-        self.council=AdminCouncil(chain,self.registry,self.receipts,now)
+        self.council=None if charter.get('bootstrap') else AdminCouncil(chain,self.registry,self.receipts,now)
         self.beacon=charter['beacon'];self.rounds={};self.pending={};self.pre={};self.programs={};self.campaigns={}
         self.reviews={};self.sessions={};self.exam_submissions={};self.grades={};self.failed=set()
         self.milestone_approvals={};self.beneficiaries={};self.finished=set();self.court_cases={};self.tokens={};self.audit_votes={};self.role_consents={};self.role_decisions={}
         self.rotations={};self.guardians={};self.recoveries={};self.session_keys={}
+        self.bootstrap=None
+        if charter.get('bootstrap'):
+            from .bootstrap import initialize
+            initialize(self,charter['bootstrap'])
         self.assert_invariants()
 
     def debit(self,agent,amount):
@@ -168,6 +173,11 @@ class World:
         if not self.registry.verify_audit():raise RuleViolation('registry audit corruption')
         if len(self.registry.ids)>1024:raise RuleViolation('native pilot account bound')
         if len(set(self.public_keys.values()))!=len(self.public_keys):raise RuleViolation('duplicate identity key')
+        if self.bootstrap:
+            b=self.bootstrap
+            if not 0<=b['spent']<=b['budget']<=6000:raise RuleViolation('fixed founding budget invariant')
+            keys=[v['key'] for v in b['invites'].values() if self.now<v['expires']]
+            if len(keys)!=len(set(keys)):raise RuleViolation('duplicate live invited key')
 
     def tick(self,now):
         if type(now) is not int or not self.now<=now<=253402300799:raise RuleViolation('consensus clock reversal')
@@ -179,7 +189,9 @@ class World:
         if previous!=self.registry.p:
             # ParameterGovernance's allowlist cannot change council/office rules.
             # Keep open cases and their roster version; only migrate the full hash.
-            self.council._rules_hash=self.registry.p.snapshot_hash()
+            if self.council:self.council._rules_hash=self.registry.p.snapshot_hash()
+        if self.council is None and len({self.registry.get(a).operator for a in self.registry.agents_with(Role.ADMIN,now)})>=5:
+            self.council=AdminCouncil(self.chain,self.registry,self.receipts,now)
         self.session_keys={key:grant for key,grant in self.session_keys.items() if now<grant['expires']}
         for scope in self.scoped.values():
             if scope['monthly'].points is not None:scope['monthly'].tick(now)
@@ -252,12 +264,16 @@ class World:
 
     def dispatch(self,actor,op,a,verified):
         n=self.now
+        from .bootstrap import seed,authorized,operate,registration
+        if op.startswith('bootstrap.'):return operate(self,actor,op,a,verified)
+        if seed(self) and not (op in {'tick','wallet.transfer','identity.challenge','identity.register','identity.heartbeat','identity.exit'} or op.startswith(('key.','party.','pre.','campaign.program'))):
+            raise RuleViolation('ordinary governance requires irreversible founding graduation')
         if op=='tick':return {'time':n}
         if op=='wallet.transfer':
             fields(a,('to','amount'));to=bounded(a['to']);amount=number(a['amount'],1)
             if re.fullmatch(r'[A-Za-z0-9][A-Za-z0-9._-]{0,127}',to) is None:raise RuleViolation('account identifier required')
             if to not in self.wallets:
-                if len(self.wallets)>=1024 or amount<self.params.citizen_bond+1 or not self.registry.can(actor,'VOTE',n)[0]:raise RuleViolation('bounded citizen-funded admission required')
+                if len(self.wallets)>=1024 or amount<self.params.citizen_bond+1 or not (self.registry.can(actor,'VOTE',n)[0] or authorized(self,actor)):raise RuleViolation('bounded citizen-funded admission required')
                 operator=self.registry.get(actor).operator
                 events=[e for e in getattr(self,'funding_events',[]) if n-86400<e[0]]
                 if len(events)>=40 or sum(e[1]==operator for e in events)>=5:raise RuleViolation('daily new-account sponsorship limit')
@@ -265,6 +281,11 @@ class World:
             self.debit(actor,amount);self.wallets[to]=self.wallets.get(to,0)+amount;return {'transferred':amount}
         if op=='identity.challenge':
             fields(a,('key',))
+            if seed(self):
+                invitation=self.bootstrap['invites'].get(actor)
+                if (self.now>=self.bootstrap['expires'] or invitation is None or self.now>=invitation['expires']
+                    or a['key']!=invitation['key']):
+                    raise RuleViolation('challenge must possess the live consensus-invited key')
             if actor in self.public_keys or not verified.get('registration_key'):raise RuleViolation('fresh key possession required')
             if len(self.public_keys)>=1024 or self.wallets.get(actor,0)<self.params.citizen_bond+1:raise RuleViolation('prefunded challenge and account capacity required')
             self.debit(actor,1);self.treasury.free+=1;self.treasury._initial_total+=1
@@ -279,6 +300,10 @@ class World:
             if actor in self.registry.ids or challenge is None or a['challenge']!=challenge[0] or not challenge[1]<n<challenge[2] or a['key']!=self.public_keys[actor]:raise RuleViolation('live prior consensus challenge required')
             # Go signs the exact challenge-bound request; no fetch of agent-controlled URLs.
             bounded(a['challenge'],256);self.debit(actor,self.params.citizen_bond)
+            if seed(self):
+                self.wallets[actor]+=self.params.citizen_bond
+                result=registration(self,actor,bounded(a['operator']),bounded(a['family']))
+                del self.challenges[actor];return result
             self.registry.register(actor,bounded(a['operator']),bounded(a['family']),self.params.citizen_bond,n)
             del self.challenges[actor];self.freeze('admission',actor,(actor,))
             return {'status':'PROBATION','task':actor}
@@ -753,6 +778,7 @@ class World:
         if op=='court.open':
             fields(a,('target','action','duration','evidence'))
             action=a['action'];target=a['target'];i=self.registry.get(target)
+            if self.bootstrap and target in self.registry.validators and action=='SUSPEND':raise RuleViolation('active consensus validators require coordinated replacement before judicial suspension')
             if not self.registry.can(actor,'FILE_CASE',n)[0] or self.registry.get(actor).operator==i.operator:raise RuleViolation('independent civic complainant required')
             if action not in ('BAN','SUSPEND','LIFT','ADMIN_DISMISS','ADMIN_RESTORE') or len(a['evidence'])!=64 or any(c not in '0123456789abcdef' for c in a['evidence']):raise RuleViolation('bounded judicial action/evidence')
             number(a['duration'],1,30*86400) if action=='SUSPEND' else number(a['duration'],0,0)

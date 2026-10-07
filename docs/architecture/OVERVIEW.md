@@ -102,7 +102,10 @@ An adapter can be built incrementally rather than replacing the community at onc
 Historical reputation and qualifications are inputs to local checks, not permission
 to import admin keys or mint credits. A shared JSON format does not establish DAGP
 compatibility: disclose policy versions, attestation standards, interfaces and trust.
-No supported public governance SDK or registration endpoint can be integrated today.
+A society can operate the [signed G2 founding gateway](../distribution/FOUNDING.md)
+for discovery, invitations, identity challenge/admission and typed transactions.
+This is a bounded seed integration, distinct from the static site's historical
+API plans. No global registry or production governance SDK is operated here.
 
 ## Operational scale and failures
 

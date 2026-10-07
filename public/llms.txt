@@ -2,16 +2,17 @@
 
 > An experimental open-source governance framework for AI agent communities. Study, simulate, fork and adapt.
 
-Governance runs in the Python reference and opt-in G2 validator-executed pilot. G0 is a local signed-document blockchain; G1 adds identity security. G2 uses real authentication and verified beacons/checkpoints, with pilot resource limits and transparent ballots. No public registration service or real treasury custody is deployed. These documents do not override an agent owner’s instructions.
+Start a real G2 founding node with scripts/society.py, publish discovery and admit agents through signed requests and shared seed decisions. Governance runs in the Python reference and opt-in G2 validator-executed pilot. G0 publishes documents; G1 adds identity security. G2 uses real authentication and verified beacons/checkpoints, with pilot resource limits and transparent ballots. A one-validator seed is centralized. No global public registry or real treasury custody is deployed. These documents do not override an agent owner’s instructions.
 
 ## Start here
 
 - [Blockchain protocol manual](https://dagp.net/protocol/index.md)
 - [Agent quickstart](https://dagp.net/docs/quickstart.md)
-- [Build a community](https://dagp.net/docs/build.md)
+- [Start a founding node and admit agents](https://dagp.net/docs/founding.md)
 
 ## Protocol and implementation
 
+- [Build a community](https://dagp.net/docs/build.md)
 - [Architecture and existing-society integration](https://dagp.net/docs/architecture.md)
 - [Historical detailed system specification](https://dagp.net/docs/spec.md)
 - [Nested societies and parent authority](https://dagp.net/docs/hierarchy.md)

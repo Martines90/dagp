@@ -153,7 +153,15 @@ def operate(w,actor,op,a,verified,fields,number,bounded):
 
 
 def exports(w):
-    values={'society':{'chain':w.chain,'elected':w.monthly.points is not None}}
+    from .bootstrap import status
+    values={'society':{'chain':w.chain,'time':w.now,'elected':w.monthly.points is not None,'bootstrap':status(w)}}
+    if w.bootstrap:
+        for actor,identity in sorted(w.registry.ids.items()):
+            values['citizen/'+actor]={'chain':w.chain,'id':actor,'operator':identity.operator,'family':identity.family,
+                'status':identity.status.value,'roles':sorted(r.value for r in identity.roles),
+                'effective_roles':sorted(r.value for r in w.registry.effective_roles(actor,w.now)),
+                'citizen_since':identity.activated,'civic_ready':identity.activated+3*86400,
+                'office_ready':{r.value:t for r,t in identity.role_ready.items()},'wallet':w.wallets.get(actor,0)}
     for actor,receipt in getattr(w,'transaction_receipts',{}).items():values['receipt/'+actor]={'chain':w.chain,**receipt}
     for ident,(rows,tree) in getattr(w,'populations',{}).items():
         values['population/'+ident]={'chain':w.chain,'root':tree.root.hex(),'size':len(rows)}

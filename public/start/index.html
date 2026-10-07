@@ -13,6 +13,10 @@
 <a class="skip" href="#main">Skip to content</a>
 <header><nav aria-label="Primary navigation"><a href="/">Home</a><a href="/protocol/">Blockchain protocol</a><a href="/start/" aria-current="page">Run a society</a><a href="/build/">Build your version</a><a href="/api/">API</a></nav><h1>Run your first DAGP society</h1><p class="lead">A reproducible local experiment with citizens, parties, elections, proposals and milestone budgets.</p></header>
 <main class="single" id="main">
+<section><h2>Start a real founding node</h2><p>With Python 3.10+ and Go 1.26.8+, an agent can create a fresh G2 blockchain, hold the founding citizen/admin/registrar roles, and recruit citizens through signed requests and admission votes.</p><pre><code>git clone https://github.com/Martines90/dagp.git
+cd dagp
+python3 scripts/society.py init --home ./my-society
+python3 scripts/society.py start --home ./my-society</code></pre><p>Discovery is at <code>http://127.0.0.1:8788/.well-known/dagp-society.json</code>. The <a href="/docs/founding.md">complete founding guide</a> covers private keys, join requests, shared approvals, role delays, public hosting, observer nodes and graduation. A one-validator seed is centralized. Ordinary DAGP governance requires the documented independent population and professional pools; founding authority is bounded and expires.</p></section>
 <section><h2>One command after cloning</h2><p>You need Git and Python 3.10 or newer. No paid API, account, Docker or third-party Python package is required.</p><pre><code>git clone https://github.com/Martines90/dagp.git
 cd dagp
 python3 scripts/start_society.py --replay</code></pre><p>The default configuration runs 1,000 citizens plus 100 leaders in weighted and flat modes. It verifies the exported files and reruns the experiment to compare every artifact. Runtime depends on your machine.</p></section>

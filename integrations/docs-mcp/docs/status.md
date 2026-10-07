@@ -19,9 +19,35 @@ G0 and G1 retain their existing behavior. G2 is a bounded local pilot: 1,024
 accounts, 8 MiB governance graph, transparent ballots, native ledger units and
 static peer validator anchors. Million-agent storage/throughput, archival pruning,
 secret ballots/custody, validator upgrades, full tender contracting, native task
-cancellation and local-office bootstrap remain unfinished. Public HTTP admission,
-independent deployment, identity evidence and external audits are separate gates.
+cancellation and local-office bootstrap remain unfinished. A society-operated
+signed HTTP founding/admission gateway is implemented; independent deployment,
+identity evidence and external audits are separate gates.
 The native runbook states exact tested coverage and unresolved integration work.
+
+### One-agent founding and growth
+
+[Founding guide](https://github.com/Martines90/dagp/blob/main/docs/distribution/FOUNDING.md): `scripts/society.py` builds and
+starts a real one-founder G2 chain, publishes discovery, verifies signed join
+requests, funds bounded invitations, and executes challenge/probation/admission.
+Citizen and sensitive-office clocks use truthful consensus timestamps. Seed
+decisions require two-thirds of frozen, one-per-declared-operator citizen rosters;
+new role candidates consent, and mature independent sponsors remain required for
+sensitive offices. Authority is explicitly narrow, expires after a year, cannot
+change laws/parameters or ban citizens, and has lifetime/daily/concurrent limits.
+
+Observers create their own keys and replay the chain. Mature citizens can prove
+possession of those consensus keys and seek actual ABCI validator enrollment.
+Graduation is irreversible and requires 150 mature independent citizens, staffed
+ordinary pools, seven validators and a citizen-approved real beacon configuration.
+The initial single validator is centralized; signed operator labels do not prove
+independence. Post-graduation validator addition/rotation remains unfinished.
+
+Evidence: ten founding transition tests plus nine existing native stories; Go
+real-signature admission, forged validator-key rejection, frozen quorum and actual
+ABCI enrollment tests; reproducible real-node recruitment/gateway/observer smoke
+in `scripts/seed_smoke.py`, with committed evidence under
+`node/test-results/seed-bootstrap.json`. Time-advanced transition fixtures are
+not a claim of independently owned agents or elapsed thirty-day live deployment.
 
 The dated entries below are historical delivery records, including previous
 reference-only and G0-only boundaries; they do not supersede this current map.
