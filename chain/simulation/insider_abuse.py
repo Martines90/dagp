@@ -4,6 +4,7 @@ import argparse,json,sys
 from pathlib import Path
 sys.path.insert(0,str(Path(__file__).resolve().parents[1]/'reference'))
 from dagp_ref.admin import AdminCouncil
+from dagp_ref.assignments import TaskAssignments
 from dagp_ref.crypto_sim import SimKeyring
 from dagp_ref.params import Params
 from dagp_ref.roles import Actor,Role,RoleRegistry,Status
@@ -17,7 +18,7 @@ def run():
         checks.append(name)
     for n in range(1000):
         a=f'admin-{n}' if n<50 else f'citizen-{n}'
-        reg.register(a,'operator-'+a,'family',10,0);reg.approve(MODULE,a,0)
+        reg.register(a,'operator-'+a,'family-'+str(n%5),10,0);reg.approve(MODULE,a,0)
         if n<50:
             keys.register(a)
             for role in (Role.ADMIN,Role.REGISTRAR,Role.SAFETY_COUNCIL):
@@ -46,14 +47,20 @@ def run():
         for supporter in range(10,35):approve(f'admin-{supporter}',c,111)
         check(f'hostile administrator {n} contained',not reg.can(target,'REGISTRAR_ACT',111)[0])
         check(f'hostile administrator {n} retains citizenship and appeal standing',reg.can(target,'VOTE',111)[0] and reg.can(target,'FILE_CASE',111)[0])
-        issuer=f'admin-{35+n}';ref=f'court-dismiss:{target}'
-        reg.register_ruling(MODULE,ref,'ADMIN_DISMISS',target,issuer)
-        reg.dismiss_admin(Actor('COURT',ref),target,112)
-        check(f'hostile administrator {n} dismissed after review',Role.ADMIN not in reg.get(target).roles)
+    assignments=TaskAssignments('insider-scenario-chain',reg)
+    for n in range(10):
+        target=f'admin-{n}';ref=f'court-dismiss:{target}';task='court:'+ref
+        height=112+2*n;round=assignments._round+1
+        assignments.freeze(MODULE,'admin_review',task,(target,),round,height)
+        assignments.publish_beacon(MODULE,round,bytes([n+1])*32,height+1)
+        result=assignments.assign(MODULE,'admin_review',task,height+1)
+        reg.register_ruling(MODULE,ref,'ADMIN_DISMISS',target,result.members[0],height=height+1)
+        reg.dismiss_admin(Actor('COURT',ref),target,height+1)
+        check(f'hostile administrator {n} dismissed after random independent assignment',Role.ADMIN not in reg.get(target).roles)
     check('all ten lose authority beyond hold expiry',all(not reg.can(f'admin-{n}','REGISTRAR_ACT',500)[0] for n in range(10)))
     check('all fifty original citizens recover without permanent citizen bans',all(reg.get(f'citizen-{50+n}').status is Status.ACTIVE for n in range(50)))
     check('audit trail verifies',reg.verify_audit())
-    return dict(format='dagp-insider-abuse-v1',citizens=1000,administrators=50,hostile_administrators=10,
+    return dict(format='dagp-insider-abuse-v2',citizens=1000,administrators=50,hostile_administrators=10,
                 attempted_freezes=50,accepted_freezes=successes,refused_freezes=denials,
                 peer_containment_threshold=council.threshold,contained_and_court_dismissed=10,
                 permanent_citizenship_bans=0,checks=len(checks),passed_checks=checks,

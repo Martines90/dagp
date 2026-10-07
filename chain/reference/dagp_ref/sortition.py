@@ -1,8 +1,8 @@
 """Random selection and the two numbers that make the design scale-independent.
 
 1. draw(): deterministic sortition. Selected set = k smallest H(seed, id); any node can
-   recompute it; nobody can grind it once the seed (an external beacon round committed BEFORE
-   the candidate list is known) is fixed. Cost O(candidates) streaming, output O(k).
+   recompute it; nobody can grind it once the seed (a future external beacon round bound to a frozen
+   candidate list BEFORE its unpredictable value is revealed) is fixed. Cost O(candidates) streaming, output O(k).
 2. panel_size(): the board size needed so that a hostile majority has probability <= target
    given an assumed hostile fraction of the pool (20% hostile, 1e-6 -> 51 members). It depends on
    the ADVERSARY, not on the population: the same board protects a million citizens as well as a
@@ -68,3 +68,18 @@ def audit_sample_size(fraud_bps: int, miss_den: int) -> int:
     while keep ** n * miss_den > BPS ** n:
         n += 1
     return n
+
+
+def draw_independent(seed, candidates, k, registry, exclude=frozenset()):
+    """Equal operator chances, one key per operator, at most ceil(k/2) per family."""
+    from math import ceil
+    ranked=sorted(set(candidates)-set(exclude),key=lambda a:(
+        H('independent-operator',seed,registry.get(a).operator),H('independent-agent',seed,a)))
+    selected=[];operators=set();families={}
+    for a in ranked:
+        identity=registry.get(a)
+        if identity.operator in operators or families.get(identity.family,0)>=ceil(k/2):continue
+        selected.append(a);operators.add(identity.operator)
+        families[identity.family]=families.get(identity.family,0)+1
+        if len(selected)==k:break
+    return selected

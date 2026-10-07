@@ -21,7 +21,7 @@ from .election import ElectionResult
 from .params import Params
 from .campaign import Campaign
 from .roles import Actor, Role, RoleRegistry, Status
-from .sortition import audit_sample_size, draw
+from .sortition import audit_sample_size, draw, draw_independent
 from .scale import (Electorate, ElectionShard, ShardSummary, election_from_shards, shard_count,
                     shard_of, summarize_election_shard, summarize_shard, tally_sharded)
 from .tally import Ballot, BillResult, Kind, Outcome, TallyResult, weight,tally_bill,YES,NO,ABSTAIN
@@ -103,6 +103,16 @@ class VoteSession:
             if open_height<campaign.end_height or windows.challenge_end+p.challenge_resolution_grace>campaign.election_deadline:
                 raise RuleViolation("election outside frozen campaign cycle")
         elif campaign is not None:raise RuleViolation("campaign belongs to election only")
+        from .assignments import require_assignment
+        subjects=tuple(sorted(recused))
+        if campaign:subjects=tuple(sorted(a for a in registry.ids if registry.get(a).operator in self._campaign_conflicts))
+        if not subjects:subjects=tuple(sorted(registry.ids)) if kind==ELECTION else ()
+        if not getattr(p,"_historical_assignments",False):
+            service=getattr(registry,"assignments",None)
+            if service is None:raise RuleViolation("certification assignment required")
+            assignment=require_assignment(registry,service.chain,"certification",issue,board.members,open_height,subjects)
+            if type(beacon) is not bytes or beacon != service._beacons[assignment.round][0]:
+                raise RuleViolation("exam randomness must match the committed assignment beacon")
         self.root, self.size = electorate_root, electorate_size
         self.board, self.bank, self.attempts, self.beacon = board, bank, attempts, beacon
         self.open_height, self.w = open_height, windows
@@ -130,7 +140,16 @@ class VoteSession:
         self.qualified = list(qualified_parties or [])
         self.scoreboard = scoreboard or Scoreboard(p)
         # Exam graders come from `pool` (never the certification board); one small panel per ticket.
+        if not getattr(p,"_historical_assignments",False):
+            full_pool={a for a in registry.agents_with(Role.EXAMINER,open_height) if registry.can(a,"GRADE",open_height,{"operators_involved":self._campaign_conflicts})[0]}
+            if set(pool or ())!=full_pool:raise RuleViolation("full eligible examiner pool required")
         self.pool = sorted(set(pool if pool is not None else []) - set(board.members))
+        self._grader_panels={}
+        self._grader_profiles={a:(registry.get(a).operator,registry.get(a).family) for a in self.pool}
+        self._task_conflicts=self._campaign_conflicts
+        if not getattr(p,"_historical_assignments",False):
+            self._task_conflicts=frozenset(service._tasks["certification",issue].operators)
+        self._grader_conflicts=self._task_conflicts | {registry.get(a).operator for a in board.members}
         self.issued: dict[str, tuple] = {}           # ticket -> (token, panel, voter)
         self.revoked: set[str] = set()
         self.struck: list[str] = []
@@ -155,7 +174,7 @@ class VoteSession:
     # ------------------------------------------------------------- eligibility & exam
     def _matter(self) -> dict:
         return {"proposer_party_members": set(self.recused),
-                "operators_involved": self._campaign_conflicts}
+                "operators_involved": self._task_conflicts}
 
     def _effect_commitment(self):
         e=self.effects
@@ -197,12 +216,22 @@ class VoteSession:
             raise RuleViolation("unknown ticket for this issue")
         owner = record.voter
         # A voter-chosen secret MUST NOT select the panel. All retries keep the same panel.
-        members = tuple(draw(H(b"exam-panel-v2", self.beacon, self.issue, owner), self.pool, self.p.exam_panel,
+        if not getattr(self.p,"_historical_assignments",False):
+            for a in self.pool:
+                if (self.registry.get(a).operator,self.registry.get(a).family)!=self._grader_profiles[a]:
+                    raise RuleViolation("examiner identity metadata changed after pool freeze")
+            if owner in self._grader_panels:
+                return Board(f"panel-{ticket[:12]}",self._grader_panels[owner],self.issue)
+        selector=draw if getattr(self.p,"_historical_assignments",False) else draw_independent
+        extra={} if selector is draw else {"registry":self.registry}
+        members = tuple(selector(H(b"exam-panel-v2", self.beacon, self.issue, owner), self.pool, self.p.exam_panel,
                              exclude={a for a in self.pool if a == owner or a in self.recused
                                       or self.registry.get(a).operator == self.registry.get(owner).operator
-                                      or (self.campaign and self.registry.get(a).operator in self._campaign_conflicts)}))
+                                      or (self.campaign and self.registry.get(a).operator in self._campaign_conflicts)
+                                      or (selector is draw_independent and self.registry.get(a).operator in self._grader_conflicts)},**extra))
         if len(members) < self.p.exam_panel:
             raise RuleViolation("examiner pool too small for a grader panel")
+        self._grader_panels[owner]=members
         return Board(f"panel-{ticket[:12]}", members, self.issue)
 
     def plan(self, attempt, declared: tuple):

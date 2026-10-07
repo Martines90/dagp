@@ -51,6 +51,9 @@ class ProposalReview:
         members=[a for group in self._parties.values() for a in group]
         if len(set(members))!=len(members):raise RuleViolation('one party membership per discussion participant')
         self._supervisors=tuple(supervisors)
+        from .assignments import require_assignment
+        require_assignment(registry,chain,"review",issue,self._supervisors,open_height,
+                           self._parties.get(party,()))
         if owner not in self._parties.get(party,()) or not registry.can(owner,'SUBMIT_PROPOSAL',open_height)[0]:
             raise RuleViolation('owner is not an authorized member of proposing party')
         self._original=copy.deepcopy(draft);self._validate(draft)
@@ -133,6 +136,9 @@ class ProposalReview:
         if agent!=self.owner or not self.reg.can(agent,'SUBMIT_PROPOSAL',height)[0]:raise RuleViolation('proposing owner only')
 
     def _supervisor(self,agent,height):
+        from .assignments import require_assignment
+        require_assignment(self.reg,self.chain,"review",self.issue,self._supervisors,height,
+                           self._parties[self.party])
         conflicts={self.reg.get(a).operator for a in self._parties[self.party]}
         if (agent not in self._supervisors or not self.reg.can(agent,'SUPERVISE_VOTE',height)[0]
                 or self.reg.get(agent).operator in conflicts):raise RuleViolation('supervisor unauthorized or conflicted')

@@ -6,7 +6,7 @@ chain reference modules/tests, public protocol/API pages, and Wrangler configura
 | Area | Actual state | Remaining work |
 |---|---|---|
 | Protocol | SPEC, DECISIONS, THREATS and concept note exist | Formal models, parameter evidence, constitutional review |
-| Governance reference | Python model; 376 tests pass with Python 3.14 | Port to production keepers and prove equivalence |
+| Governance reference | Python model; 401 tests pass with Python 3.14 | Port to production keepers and prove equivalence |
 | Consensus/network | Go CometBFT G0 network with seven local validator configurations | Independent operators, validator policy, fault/censorship drills |
 | Transactions | Real Ed25519 signatures, chain binding, sequences, height expiry, strict JSON | Versioned protobuf/CBOR, resource quotas, key lifecycle |
 | State | Durable snapshots, deterministic hash, committed-state queries | Scalable database, Merkle proofs, snapshots/state sync |
@@ -144,3 +144,15 @@ required. Pending officials cannot exercise powers or expand council denominator
 See [insider protection](https://github.com/Martines90/dagp/blob/main/chain/security/INSIDER_PROTECTION.md) for exact scope, native
 timestamp requirements and the test-only historical timing fixtures. The G0 native
 chain does not enforce these gates yet.
+
+## Independent task assignments (2026-10-06)
+
+The reference freezes complete eligible pools before a future beacon round and
+enforces receipts for registrar decisions, proposal supervisors, certification
+boards, authenticated milestone verifiers and named accountable court admins.
+Panels enforce independent operators, model-family concentration limits, repeat
+pairing limits and cross-stage exclusions. Stalled tasks have delayed, ratified
+and rate-limited cancellation. Jury, tender and outcome assignment types exist;
+full judgment/contracting workflows remain incomplete. Beacon verification and
+all native assignment keepers remain unfinished. See
+[task assignment boundaries](https://github.com/Martines90/dagp/blob/main/chain/security/TASK_ASSIGNMENTS.md).

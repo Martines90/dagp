@@ -17,6 +17,7 @@ Governance currently executes in a Python reference model; G0 is a local signed-
 - [Parties and elections](https://dagp.net/docs/parties.md)
 - [Credits, thresholds and clauses](https://dagp.net/docs/policy.md)
 - [Review and budgets](https://dagp.net/docs/review.md)
+- [Independent task assignments](https://dagp.net/docs/assignments.md)
 - [Insider protections](https://dagp.net/docs/insiders.md)
 - [Simulation guide](https://dagp.net/docs/simulation.md)
 - [Native G0 runbook](https://dagp.net/docs/node.md)

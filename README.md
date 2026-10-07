@@ -55,3 +55,9 @@ and shared rolling appointment limits (5 per sponsoring admin/operator, 20 globa
 Appointments still require governance approval. See the
 [insider protection rules](chain/security/INSIDER_PROTECTION.md). Native G0 does
 not yet implement these governance gates.
+
+The reference also enforces [independent delegated-task assignments](chain/security/TASK_ASSIGNMENTS.md):
+future-beacon selection from frozen eligible pools, distinct operators, party and
+beneficiary exclusions, repeat-pairing limits, and audited cancellation. Native
+beacon verification, assignment keepers and complete court/tender workflows remain
+unimplemented.

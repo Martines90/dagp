@@ -32,7 +32,7 @@ class MilestonePayments:
         from .emergency import Emergency
         self._emergency=Emergency(registry.p,registry,self._treasury)
 
-    def fund(self, project, tranches, verifiers, threshold, excluded_operators):
+    def fund(self, project, tranches, verifiers, threshold, excluded_operators, height=0):
         """Trusted finalized-vote entry point, never a public funding transaction."""
         members=tuple(verifiers);excluded=frozenset(excluded_operators)
         if (type(threshold) is not int or threshold < 2 or threshold > len(members) or 2*threshold <= len(members)
@@ -48,8 +48,11 @@ class MilestonePayments:
             operators.append(identity.operator)
         if len(set(operators)) != len(members) or set(operators)&excluded:
             raise RuleViolation('verifier conflict of interest')
+        from .assignments import require_assignment
+        subjects=tuple(sorted(a for a in self.registry.ids if self.registry.get(a).operator in excluded))
+        require_assignment(self.registry,self.chain,"verification",project,members,height,subjects)
         self._treasury.reserve_and_grant(project,tranches)
-        self._policies[project]=(members,threshold,excluded)
+        self._policies[project]=(members,threshold,excluded,subjects)
 
     def release(self, approval, signatures, height):
         if (type(height) is not int or height < 0 or approval.chain != self.chain
@@ -62,7 +65,9 @@ class MilestonePayments:
         project=approval.project
         if project not in self._policies:
             raise RuleViolation('unknown project')
-        members,threshold,excluded=self._policies[project]
+        members,threshold,excluded,subjects=self._policies[project]
+        from .assignments import require_assignment
+        require_assignment(self.registry,self.chain,"verification",project,members,height,subjects)
         index=self._treasury.paid_idx[project]
         if (approval.index != index or index >= len(self._treasury.tranches[project])
                 or approval.amount != self._treasury.tranches[project][index]):

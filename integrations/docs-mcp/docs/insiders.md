@@ -191,3 +191,11 @@ and **six simulation tests** pass. The **47-check** insider scenario and **20,47
 community events replay exactly. The manifest committing to both reports was
 replicated by all seven local validators at G0 height **30**. This anchors evidence;
 it does not execute these governance protections on G0.
+
+## Independent official assignment
+
+[Task assignment rules](https://github.com/Martines90/dagp/blob/main/chain/security/TASK_ASSIGNMENTS.md) now prevent owners from hand-picking
+registrars, proposal supervisors, certification boards, authenticated payment
+verifiers and accountable court administrative issuers. The new v2 insider
+story uses random independent court-review assignments after peer containment.
+Legacy evidence above remains tied to its earlier protocol version.

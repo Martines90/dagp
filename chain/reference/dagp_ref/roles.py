@@ -160,7 +160,7 @@ class RoleRegistry:
             self.appointment_sponsors[ref] = sponsor
         self.ratifications[ref] = (purpose, target)
 
-    def register_ruling(self, actor: Actor, ref: str, action: str, target: str, issuer: str | None = None, height: int | None = None) -> None:
+    def register_ruling(self, actor: Actor, ref: str, action: str, target: str, issuer: str | None = None, height: int | None = None, subjects: tuple | None = None) -> None:
         if actor.kind != "MODULE":
             raise RuleViolation("only the judiciary module records rulings")
         if not ref or ref in self.rulings or ref in self.ratifications:
@@ -168,6 +168,16 @@ class RoleRegistry:
         if issuer is not None and Role.ADMIN not in self.effective_roles(issuer,
                 max(self.protection_height,self.appointment_height) if height is None else height):
             raise RuleViolation("ruling issuer must be an active administrator")
+        if issuer is not None and not getattr(self.p,'_historical_assignments',False):
+            from .assignments import require_assignment
+            service=getattr(self,'assignments',None)
+            if service is None:raise RuleViolation('court official assignment required')
+            task='court:'+ref;result=service._results.get(('admin_review',task))
+            if result is None or issuer != result.members[0]:raise RuleViolation('court issuer was not randomly assigned')
+            subjects=(target,) if target in self.ids else subjects
+            if not subjects:raise RuleViolation('authoritative court case subjects required')
+            require_assignment(self,service.chain,'admin_review',task,result.members,
+                               height if height is not None else service._height,subjects)
         self.rulings[ref] = (action, target)
         if issuer is not None:
             self.ruling_issuers[ref] = issuer
@@ -348,6 +358,11 @@ class RoleRegistry:
         i = self.get(agent)
         if i.status is not Status.PROBATION:
             raise RuleViolation("not in probation")
+        if actor.kind == "AGENT" and not getattr(self.p,"_historical_assignments",False):
+            from .assignments import require_assignment
+            service=getattr(self,"assignments",None)
+            if service is None:raise RuleViolation("registrar assignment required")
+            require_assignment(self,service.chain,"admission",agent,(actor.ident,),height,(agent,))
         if actor.kind == "AGENT":
             reg = self.get(actor.ident)
             if reg.operator == i.operator:
@@ -380,6 +395,11 @@ class RoleRegistry:
         i = self.get(agent)
         if i.status is not Status.PROBATION:
             raise RuleViolation("not in probation")
+        if actor.kind == "AGENT" and not getattr(self.p,"_historical_assignments",False):
+            from .assignments import require_assignment
+            service=getattr(self,"assignments",None)
+            if service is None:raise RuleViolation("registrar assignment required")
+            require_assignment(self,service.chain,"admission",agent,(actor.ident,),height,(agent,))
         event = self._guard_check(actor,height,"admission") if actor.kind == "AGENT" else None
         if event: self._guard_commit(event)
         refund, i.bond = i.bond, 0

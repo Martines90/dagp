@@ -68,6 +68,7 @@ def main():
         'parties':('Parties and elections','chain/security/PARTIES_ELECTIONS.md'),
         'policy':('Credits, thresholds and clauses','chain/security/POLICY_POINTS.md'),
         'review':('Review and budgets','chain/security/REVIEW_BUDGET.md'),
+        'assignments':('Independent task assignments','chain/security/TASK_ASSIGNMENTS.md'),
         'insiders':('Insider protections','chain/security/INSIDER_PROTECTION.md'),
         'simulation':('Simulation guide','chain/simulation/README.md'),
         'node':('Native G0 runbook','chain/node/README.md'),

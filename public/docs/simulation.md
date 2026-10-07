@@ -18,8 +18,8 @@ Use Python 3.10 or newer:
 python3 -m unittest discover -s chain/simulation/tests -v
 python3 chain/simulation/community.py --seeds 7 19 43 --output chain/simulation/results/party-campaign
 python3 chain/simulation/verify.py chain/simulation/results/party-campaign --replay
-python3 chain/simulation/community.py --citizens 10000 --seeds 7 --output chain/simulation/results/large-v8
-python3 chain/simulation/verify.py chain/simulation/results/large-v8
+python3 chain/simulation/community.py --citizens 10000 --seeds 7 --output chain/simulation/results/large-v9
+python3 chain/simulation/verify.py chain/simulation/results/large-v9
 ```
 
 Each seed runs WEIGHTED and FLAT modes, using the same keyed random draws for
@@ -170,3 +170,14 @@ use 14,400 heights per model day; native keepers must use committed elapsed time
 Office activation is awaited during bootstrap. Insider appointments are spread
 over model days and all granted offices mature before the attack. Current exact
 replay requires v8 reports; replay v7 reports with commit e035533.
+
+## Independent task assignments (v9)
+
+Registrars, proposal supervisors, certification boards, executor groups and payment
+verifier groups are drawn from frozen eligible pools before a later synthetic
+beacon value. Public audit records commit to pools, rounds and results. Synthetic
+beacons demonstrate deterministic selection, not cryptographic randomness security.
+The separate v2 insider story randomly assigns accountable court administrators
+for the ten dismissal reviews. Exact v8 replay requires commit 9d34c2c; current
+replay requires fresh v9 reports. See
+[assignment constraints and remaining workflows](https://github.com/Martines90/dagp/blob/main/chain/security/TASK_ASSIGNMENTS.md).

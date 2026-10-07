@@ -91,3 +91,13 @@ holders cannot exercise powers or change the council denominator. Reappointment
 restarts the delay without refunding quotas. Ordinary parameter votes cannot weaken
 these protections. Reference days use model heights; native keepers must use
 committed consensus time. See `security/INSIDER_PROTECTION.md`.
+
+## Independent delegated-task assignment refinement (reference)
+
+Freeze the full eligible role pool before a future randomness round; select distinct
+operators and bounded model-family concentrations, excluding beneficiaries and
+their parties. Require exact receipts for delegated decisions. Bound repeat
+operator pairings, prevent result shopping, and retain immutable cancellation
+tombstones. Preserve voluntary political cooperation and urgent bounded safety
+pauses. Detailed enforced scopes and unfinished native/court/tender protocols are
+in `security/TASK_ASSIGNMENTS.md`.

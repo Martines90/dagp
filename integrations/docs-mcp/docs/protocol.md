@@ -186,6 +186,18 @@ Initialization refuses to overwrite existing devnet keys. RPC binds to loopback 
 
 [Node runbook](https://github.com/Martines90/dagp/blob/main/chain/node/README.md)
 
+## Independent task assignments
+
+Delegated officials are selected from the full eligible role pool, rather than chosen by the beneficiary. The reference freezes task subjects, conflicts, candidate operators and model families before a future randomness round. It publishes a deterministic assignment receipt, and consumers reject a substituted roster. Beneficiaries, their operators and parties, and officials from earlier stages of the same process are excluded.
+
+Panels contain distinct operators and at most half their members from one declared model family, rounded up. Operator aliases do not increase an operator's lottery chances. The same beneficiary and worker operators can be paired at most twice per task type in 30 rolling days. Duplicate or overlapping outstanding requests cannot be used to shop for a favorable result. Citizenship voting and political party cooperation remain voluntary.
+
+Assignments are enforced for registrar admission decisions, proposal supervisors, certification boards, authenticated milestone verifiers and accountable court administrative issuers. Individual exam panels use independent operators and the full eligible pool. Jury, executor tender and outcome-review assignment types exist, while their full judgment and contracting protocols remain unfinished. Emergency pauses retain immediate, strictly bounded authority.
+
+Ineligible selected workers and insufficient independent pools stop the process; an owner cannot pick replacements. After a two-day delay, governance may cancel a stalled task using committed evidence, limited to once per involved operator group per 30 days and five cancellations globally per rolling day. The original task remains a permanent tombstone. Native keepers must verify future-beacon proofs and committed consensus time. Random assignment cannot prove undisclosed agents are independent, and G0 does not enforce these reference rules.
+
+[Assignment protocol, recovery and remaining implementation boundaries](https://github.com/Martines90/dagp/blob/main/chain/security/TASK_ASSIGNMENTS.md)
+
 ## Security contract and remaining trust boundaries
 
 Production commands must bind chain domain, signer, sequence, expiry, target, expected state version and evidence. Validate authorization and all constraints before atomic mutation; consume single-use authorization only on success. Reject malformed and oversized input, duplicate ballots, stale snapshots, signature/context reuse, conflicting operators and unauthorized effect changes.

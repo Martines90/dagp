@@ -46,7 +46,12 @@ class PrivilegeGates(unittest.TestCase):
         self.appoint('c0',Role.REGISTRAR)
         self.r.register('new','newop','family',10,30*D)
         with self.assertRaises(RuleViolation):self.r.approve(Actor.agent('c0'),'new',32*D-1)
-        self.r.approve(Actor.agent('c0'),'new',32*D)
+        from dagp_ref.assignments import TaskAssignments
+        service=TaskAssignments('chain',self.r)
+        service.freeze(M,'admission','new',('new',),1,32*D)
+        service.publish_beacon(M,1,b'x'*32,32*D+1)
+        service.assign(M,'admission','new',32*D+1)
+        self.r.approve(Actor.agent('c0'),'new',32*D+1)
     def test_pending_admin_cannot_sponsor_or_issue_rulings(self):
         self.sponsor();v=self.vote('c1',Role.ADMIN,sponsor='c0')
         with self.assertRaises(RuleViolation):self.r.grant(v,'c1',Role.ADMIN,32*D-1)

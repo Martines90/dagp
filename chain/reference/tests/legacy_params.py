@@ -2,6 +2,7 @@
 from dagp_ref.params import Params as ProductionParams
 
 class HistoricalParams(ProductionParams):
+    _historical_assignments = True
     def __post_init__(self):
         fields=dict(citizen_activation_days=3,official_min_citizen_days=30,
                     official_activation_days=2,appointment_global_limit=20)

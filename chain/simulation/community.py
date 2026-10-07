@@ -25,6 +25,7 @@ from dagp_ref.campaign import Campaign,Program,article_id,source_hash
 from dagp_ref.policy import MonthlyCredits, ParameterGovernance
 from dagp_ref.proposal import Envelope, FilingRegistry, Proposal, amendment_is_refinement
 from dagp_ref.roles import Actor, Role, RoleRegistry, Status
+from dagp_ref.assignments import TaskAssignments
 from dagp_ref.review import ProposalReview,VotingDraft,Milestone,BillPoint
 from dagp_ref.session import ELECTION, Effects, VoteSession, Windows, snapshot_electorate
 from dagp_ref.sortition import draw, panel_size
@@ -97,6 +98,15 @@ class Community:
         ref=f'bootstrap:{agent}:{role.value}'
         self.reg.register_ratification(MODULE,ref,'GRANT:'+role.value,agent)
         self.reg.grant(Actor('VOTE',ref),agent,role,self.height,stake=self.p.examiner_stake)
+    def assigned(self,kind,issue,subjects):
+        if not hasattr(self,"assignments"):
+            self.assignments=TaskAssignments("dagp-reference",self.reg)
+        round=self.assignments._round+1
+        self.assignments.freeze(MODULE,kind,issue,subjects,round,self.height)
+        self.height+=1
+        self.assignments.publish_beacon(MODULE,round,H("synthetic-assignment-beacon",self.seed,round),self.height)
+        return self.assignments.assign(MODULE,kind,issue,self.height).members
+
     def bootstrap(self):
         # Registration challenge/administrator HTTP service is not implemented; inputs are pre-vetted.
         for i,a in enumerate(self.ids):
@@ -112,16 +122,18 @@ class Community:
         self.height += self.p.official_activation_days
         # Demonstrate an actual registrar reviewing a separate applicant.
         extra='applicant-approved';self.reg.register(extra,'operator-extra','family-0',10,self.height)
-        self.kr.register(extra);self.reg.approve(Actor.agent(self.citizens[0]),extra,self.height)
+        self.kr.register(extra);registrar=self.assigned("admission",extra,(extra,))[0]
+        self.reg.approve(Actor.agent(registrar),extra,self.height)
         probation='applicant-rejected';self.reg.register(probation,'operator-rejected','family-1',10,self.height)
         self.refused('probationary identity cannot vote',lambda:self.require_can(probation,'VOTE'))
-        refund=self.reg.reject(Actor.agent(self.citizens[1]),probation,self.height,'EVIDENCE_INSUFFICIENT')
+        registrar=self.assigned('admission',probation,(probation,))[0]
+        refund=self.reg.reject(Actor.agent(registrar),probation,self.height,'EVIDENCE_INSUFFICIENT')
         self.check('rejected applicant bond refunded',refund==10)
         self.examiners=self.citizens[10:10+max(100,len(self.citizens)//8)]
         for a in self.examiners:self.reg.grant(MODULE,a,Role.EXAMINER,self.height,stake=50)
         self.hostile={a for a in self.examiners if self.u(a,'examiner-hostile')<.1}
         for role,group in [(Role.VERIFIER,self.citizens[-30:-20]),(Role.REVIEWER,self.citizens[-20:-10]),
-                           (Role.JUROR,self.citizens[-10:]),(Role.EXECUTOR,self.leaders[:10])]:
+                           (Role.JUROR,self.citizens[-10:]),(Role.EXECUTOR,self.citizens[-40:-30])]:
             for a in group:self.reg.grant(MODULE,a,role,self.height,stake=50)
         for a in self.citizens[3:6]: self.appointed(a,Role.SAFETY_COUNCIL)
         for a in self.citizens[6:9]: self.appointed(a,Role.VOTE_SUPERVISOR)
@@ -218,7 +230,9 @@ class Community:
         conflicts=frozenset(campaign.member_operators) if campaign else frozenset()
         available=[a for a in self.examiners if self.reg.can(a,'GRADE',self.height,{'operators_involved':conflicts})[0]]
         recused=frozenset(self.members.get(party,set()))
-        board=Board('board-'+issue,tuple(draw(beacon,available,board_size,exclude=recused)),issue)
+        subjects=tuple(sorted(a for a in self.reg.ids if self.reg.get(a).operator in conflicts)) if campaign else tuple(sorted(recused))
+        board=Board('board-'+issue,self.assigned('certification',issue,subjects),issue)
+        beacon=self.assignments._beacons[self.assignments._round][0]
         el=snapshot_electorate(self.reg,self.height,set(recused)|set(board.members))
         bank,keys=campaign_bank if campaign_bank is not None else self.bank(issue)
         effects=Effects(self.tr,self.cr,issue,amount,[amount//2,amount-amount//2],party) if amount else Effects()
@@ -382,7 +396,8 @@ class Community:
             points=tuple(BillPoint(f'clause-{i}',f'Independent clause {i}',800,
                 (Milestone(f'clause-{i}',800,f'Independent acceptance of clause {i}'),)) for i in range(5))
             draft=replace(draft,points=points,milestones=tuple(m for p in points for m in p.milestones))
-        review=ProposalReview('dagp-reference',issue,owner,party,self.members,self.citizens[6:9],draft,
+        supervisors=self.assigned('review',issue,tuple(sorted(self.members[party])))
+        review=ProposalReview('dagp-reference',issue,owner,party,self.members,supervisors,draft,
                               self.reg,self.kr,self.height,self.height+20,credits=self.cr)
         for round_n in range(1,4):
             for other in PARTIES[:5]:
@@ -403,13 +418,13 @@ class Community:
         review.amend(owner,amendment,'refine-1',self.height,self.kr.sign(owner,review.amendment_message(amendment,'refine-1')))
         self.refused('bait-and-switch rejected '+issue,lambda:review.amend(owner,
             VotingDraft(title,'Other goal',result,'Changed project',refined,3000,amendment.milestones),'bad',self.height,'invalid'))
-        for supervisor in self.citizens[6:8]:
+        for supervisor in supervisors:
             note='Same committed goal/result; smaller resource and treasury caps; measurable milestones retained'
             review.approve(supervisor,note,self.height,self.kr.sign(supervisor,H(review.approval_message(),note)))
         self.height+=20
         approved=review.lock(owner,self.height,self.kr.sign(owner,review.lock_message()))
         self.event('deliberation',issue=issue,title=title,party=party,comments=review.snapshot()['comments'],
-                   approved_version=review.snapshot()['version'],supervisors=self.citizens[6:8],
+                   approved_version=review.snapshot()['version'],supervisors=supervisors,
                    original_record=asdict(draft),approved_record=asdict(approved),
                    supervisor_approvals=review.snapshot()['approvals'],amendments=review.snapshot()['amendments'],
                    record_hash=approved.digest(),milestones=[asdict(m) for m in approved.milestones],
@@ -453,7 +468,9 @@ class Community:
             prop.move('APPROVED');prop.move('FUNDED');prop.move('EXECUTING')
             self.check('executor cannot self-attest '+issue,not self.reg.can(self.leaders[0],'VERIFY',self.height,
                 dict(executors={self.leaders[0]}))[0])
-            verifiers=self.reg.agents_with(Role.VERIFIER,self.height)
+            executors=self.assigned('executor',issue,tuple(sorted(self.members[party])))
+            verifiers=self.assigned('verification',issue,tuple(sorted(self.members[party])))
+            self.event('project-workers-assigned',issue=issue,executors=list(executors),verifiers=list(verifiers))
             self.check('independent verifier roles available '+issue,len(verifiers)>=3)
             self.refused('unattested release blocked '+issue,lambda:self.tr.release_next(issue,0,3,self.height))
             emergency=Emergency(self.p,self.reg,self.tr)
@@ -491,9 +508,10 @@ class Community:
         goal='Adjust monthly proposal-credit step';result='Four percent of election points per credit'
         draft=VotingDraft('Credit rule referendum',goal,result,'Change 500 to 400 basis points; preserve turnout floor',
             Envelope(hx('goal',goal),hx('result',result),()),parameter_changes=(('credit_step_bps',400),))
-        review=ProposalReview('dagp-reference',issue,owner,party,self.members,self.citizens[6:9],draft,
+        supervisors=self.assigned('review',issue,tuple(sorted(self.members[party])))
+        review=ProposalReview('dagp-reference',issue,owner,party,self.members,supervisors,draft,
             self.reg,self.kr,self.height,self.height+20,credits=self.cr)
-        for supervisor in self.citizens[6:8]:
+        for supervisor in supervisors:
             note='Bounded numerical update; turnout and administrative protections remain intact'
             review.approve(supervisor,note,self.height,self.kr.sign(supervisor,H(review.approval_message(),note)))
         self.height+=20;review.lock(owner,self.height,self.kr.sign(owner,review.lock_message()))
@@ -589,7 +607,7 @@ def main():
             differences=[dict(issue=a['issue'],weighted=a['outcome'],flat=b['outcome'])
                 for a,b in zip(pair['WEIGHTED']['sessions'],pair['FLAT']['sessions']) if a['outcome']!=b['outcome']]
             comparisons.append(dict(seed=seed,outcome_differences=differences))
-    report=dict(format='dagp-community-simulation-v8',execution='reference-governance-with-optional-G0-result-anchoring',
+    report=dict(format='dagp-community-simulation-v9',execution='reference-governance-with-optional-G0-result-anchoring',
         limitations=['Synthetic policies, not AGI or LLM agents','Reference signatures are HMAC stand-ins',
         'HTTP challenge admission is not implemented','Court semantics and milestone evidence are scripted',
         'G0 chain records result commitment, does not enforce governance','Seven validators share one host'],

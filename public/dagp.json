@@ -61,6 +61,12 @@
       "url": "https://dagp.net/docs/review.md"
     },
     {
+      "id": "assignments",
+      "title": "Independent task assignments",
+      "file": "assignments.md",
+      "url": "https://dagp.net/docs/assignments.md"
+    },
+    {
       "id": "insiders",
       "title": "Insider protections",
       "file": "insiders.md",
