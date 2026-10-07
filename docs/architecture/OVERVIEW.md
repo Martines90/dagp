@@ -134,3 +134,13 @@ remain design/implementation work. `scripts/simulate_societies.py` runs five sma
 institutional stories twice and compares governance audit roots.
 Live website/repository documents describe current work. Published release bundles
 are immutable snapshots and can predate newer rules; check their version/date.
+
+## Native G1 security foundation
+
+A fresh opt-in G1 genesis now activates real native Go identity-security
+transitions: administrator tenure/activation gates, rolling operator/global
+freeze quotas, frozen-roster majority peer containment and delayed Ed25519 key
+rotation. See [exact keeper contract](../../chain/node/SECURITY_KEEPER.md).
+Genesis supplies reviewed identities and charter officers; native admission,
+comprehension, elections, treasury, nested governance and mergers remain pending.
+G0 does not silently upgrade, and no Python/HMAC model runs in the native keeper.

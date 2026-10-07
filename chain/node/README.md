@@ -81,3 +81,11 @@ validate the report contents. Existing content is not republished: keep the
 receipt for an already anchored manifest. See `../simulation/README.md`.
 
 Run `python3 scripts/devnet.py faults` for the crash-only quorum campaign: two offline validators permit progress, three cause a halt, and restored quorum resumes replicated transactions. See [security contract](../security/PROTOCOL.md).
+
+## Opt-in native G1 security foundation
+
+The Go application now also supports a fresh G1 genesis for consensus-time admin
+privilege gates, rolling freeze quotas, frozen-roster peer containment and delayed
+Ed25519 key rotation. See [keeper rules and test command](SECURITY_KEEPER.md).
+G0 devnets are not implicitly upgraded. This implements identity-security
+transitions, not the remaining elections, comprehension or treasury keepers.

@@ -8,11 +8,11 @@ chain reference modules/tests, public protocol/API pages, and Wrangler configura
 | Protocol | SPEC, DECISIONS, THREATS and concept note exist | Formal models, parameter evidence, constitutional review |
 | Governance reference | Python model; 430 tests pass with Python 3.14 | Port to production keepers and prove equivalence |
 | Consensus/network | Go CometBFT G0 network with seven local validator configurations | Independent operators, validator policy, fault/censorship drills |
-| Transactions | Real Ed25519 signatures, chain binding, sequences, height expiry, strict JSON | Versioned protobuf/CBOR, resource quotas, key lifecycle |
+| Transactions | Real Ed25519 signatures, chain binding, sequences, height expiry, strict JSON, bounded quotas and opt-in delayed key rotation | Versioned protobuf/CBOR, guardian recovery and session keys |
 | State | Durable snapshots, deterministic hash, committed-state queries | Scalable database, Merkle proofs, snapshots/state sync |
 | Documents | Signed SHA-256 content-addressed publishing up to 64 KiB | Availability attestations for larger documents |
 | Registration | Roadmap only | Worker/D1, challenge-first admission, signed evidence, admin review, SSRF defense |
-| Governance on chain | Not yet implemented | Identity/roles → proposals/deliberation → examiner/tally → escrow/review → elections/courts |
+| Governance on chain | Opt-in native G1 identity-security keeper; broader governance remains reference-only | Identity/roles → proposals/deliberation → examiner/tally → escrow/review → elections/courts |
 | Cryptography | Ed25519 on G0; HMAC stand-in in reference | Sealing/timelocks, beacon verification, threshold custody |
 | Website | Live static manual, agent discovery, architecture/integration guides and read-only documentation MCP | Public governance API, SDK, versioned OpenAPI and schemas |
 | Deployment | Cloudflare website live; native validators local only | Governance gateway/read mirror; independently hosted nodes; monitoring/recovery |
@@ -192,3 +192,28 @@ boundaries. No native hierarchy, remote light client, asset/debt migration, sour
 shutdown, arbitrary boundary/membership updates or fully integrated appellate court
 is implemented. Native root-law adapters must atomically record governing decisions;
 semantic compatibility relies on assigned accountable supervisors, not hash equality.
+
+## Native G1 identity-security foundation (2026-10-07)
+
+A fresh opt-in genesis now enables native Go enforcement of thirty-day citizen
+tenure for charter administrators, two-day office activation, rolling operator
+and population-wide freeze quotas, frozen-roster 50% peer containment and two-day
+Ed25519 key rotation with new-key possession proof. These transactions execute
+inside ABCI proposal checking/finalization and durable committed state. They are
+not Python reference reports published as documents. Existing G0 chains keep their
+state format and are not silently upgraded.
+
+See [native keeper](node/SECURITY_KEEPER.md) for exact bounds and trust assumptions.
+Citizens and administrators are provisioned by the genesis charter; reviewed
+admission, randomized assignment, appointments, elections, comprehension, treasury,
+nested governance and remote merger enforcement are still pending native work.
+This is a first native security foundation, not completion of production governance.
+
+Verification: the full Go race-tested suite passes, including eleven new G1
+regressions. A fresh seven-validator G1 network executed the security scenario
+through transaction height 41; all seven header-42 app hashes match. Ten approvals
+could not contain an administrator; twenty-five did. Rolling freeze quotas,
+replay/duplicate rejection and capacity after ten hostile complaints passed.
+See [native network evidence](node/test-results/g1-security.json). These are local
+RPC and snapshot observations, not an independent light-client certificate.
+Six documentation MCP tests and the 199-link discovery check also pass.

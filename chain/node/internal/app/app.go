@@ -1,4 +1,4 @@
-// Package app implements the G0 authenticated content registry. Governance is not enabled.
+// Package app implements the authenticated registry and opt-in G1 identity security.
 package app
 
 import (
@@ -25,10 +25,11 @@ type Account struct {
 	Sequence       uint64 `json:"sequence"`
 }
 type State struct {
-	ChainID   string             `json:"chain_id"`
-	Height    int64              `json:"height"`
-	Accounts  map[string]Account `json:"accounts"`
-	Documents map[string][]byte  `json:"documents"`
+	ChainID    string             `json:"chain_id"`
+	Height     int64              `json:"height"`
+	Accounts   map[string]Account `json:"accounts"`
+	Documents  map[string][]byte  `json:"documents"`
+	Governance *Governance        `json:"governance,omitempty"`
 }
 
 // Transaction uses a fixed struct encoding; arbitrary JSON objects never enter signed state.
@@ -45,7 +46,11 @@ type Transaction struct {
 func (t Transaction) SignBytes() []byte {
 	t.Signature = nil
 	b, _ := json.Marshal(t)
-	return append([]byte("DAGP/G0/JSON-v1\x00"), b...)
+	domain := "DAGP/G0/JSON-v1\x00"
+	if t.Type != "publish_document" {
+		domain = "DAGP/G1/JSON-v1\x00"
+	}
+	return append([]byte(domain), b...)
 }
 func Root(s State) []byte { b, _ := json.Marshal(s); h := sha256.Sum256(b); return h[:] }
 func clone(s State) State { b, _ := json.Marshal(s); var n State; _ = json.Unmarshal(b, &n); return n }
@@ -67,6 +72,20 @@ func Execute(s *State, raw []byte, height int64) error {
 	t, err := validateTransaction(s, raw, height)
 	if err != nil {
 		return err
+	}
+	if t.Type != "publish_document" {
+		next := cloneSecurity(*s)
+		if err := executeSecurity(&next, t); err != nil {
+			return err
+		}
+		if err := validateGovernance(next); err != nil {
+			return err
+		}
+		a := next.Accounts[t.Account]
+		a.Sequence++
+		next.Accounts[t.Account] = a
+		*s = next
+		return nil
 	}
 	a := s.Accounts[t.Account]
 	h := sha256.Sum256(t.Body)
@@ -103,15 +122,18 @@ func Open(path string) (*Application, error) {
 		return nil, err
 	}
 	defer f.Close()
-	b, err := io.ReadAll(io.LimitReader(f, MaxSnapshotBytes+1))
+	b, err := io.ReadAll(io.LimitReader(f, MaxG1SnapshotBytes+1))
 	if err != nil {
 		return nil, err
 	}
-	if len(b) > MaxSnapshotBytes {
+	if len(b) > MaxG1SnapshotBytes {
 		return nil, errors.New("snapshot exceeds limit")
 	}
 	if err = decode(b, &a.committed); err != nil {
 		return nil, err
+	}
+	if a.committed.Governance == nil && len(b) > MaxSnapshotBytes {
+		return nil, errors.New("G0 snapshot exceeds limit")
 	}
 	if err = validateState(a.committed); err != nil {
 		return nil, err
@@ -125,7 +147,11 @@ func (a *Application) Info(context.Context, *abci.RequestInfo) (*abci.ResponseIn
 	if a.committed.ChainID != "" {
 		h = Root(a.committed)
 	}
-	return &abci.ResponseInfo{Data: "DAGP G0 content registry", LastBlockHeight: a.committed.Height, LastBlockAppHash: h}, nil
+	label := "DAGP G0 content registry"
+	if a.committed.Governance != nil {
+		label = "DAGP G1 identity security"
+	}
+	return &abci.ResponseInfo{Data: label, LastBlockHeight: a.committed.Height, LastBlockAppHash: h}, nil
 }
 func (a *Application) InitChain(_ context.Context, r *abci.RequestInitChain) (*abci.ResponseInitChain, error) {
 	a.mu.Lock()
@@ -146,6 +172,17 @@ func (a *Application) InitChain(_ context.Context, r *abci.RequestInitChain) (*a
 		}
 	}
 	s.Documents = map[string][]byte{}
+	if s.Governance != nil {
+		g := s.Governance
+		if g.Time != r.Time.Unix() || len(g.Freezes) > 0 || len(g.Complaints) > 0 || len(g.Cases) > 0 || len(g.Rosters) > 0 || len(g.Rotations) > 0 {
+			return nil, errors.New("invalid G1 genesis clock or pending actions")
+		}
+		for _, i := range g.Identities {
+			if i.FrozenUntil != 0 || i.HeldUntil != 0 {
+				return nil, errors.New("genesis sanctions forbidden")
+			}
+		}
+	}
 	if err := validateState(s); err != nil {
 		return nil, err
 	}
@@ -167,6 +204,9 @@ func (a *Application) PrepareProposal(_ context.Context, r *abci.RequestPrepareP
 	a.mu.Lock()
 	defer a.mu.Unlock()
 	s := clone(a.committed)
+	if err := advanceTime(&s, r.Time.Unix()); err != nil {
+		return nil, err
+	}
 	var txs [][]byte
 	if r.MaxTxBytes > MaxBlockBytes {
 		r.MaxTxBytes = MaxBlockBytes
@@ -193,6 +233,9 @@ func (a *Application) ProcessProposal(_ context.Context, r *abci.RequestProcessP
 		return &abci.ResponseProcessProposal{Status: abci.ResponseProcessProposal_REJECT}, nil
 	}
 	s := clone(a.committed)
+	if advanceTime(&s, r.Time.Unix()) != nil {
+		return &abci.ResponseProcessProposal{Status: abci.ResponseProcessProposal_REJECT}, nil
+	}
 	for _, t := range r.Txs {
 		if Execute(&s, t, r.Height) != nil {
 			return &abci.ResponseProcessProposal{Status: abci.ResponseProcessProposal_REJECT}, nil
@@ -210,6 +253,9 @@ func (a *Application) FinalizeBlock(_ context.Context, r *abci.RequestFinalizeBl
 		return nil, errors.New("unexpected height")
 	}
 	s := clone(a.committed)
+	if err := advanceTime(&s, r.Time.Unix()); err != nil {
+		return nil, err
+	}
 	results := make([]*abci.ExecTxResult, len(r.Txs))
 	for i, t := range r.Txs {
 		results[i] = &abci.ExecTxResult{}
@@ -229,6 +275,13 @@ func (a *Application) persist(s State) error {
 	b, err := json.Marshal(s)
 	if err != nil {
 		return err
+	}
+	limit := MaxSnapshotBytes
+	if s.Governance != nil {
+		limit = MaxG1SnapshotBytes
+	}
+	if len(b) > limit {
+		return errors.New("snapshot capacity")
 	}
 	f, err := os.OpenFile(a.path+".tmp", os.O_CREATE|os.O_TRUNC|os.O_WRONLY, 0600)
 	if err != nil {
@@ -283,6 +336,8 @@ func (a *Application) Query(_ context.Context, r *abci.RequestQuery) (*abci.Resp
 			Accounts      map[string]Account `json:"accounts"`
 			DocumentCount int                `json:"document_count"`
 		}{a.committed.ChainID, a.committed.Height, a.committed.Accounts, len(a.committed.Documents)})
+	case "/governance":
+		value, _ = json.Marshal(a.committed.Governance)
 	case "/document":
 		value = append([]byte(nil), a.committed.Documents[string(r.Data)]...)
 	default:

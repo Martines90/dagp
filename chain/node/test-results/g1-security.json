@@ -1,0 +1,25 @@
+{
+  "format": "dagp-native-security-devnet-v1",
+  "validators": 7,
+  "citizens": 100,
+  "administrators": 50,
+  "transaction_height": 41,
+  "header_height": 42,
+  "app_hashes": [
+    "7F9591FD25BC0D49EC128D8F618A09744F8290AE0B199507623043BD60076BC5",
+    "7F9591FD25BC0D49EC128D8F618A09744F8290AE0B199507623043BD60076BC5",
+    "7F9591FD25BC0D49EC128D8F618A09744F8290AE0B199507623043BD60076BC5",
+    "7F9591FD25BC0D49EC128D8F618A09744F8290AE0B199507623043BD60076BC5",
+    "7F9591FD25BC0D49EC128D8F618A09744F8290AE0B199507623043BD60076BC5",
+    "7F9591FD25BC0D49EC128D8F618A09744F8290AE0B199507623043BD60076BC5",
+    "7F9591FD25BC0D49EC128D8F618A09744F8290AE0B199507623043BD60076BC5"
+  ],
+  "case": "211ea1517a4691c525a6942c9d9aa43971b0996598c64b09f5ce76942c927d9a",
+  "quorum_approvals": 25,
+  "minority_approvals_tested": 10,
+  "minority_complaint_capacity_tested": true,
+  "freeze_cap": 3,
+  "replay_rejected": true,
+  "native_execution": true,
+  "assurance": "Local RPC and committed snapshot observations; no independent light-client proof"
+}

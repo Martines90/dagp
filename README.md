@@ -71,3 +71,7 @@ Historical specification examples, reports and immutable release bundles retain
 their dates and are explicitly distinguished from current rules. Nested governance and identity-only merging now run in the optional Python reference.
 Native hierarchy, remote finality proofs and financial migration remain unfinished.
 Run `python3 scripts/simulate_societies.py` for five deterministic institutional stories.
+
+Native validators now have an opt-in [G1 identity-security keeper](chain/node/SECURITY_KEEPER.md)
+for administrator gates, rolling freeze quotas, peer containment and delayed key
+rotation. Broader governance remains reference-only; G0 is not implicitly upgraded.

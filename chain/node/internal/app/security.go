@@ -24,6 +24,7 @@ const (
 	MaxAccountEpochBytes     = 512 * 1024
 	MaxAccountEpochDocuments = 16
 	MaxSnapshotBytes         = 48 * 1024 * 1024
+	MaxG1SnapshotBytes       = 56 * 1024 * 1024
 )
 
 var identifier = regexp.MustCompile(`^[A-Za-z0-9][A-Za-z0-9._-]{0,127}$`)
@@ -105,7 +106,7 @@ func validateState(s State) error {
 	if size > MaxStoreBytes {
 		return errors.New("store capacity")
 	}
-	return nil
+	return validateGovernance(s)
 }
 func validBlock(txs [][]byte) bool {
 	if len(txs) > MaxBlockTransactions {
@@ -151,7 +152,17 @@ func validateTransaction(s *State, raw []byte, height int64) (Transaction, error
 	if !ed25519.Verify(a.Key, t.SignBytes(), t.Signature) {
 		return t, errors.New("invalid signature")
 	}
-	if t.Type != "publish_document" || len(t.Body) == 0 || len(t.Body) > 65536 || s.Documents == nil {
+	if t.Type != "publish_document" {
+		if len(t.Body) > 4096 {
+			return t, errors.New("G1 message size")
+		}
+		next := cloneSecurity(*s)
+		if err := executeSecurity(&next, t); err != nil {
+			return t, err
+		}
+		return t, validateGovernance(next)
+	}
+	if len(t.Body) == 0 || len(t.Body) > 65536 || s.Documents == nil {
 		return t, errors.New("unsupported message or document size")
 	}
 	h := sha256.Sum256(t.Body)
