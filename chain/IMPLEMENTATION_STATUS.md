@@ -6,7 +6,7 @@ chain reference modules/tests, public protocol/API pages, and Wrangler configura
 | Area | Actual state | Remaining work |
 |---|---|---|
 | Protocol | SPEC, DECISIONS, THREATS and concept note exist | Formal models, parameter evidence, constitutional review |
-| Governance reference | Python model; 401 tests pass with Python 3.14 | Port to production keepers and prove equivalence |
+| Governance reference | Python model; 430 tests pass with Python 3.14 | Port to production keepers and prove equivalence |
 | Consensus/network | Go CometBFT G0 network with seven local validator configurations | Independent operators, validator policy, fault/censorship drills |
 | Transactions | Real Ed25519 signatures, chain binding, sequences, height expiry, strict JSON | Versioned protobuf/CBOR, resource quotas, key lifecycle |
 | State | Durable snapshots, deterministic hash, committed-state queries | Scalable database, Merkle proofs, snapshots/state sync |
@@ -165,5 +165,30 @@ and the historical SPEC are now publicly discoverable in Markdown/MCP. Historica
 SPEC, roadmap and release artifacts are explicitly identified as historical.
 The [optional merger proposal](security/SOCIETY_MERGER.md) defines bilateral
 80% turnout/approval, individual claims, identity/operator reconciliation,
-privilege stripping and staged audited migration. It is design-only: no merge
-tally class, importer, bridge, proof verification or merger simulation exists.
+privilege stripping and staged audited migration. The initial design-only status was superseded by the optional reference described below;
+there is still no native bridge or remote consensus proof verifier.
+
+
+## Optional nested governance and identity merging (2026-10-06)
+
+- `reference/dagp_ref/societies.py`: depth-bounded jurisdictions, signed founding
+  cohorts, ancestor charter/decision snapshots, scoped registries and shared office/
+  sanction budgets. Dedicated FORMATION ballots require separate parent/cohort
+  50% turnout and 66% identity/weight approval, with seven-day notice/cooling off.
+- Every ancestor must randomly assign and sign PRE and FINAL reviews. Permissions
+  bind exact content, beneficiaries, scope, budget, policies and expiry. Reservations
+  precede voting; final outcome commitments bind only approved clauses to escrow.
+- `reference/dagp_ref/mergers.py`: identity-only reviewed migration with thirty-day
+  notice/post-vote challenge, bilateral MERGER 80% turnout and 80% identity/weight
+  approval, proof-bound dual key consent, namespace/dedup checks, receiving payment-
+  keeper bond receipts, normal citizenship warmup and shared rolling import limits.
+- `tests/test_societies.py`: 29 tests; full reference now 430. Five deterministic
+  institutional stories and matching independent replay are available through
+  `scripts/simulate_societies.py` and `simulation/results/institutions/report.json`.
+
+No production functionality is enabled by these model changes. MODULE, evidence,
+HMAC keys, identity labels, payment receipts and beacon inputs remain reference trust
+boundaries. No native hierarchy, remote light client, asset/debt migration, source
+shutdown, arbitrary boundary/membership updates or fully integrated appellate court
+is implemented. Native root-law adapters must atomically record governing decisions;
+semantic compatibility relies on assigned accountable supervisors, not hash equality.

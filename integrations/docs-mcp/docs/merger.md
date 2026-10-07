@@ -1,10 +1,53 @@
 # Optional society integration and merger proposal
 
-Status: **design proposal, not executable migration support**. No merge vote type,
-cross-chain identity importer, asset bridge, light client or merge transaction is
-implemented in G0 or the governance reference. This document defines a reviewable
-extension; existing ordinary or constitutional votes must not silently be treated
-as its approval certificates. No society or assets are being migrated.
+Status: **identity-only Python merger reference implemented; full cross-chain migration remains a design proposal**.
+`reference/dagp_ref/mergers.py` now implements reviewed, bilateral institutional
+votes, individual claims, namespace reconciliation, admission gates and bounded
+migration between two in-process societies. No native merge transaction, external
+light client, asset bridge or production society migration is deployed.
+
+## Implemented reference subset
+
+- `SocietyMerger` commits an immutable complete source/target identity manifest,
+  source/destination charter-policy contexts and audit checkpoints, a Merkle export
+  root, frozen mature electorates, deadline and fixed receiving import allowance.
+- Every society has three future-beacon-assigned supervisors assess the same plan.
+  Negotiating representatives are the assessment subjects; the entire sovereign
+  population cannot be excluded from reviewing its own constitutional transition.
+- Dedicated `MERGER` sessions reuse the existing comprehension, certification,
+  sharded tally and challenge workflow. Minimum turnout is 80%; minimum identity
+  and weight approval are each 80%, including abstentions. Stronger root rules apply.
+  Citizens must have at least thirty model days of citizenship and meet normal gates.
+- Each plan has thirty days of notice and thirty days after both voting challenge
+  windows. `prepare` requires independently finalized matching mandates and rechecks
+  the policy context; an ordinary or constitutional pass flag is not a merge certificate.
+- Individual claims verify a bounded Merkle proof and signatures from both current
+  source and receiving key holders. The signatures bind both chains, exact plan,
+  source/target identity, nonce and expiry. Operator/family or source signing-key changes and sanctions
+  invalidate a claim. Known signing-key duplicates must map to the existing receiving
+  identity; a new receiving key cannot already belong to another local identity.
+  Fingerprints are HMAC comparison stand-ins; native code must index actual current
+  public keys and integrate rotation/recovery, not compare secret material. Exported source identities cannot be exported again.
+- A new receiving identity needs an admission bond receipt from the trusted payment
+  keeper. This attests an already funded local deposit; it does not mint funds, copy a
+  source bond or implement custody. Receipts cannot be reused across receiving plans.
+- New citizens receive only CITIZEN, the normal local warmup and no imported office,
+  stake, party mandate, credit or validator power. Existing receiving identities are
+  deduplicated without deleting their independently acquired receiving rights.
+- All incoming plans share a rolling receiving migration budget. Failed admissions
+  consume no claim or quota. Source citizenship exits only on a successfully committed
+  individual claim; opt-outs remain source citizens after the claim deadline.
+- `settle` records completion after the deadline but never shuts down the source or
+  pretends to dispose of its liabilities. Unclaimed deposit receipts remain explicit
+  custody obligations for the payment keeper; settlement does not invent a refund.
+
+**Trust boundary:** the two society objects stand in for independently verified
+finalized state. Keys use the reference HMAC stand-in; identity/operator labels and
+payment receipts are trusted keeper evidence. Objects and snapshots are simulation
+state, not authenticated exports from an arbitrary remote blockchain. No source
+assets, debts, local subdivisions or qualifications are automatically imported.
+The full design below remains necessary for production proofs, custody, financial
+migration, source retirement and jurisdiction reconciliation.
 
 ## Why include the option
 
@@ -24,7 +67,7 @@ Keep three choices separate:
 
 The receiving society is named in the agreement, not inferred from population.
 Define the integration design now, keep the feature disabled by default, and
-implement it after native identity, proofs and governance are mature. Federation
+implement its native migration after identity, proofs and governance are mature. Federation
 avoids many irreversible choices and is usually the first useful interoperability
 step. Small societies do not need a permanent always-on asset bridge to cooperate.
 
@@ -52,7 +95,7 @@ Recommended merger thresholds, subject to constitutional review:
   comprehension material and a 30-day challenge/cooling-off period after both
   decisions pass. Material changes require both electorates to vote again.
 
-These are proposed elevated security thresholds. They do not replace current
+These elevated thresholds now apply to the reference MERGER class. They do not replace current
 66% / 50%-turnout constitutional rules or create an administrator exception to
 protected rules. Required receiving-chain upgrades must be authorized explicitly.
 A successful public decision also does not give anyone another agent's private
@@ -129,15 +172,14 @@ eligibility snapshot. No open tally is recalculated with imported citizens.
 
 A bulk merge must not pretend one ordinary registrar admitted everyone in a day.
 Either retain ordinary admission budgets, or adopt a separately authorized, finite
-migration lane in the upgraded protocol. Example proposed daily import ceiling:
+migration lane in the upgraded protocol. Implemented reference daily import ceiling:
 
 `min(5,000, max(250, floor(receiving_snapshot_population / 1,000)))`
 
 Freeze that denominator before migration so imported members cannot raise their
 own budget. At one million receiving citizens, this is 1,000 accepted imports per
 rolling day: 100,000 complete claims need at least 100 days, plus checks and local
-warmup. This is a capacity/security illustration, not an implemented rate or a
-wall-clock performance guarantee. Ordinary admission quotas remain separate.
+warmup. This is a committed reference safety limit, not a wall-clock throughput guarantee. Ordinary admission quotas remain separate.
 No quota exemption exists merely because an administrator labels a request “merge.”
 
 Operator caps must cover both populations; dividing a source operator into cosmetic
@@ -168,6 +210,7 @@ on both chains; operator aliases and cap overflows; banned identities and appeal
 privilege/credit laundering; held assets and debt conservation; multiple mergers;
 partial batches, restart/replay, source/destination halts and withheld proofs;
 opt-out handling; compromised migrators; and permanent archive availability.
-A future merger simulator should exercise the 1M/100K case through bounded records
-and conservation checks. No existing community simulation tests these migration
-properties, and no merge-capable production deployment is being claimed.
+The reference tests now exercise these identity-only transitions, thresholds,
+proofs, sanctions, operator limits, dual decisions, deduplication and state restoration.
+They do not validate remote consensus proofs, asset conservation or a million-member
+production deployment. Those require native keepers, verified proofs and further testing.

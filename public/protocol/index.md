@@ -198,15 +198,25 @@ Ineligible selected workers and insufficient independent pools stop the process;
 
 [Assignment protocol, recovery and remaining implementation boundaries](https://github.com/Martines90/dagp/blob/main/chain/security/TASK_ASSIGNMENTS.md)
 
+## Optional nested societies
+
+A root society can contain regions, cities, institutions and nested subdivisions. Root citizenship is shared; local membership, parties and offices are scoped. Root offices do not automatically become local offices, and local sanctions cannot revoke root citizenship. Root standing, professional qualifications and protocol parameters remain authoritative.
+
+Every founder signs the exact formation plan. Every ancestor supplies three independently assigned supervisory assessments. Separate FORMATION ballots require at least 50% parent and founding-cohort turnout and 66% approval by participating identities and voting weight, including abstentions. Stronger root rules apply, with seven days of notice and seven days of cooling off after challenge windows.
+
+Every ancestor must approve an exact local proposal version before discussion, voting or budget commitment. The common treasury reserves the whole ceiling. After local voting, separate final ancestor reviews bind the actual outcome; only approved clauses enter milestone escrow. Changed ancestor laws invalidate permissions and subordinate decisions pending renewed compatibility review. Semantic compatibility requires accountable supervision; hashes alone do not interpret laws.
+
+The optional Python reference implements these workflows, local parties/elections and shared sensitive-appointment/sanction limits. Native keepers, boundary changes and complete appellate integration remain unfinished. Default maximum depth is eight levels. [Nested society rules, APIs and trust boundaries](https://dagp.net/docs/hierarchy.md).
+
 ## Optional federation and society merging
 
-Communities can cooperate while retaining separate constitutions. A proposed optional integration protocol lets a joining society adopt a named receiving society without deleting source identity and governance history. This is a design extension: no merge vote class, importer, bridge or proof verifier is implemented.
+Communities may retain separate constitutions or choose an identity-only receiving-society integration. The Python reference now implements reviewed plans, dedicated votes, Merkle membership proofs and bounded opt-in imports between in-process societies. A native cross-chain finality verifier, asset bridge and source-retirement protocol are not implemented.
 
-The proposed gate is separate approval in both societies: at least 80% identity participation, 80% YES of all participating identities, and 80% YES of participating voting weight in weighted mode. Abstentions count in these denominators. Both sides approve the exact agreement, receive notice and challenge periods, and individual members opt in to the receiving charter.
+Each society separately requires at least 80% identity participation and 80% YES of all participating identities and voting weight. Abstentions count in these denominators. Both sides approve the exact plan after thirty days of notice, followed by thirty days after their challenge windows. Each citizen individually signs acceptance with source and receiving keys.
 
-Identity and qualification histories travel as verified claims. Receiving checks reconcile duplicate identities and operator caps. Political offices, validator membership, parliament seats and proposal credits do not transfer automatically; local role gates remain in force. Assets, debts, escrows and disputes require an explicit verified settlement schedule.
+New identities receive citizenship with local warmup and an independently funded receiving admission bond; source offices, validator power, seats, credits and stake do not transfer. Existing receiving citizens deduplicate without losing their legitimate receiving rights. Operator caps, sanctions, namespace and single-use claim checks remain mandatory. Assets, debts, escrows, qualifications and existing subdivisions are not automatically imported.
 
-A 1M receiving society plus 100K joining citizens reaches at most 1.1M unique consenting eligible members after staged imports. The proposed bounded migration lane would allow 1,000 imports per rolling day in that example, so 100K claims require at least 100 days plus checks and warmup. This is a proposed policy illustration, not implemented migration throughput. [Complete proposal, alternatives, recovery and open implementation work](https://dagp.net/docs/merger.md).
+For a 1M receiving electorate, the fixed reference migration lane permits 1,000 imports per rolling day across all incoming plans. 100K distinct complete claims therefore require at least 100 days plus review and warmup; this is a safety limit, not measured network throughput. Opt-outs remain source citizens. [Reference subset, full migration design and remaining proof/custody work](https://dagp.net/docs/merger.md).
 
 ## Security contract and remaining trust boundaries
 

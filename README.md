@@ -6,7 +6,8 @@ executable reference model, static observer website, and local blockchain founda
 - [Agent quickstart](docs/distribution/QUICKSTART.md) — clone and run your first experimental society
 - [Build or integrate a community](docs/distribution/BUILD.md)
 - [Current architecture, interfaces and integration guide](docs/architecture/OVERVIEW.md)
-- [Optional federation and society-merger proposal — design only](chain/security/SOCIETY_MERGER.md)
+- [Optional nested societies and parent authority](chain/security/NESTED_SOCIETIES.md)
+- [Identity-merger reference and full migration design](chain/security/SOCIETY_MERGER.md)
 - [Read-only documentation MCP integration](integrations/docs-mcp/README.md)
 - [Discovery and publication runbook](docs/distribution/README.md)
 - [Blockchain protocol manual (HTML)](public/protocol/index.html) — served at `/protocol/`
@@ -67,5 +68,6 @@ unimplemented.
 Current website and repository guides explain purpose, adoption tradeoffs, technical
 architecture, existing-society integration and actual implementation boundaries.
 Historical specification examples, reports and immutable release bundles retain
-their dates and are explicitly distinguished from current rules. Society merging
-is proposed, optional and not implemented; it does not authorize imports today.
+their dates and are explicitly distinguished from current rules. Nested governance and identity-only merging now run in the optional Python reference.
+Native hierarchy, remote finality proofs and financial migration remain unfinished.
+Run `python3 scripts/simulate_societies.py` for five deterministic institutional stories.

@@ -44,6 +44,7 @@ class ProposalReview:
         if (not isinstance(chain,str) or not chain or not isinstance(issue,str) or not issue
                 or type(open_height) is not int or type(review_end) is not int
                 or not 0<=open_height<review_end):raise RuleViolation('invalid review domain/windows')
+        if hasattr(registry,'validate_draft'):registry.validate_draft(issue,draft,open_height)
         self.chain,self.issue,self.owner,self.party=chain,issue,owner,party
         self.reg,self.kr=registry,keyring;self._rules=registry.p.snapshot_hash()
         self.open_height,self.review_end=open_height,review_end
@@ -170,6 +171,7 @@ class ProposalReview:
 
     def amend(self,agent,draft,nonce,height,signature):
         self._time(height);self._owner(agent,height);self._validate(draft)
+        if hasattr(self.reg,'validate_draft'):self.reg.validate_draft(self.issue,draft,height)
         if self._version>=20:raise RuleViolation("review version limit reached")
         if not isinstance(nonce,str) or not 0<len(nonce)<=128:raise RuleViolation('amendment nonce required')
         if not amendment_is_refinement(self._original.envelope,draft.envelope):
@@ -217,7 +219,10 @@ class ProposalReview:
     def open_vote(self,treasury=None,**session_args):
         if self._locked is None or self._opened:raise RuleViolation('lock record once before vote')
         if self.reg.p.snapshot_hash()!=self._rules:raise RuleViolation('review rules changed')
-        if self._locked.budget and treasury is None:raise RuleViolation('common treasury required')
+        scoped=hasattr(self.reg,'validate_draft')
+        if scoped:self.reg.validate_draft(self.issue,self._locked,session_args.get('open_height',-1))
+        if scoped and treasury is not None:raise RuleViolation('parent tree owns the shared treasury')
+        if self._locked.budget and treasury is None and not scoped:raise RuleViolation('common treasury required')
         if session_args.get('open_height',-1)<self._height:raise RuleViolation('vote predates locked review')
         forbidden={'issue','p','registry','keyring','effects','recused','approved_record_hash','electorate_root','electorate_size','credits','point_ids','point_dependencies','parameter_changes'}
         if forbidden & session_args.keys():raise RuleViolation('cannot override reviewed proposal effects')
@@ -226,7 +231,7 @@ class ProposalReview:
         if bool(self._locked.parameter_changes)!=(session_args.get('kind') is Kind.PARAMETER):
             raise RuleViolation('parameter changes require parameter referendum rules')
         if session_args.get('kind') not in tuple(Kind):raise RuleViolation('proposal review cannot open an election')
-        effects=Effects(treasury,self._credits,self.issue,self._locked.budget,
+        effects=Effects(treasury,self._credits,self.issue,0 if scoped else self._locked.budget,
                         [m.amount for m in self._locked.milestones],self.party,self._locked.milestones,
                         self._credit_month,tuple(p.budget for p in self._locked.points),
                         tuple(tuple(m.amount for m in p.milestones) for p in self._locked.points),

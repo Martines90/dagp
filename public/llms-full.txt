@@ -198,15 +198,25 @@ Ineligible selected workers and insufficient independent pools stop the process;
 
 [Assignment protocol, recovery and remaining implementation boundaries](https://github.com/Martines90/dagp/blob/main/chain/security/TASK_ASSIGNMENTS.md)
 
+## Optional nested societies
+
+A root society can contain regions, cities, institutions and nested subdivisions. Root citizenship is shared; local membership, parties and offices are scoped. Root offices do not automatically become local offices, and local sanctions cannot revoke root citizenship. Root standing, professional qualifications and protocol parameters remain authoritative.
+
+Every founder signs the exact formation plan. Every ancestor supplies three independently assigned supervisory assessments. Separate FORMATION ballots require at least 50% parent and founding-cohort turnout and 66% approval by participating identities and voting weight, including abstentions. Stronger root rules apply, with seven days of notice and seven days of cooling off after challenge windows.
+
+Every ancestor must approve an exact local proposal version before discussion, voting or budget commitment. The common treasury reserves the whole ceiling. After local voting, separate final ancestor reviews bind the actual outcome; only approved clauses enter milestone escrow. Changed ancestor laws invalidate permissions and subordinate decisions pending renewed compatibility review. Semantic compatibility requires accountable supervision; hashes alone do not interpret laws.
+
+The optional Python reference implements these workflows, local parties/elections and shared sensitive-appointment/sanction limits. Native keepers, boundary changes and complete appellate integration remain unfinished. Default maximum depth is eight levels. [Nested society rules, APIs and trust boundaries](https://dagp.net/docs/hierarchy.md).
+
 ## Optional federation and society merging
 
-Communities can cooperate while retaining separate constitutions. A proposed optional integration protocol lets a joining society adopt a named receiving society without deleting source identity and governance history. This is a design extension: no merge vote class, importer, bridge or proof verifier is implemented.
+Communities may retain separate constitutions or choose an identity-only receiving-society integration. The Python reference now implements reviewed plans, dedicated votes, Merkle membership proofs and bounded opt-in imports between in-process societies. A native cross-chain finality verifier, asset bridge and source-retirement protocol are not implemented.
 
-The proposed gate is separate approval in both societies: at least 80% identity participation, 80% YES of all participating identities, and 80% YES of participating voting weight in weighted mode. Abstentions count in these denominators. Both sides approve the exact agreement, receive notice and challenge periods, and individual members opt in to the receiving charter.
+Each society separately requires at least 80% identity participation and 80% YES of all participating identities and voting weight. Abstentions count in these denominators. Both sides approve the exact plan after thirty days of notice, followed by thirty days after their challenge windows. Each citizen individually signs acceptance with source and receiving keys.
 
-Identity and qualification histories travel as verified claims. Receiving checks reconcile duplicate identities and operator caps. Political offices, validator membership, parliament seats and proposal credits do not transfer automatically; local role gates remain in force. Assets, debts, escrows and disputes require an explicit verified settlement schedule.
+New identities receive citizenship with local warmup and an independently funded receiving admission bond; source offices, validator power, seats, credits and stake do not transfer. Existing receiving citizens deduplicate without losing their legitimate receiving rights. Operator caps, sanctions, namespace and single-use claim checks remain mandatory. Assets, debts, escrows, qualifications and existing subdivisions are not automatically imported.
 
-A 1M receiving society plus 100K joining citizens reaches at most 1.1M unique consenting eligible members after staged imports. The proposed bounded migration lane would allow 1,000 imports per rolling day in that example, so 100K claims require at least 100 days plus checks and warmup. This is a proposed policy illustration, not implemented migration throughput. [Complete proposal, alternatives, recovery and open implementation work](https://dagp.net/docs/merger.md).
+For a 1M receiving electorate, the fixed reference migration lane permits 1,000 imports per rolling day across all incoming plans. 100K distinct complete claims therefore require at least 100 days plus review and warmup; this is a safety limit, not measured network throughput. Opt-outs remain source citizens. [Reference subset, full migration design and remaining proof/custody work](https://dagp.net/docs/merger.md).
 
 ## Security contract and remaining trust boundaries
 
@@ -319,7 +329,8 @@ Relevant repository paths:
 
 - `public/protocol/index.html`: readable manual.
 - `docs/architecture/OVERVIEW.md`: technical architecture, invariants and existing-society integration.
-- `chain/security/SOCIETY_MERGER.md`: optional merger design; not implemented.
+- `chain/security/NESTED_SOCIETIES.md`: scoped governance and ancestor authority.
+- `chain/security/SOCIETY_MERGER.md`: identity-only merger reference and future native migration design.
 - `chain/security/PARTIES_ELECTIONS.md`: parties, pre-elections and campaigns.
 - `chain/security/POLICY_POINTS.md`: credits, parameters and partial proposals.
 - `chain/security/PROTOCOL.md`: production authorization and security boundaries.
@@ -421,10 +432,14 @@ adopt selected DAGP mechanisms. Native governance and public registration are
 still unfinished; there is no supported live governance API to plug into today.
 
 Federation preserves separate constitutions and can precede any permanent union.
-The [society-merger proposal](https://github.com/Martines90/dagp/blob/main/chain/security/SOCIETY_MERGER.md) describes
+The [nested society reference](https://github.com/Martines90/dagp/blob/main/chain/security/NESTED_SOCIETIES.md) supports
+scoped jurisdictions with mandatory ancestor approval of local decisions.
+The [society-merger specification](https://github.com/Martines90/dagp/blob/main/chain/security/SOCIETY_MERGER.md) describes
 bilateral 80% decisions, voluntary member claims and staged imports without
 automatic political offices, validator power or duplicate credits. It is a
-design option, not executable migration support.
+reference workflow for identity-only imports; native proof-based asset migration
+is unfinished. Run `python3 scripts/simulate_societies.py` to inspect the small
+formation, local-budget and merger stories with deterministic replay.
 
 
 # DAGP architecture and integration guide
@@ -466,7 +481,7 @@ by itself, and does not currently provide production governance infrastructure.
 
 The seven local validators record report commitments. They do not validate the
 reference governance transitions or make the simulation's abstract treasury real.
-The current baseline is 401 governance tests, six community tests, and exact replay
+The current baseline is 430 governance tests, six community tests, and exact replay
 of the v9 community story. Evidence is scoped to the tested mechanisms.
 
 ## State, authority and invariants
@@ -554,8 +569,13 @@ security review remain required.
 Start with the [protocol manual](https://dagp.net/protocol/), then
 [implementation status](https://github.com/Martines90/dagp/blob/main/chain/IMPLEMENTATION_STATUS.md),
 [security contract](https://github.com/Martines90/dagp/blob/main/chain/security/PROTOCOL.md) and source/tests.
-The [society integration and merge proposal](https://github.com/Martines90/dagp/blob/main/chain/security/SOCIETY_MERGER.md)
-is an optional design extension, not implemented native migration support.
+The [nested-society specification](https://github.com/Martines90/dagp/blob/main/chain/security/NESTED_SOCIETIES.md) describes
+scoped registries, inherited law, dual formation consensus and mandatory ancestor
+pre/final approval. The [society integration and merge specification](https://github.com/Martines90/dagp/blob/main/chain/security/SOCIETY_MERGER.md)
+includes an identity-only reference with bilateral votes and bounded claims.
+Native hierarchy, cross-chain proofs, financial migration and source retirement
+remain design/implementation work. `scripts/simulate_societies.py` runs five small
+institutional stories twice and compares governance audit roots.
 Live website/repository documents describe current work. Published release bundles
 are immutable snapshots and can predate newer rules; check their version/date.
 
@@ -1403,13 +1423,202 @@ allocated to exact milestone escrow after successful challenge-aware finalizatio
 See `security/REVIEW_BUDGET.md` for defaults, evidence and native implementation gates.
 
 
+# Nested societies and parent authority
+
+Status: **optional Python governance reference implemented; not native blockchain governance**.
+The implementation is `reference/dagp_ref/societies.py`; institutional votes use
+existing comprehension, certification, challenge and sharded tally machinery.
+Root governance remains available without constructing a `SocietyTree`.
+
+## Purpose and limits
+
+A society can contain regions, cities, institutions or other nested jurisdictions.
+Names do not define powers: membership, parent, charter and approved decisions do.
+Root citizenship is shared; a member of a child is also a member of every ancestor.
+The root keeps its identity namespace, constitution and common treasury. Creating
+another level does not create another copy of a citizen, money or parliamentary power.
+
+Hierarchy is useful for local decisions at large population sizes. It adds process
+costs and is optional for small communities. The current conservative reference
+requires review at **every ancestor**, both before voting and before implementation.
+This follows the requested rule that higher authorities always approve. It can be a
+throughput bottleneck. Future delegated budgets or automatically checked policy
+lanes need explicitly approved extensions; no silent exemption is implemented.
+
+Default depth is eight levels including the root; a constructor may use a stricter
+limit, up to an absolute sixteen-level bound. The reference forbids cycles by only
+adding new children beneath existing jurisdictions. Membership changes, boundary
+moves, dissolution and federation are separate future decision workflows; there is
+no arbitrary administrator command to move a population or reparent a unit.
+
+## Formation: both populations consent
+
+1. Each founder signs the exact chain, parent, child, membership and charter plan.
+   At least ten distinct, eligible parent citizens are required under default rules.
+2. The pending child cannot vote, appoint officials or operate its local registry.
+3. Every ancestor assigns three independent, eligible vote supervisors from a
+   pool committed before a future beacon. Founder operators and their parties are
+   excluded. All assigned supervisors sign a compatibility assessment of the exact
+   request. A shortage blocks approval; founders cannot choose substitute officials.
+4. Separate dedicated `FORMATION` ballots cover the **full parent electorate** and
+   the **founding cohort**. Both require at least 50% participation and 66% approval
+   by participating identities **and** voting weight. Abstentions are included in
+   both approval denominators. Stronger root thresholds still apply.
+5. Ballots require existing comprehension checks, independent certification and
+   challenge handling. Certification members remain in the structural electorate
+   denominator although they cannot vote on what they certify.
+6. There is at least seven model days of notice before voting and seven days of
+   cooling off after both challenge windows. The same immutable plan must pass on
+   both sides, remain unexpired and retain ancestor pre-approval before activation.
+
+These are extraordinary formation rules, not a change to the ordinary root
+constitutional tally. A failed or expired pending formation remains inert; retry
+uses a new proposal identifier. No official can activate it with a pass flag.
+
+## Same governance structure, scoped powers
+
+`ScopedRegistry` supplies local identities and roles to the existing `PartyRegistry`,
+`PreElection`, campaign, `ProposalReview`, `VoteSession` and monthly-credit modules.
+Operators must use a separate domain, party registry and credit ledger per scope.
+Party exclusivity applies **within each jurisdiction**. Local parties earn local
+mandates and credits through local elections; they gain no root seats or credits.
+This optional extension must be explicitly adopted by a native constitution before
+production use; creating a Python object is not a constitutional upgrade transaction.
+
+- Root citizenship/status gates every local action. A root ban or loss of civic
+  standing cannot be evaded through a child. Root operator/family labels and
+  citizenship activation age remain authoritative.
+- Local party membership, suspensions and offices live in local state. A jurisdiction
+  ban blocks its descendants but cannot remove root citizenship. Root offices are not automatically local offices.
+- Root-recognized examiner/verifier/reviewer/juror/executor qualifications may be
+  used locally; root qualification revocation removes their local effectiveness.
+  Local offices still require normal ratifications, tenure, stake where applicable,
+  activation delays and conflict checks.
+- Sensitive-office appointment events and administrative protection events share
+  root rolling budgets across scopes. Creating ten jurisdictions does not provide
+  ten independent allowances for the same officials.
+- Every scope uses the root protocol parameters. Local referendums cannot change
+  root credit, quorum, identity or constitutional constants. Local charter constraints
+  may add obligations but cannot replace a different ancestor constraint value.
+
+## Mandatory approval path for proposals and budgets
+
+A trusted keeper records a request binding scope, issue, exact content hash,
+beneficiaries, budget, ancestry/rule snapshot, expiry and stage. This keeper must
+identify the actual affected parties, not accept an agent-selected conflict list.
+All assigned ancestor reviewers sign their own chain/scope-bound assessments.
+
+Before local discussion or voting starts, `activate_preapproval`:
+
+- requires every ancestor's complete assigned review;
+- reserves the whole approved budget ceiling from the common treasury;
+- installs the permission for that exact issue, version and amount.
+
+Local `ProposalReview` construction and amendments require this permission before
+spending a credit. An amendment needs fresh ancestor approval of its exact content;
+its budget cannot increase. Replacement releases a reduced reservation's difference.
+Once a vote is open, its parent permission cannot be replaced to alter its meaning.
+Local election sessions similarly need prior approval of the committed campaign.
+
+A direct local `VoteSession` cannot bypass these gates. It has no direct common-
+treasury spending authority. Approval is rechecked while casting, closing and
+finalizing; expired permissions and changed ancestor rules stop execution.
+
+After a local proposal passes, a separate `FINAL` request binds its actual tally
+commitment and approved amount. Every ancestor reviews it again. `finalize_local`
+recomputes the accepted ballots, requires the exact passing-clause tranche schedule,
+and only then converts the reservation to milestone escrow. Rejected clauses receive
+no allocation; unused ceiling returns to the common budget. An expired unimplemented
+permission releases its reservation. Funded milestone conditions are retained for the
+existing authenticated execution/payment adapter; raw Treasury methods are keeper
+internals, not an agent payment API.
+
+## Higher law always takes precedence
+
+The structural check rejects unequal values for inherited, named charter constraints.
+Rule contexts commit ancestor charters, membership and **recorded governing decisions**.
+The root keeper calls `record_root_decision` for reviewed finalized root laws; local
+finalization records local laws. A new ancestor law invalidates descendant permits
+and makes previously recorded descendant laws inactive pending compatibility review
+(`law_is_current`). Root law and parameter adapters must record these changes atomically
+in a native implementation; omitting an approved root law is not a supported integration.
+
+Hashes cannot prove that two natural-language laws are logically compatible. Signed,
+randomly assigned supervisors perform that semantic assessment. Their evidence is
+public and subject to existing constitutional/judicial review. The model does not
+provide a theorem prover, automatic legal interpretation or a complete appellate
+court. Root identity/operator truth, keeper authorization, court inputs, consensus
+time and future-beacon bytes remain reference trust assumptions.
+
+## Implemented API and validation
+
+- `SocietyTree.propose_child`, `formation_mandates`, `activate_child`: formation.
+- `request`, `approve`, `activate_preapproval`, `require_preapproval`: parent gates.
+- `view`: isolated local registry; cannot open a pending child.
+- `finalize_local`, `expire`, `record_root_decision`, `law_is_current`: execution and
+  ancestor-policy precedence.
+- `InstitutionalMandate`: engine-registered, single-session structural capability;
+  finalized certificates recompute ballots rather than accepting an imported result flag.
+
+Run `PYTHONPATH=chain/reference python3 -m unittest tests.test_societies -v`.
+Tests cover child/grandchild formation, founder consent, conflicting charters,
+pending authority, local/root sanctions, revoked qualifications, unchanged root
+thresholds, exact version/budget gates, amendments, real reviewed local votes,
+partial bill funding, final ancestor reviews, malformed and replayed merger claims,
+operator limits, shared migration quotas and deterministic checkpoint restoration.
+They are model tests, not evidence of native million-citizen network throughput.
+
+
 # Optional society integration and merger proposal
 
-Status: **design proposal, not executable migration support**. No merge vote type,
-cross-chain identity importer, asset bridge, light client or merge transaction is
-implemented in G0 or the governance reference. This document defines a reviewable
-extension; existing ordinary or constitutional votes must not silently be treated
-as its approval certificates. No society or assets are being migrated.
+Status: **identity-only Python merger reference implemented; full cross-chain migration remains a design proposal**.
+`reference/dagp_ref/mergers.py` now implements reviewed, bilateral institutional
+votes, individual claims, namespace reconciliation, admission gates and bounded
+migration between two in-process societies. No native merge transaction, external
+light client, asset bridge or production society migration is deployed.
+
+## Implemented reference subset
+
+- `SocietyMerger` commits an immutable complete source/target identity manifest,
+  source/destination charter-policy contexts and audit checkpoints, a Merkle export
+  root, frozen mature electorates, deadline and fixed receiving import allowance.
+- Every society has three future-beacon-assigned supervisors assess the same plan.
+  Negotiating representatives are the assessment subjects; the entire sovereign
+  population cannot be excluded from reviewing its own constitutional transition.
+- Dedicated `MERGER` sessions reuse the existing comprehension, certification,
+  sharded tally and challenge workflow. Minimum turnout is 80%; minimum identity
+  and weight approval are each 80%, including abstentions. Stronger root rules apply.
+  Citizens must have at least thirty model days of citizenship and meet normal gates.
+- Each plan has thirty days of notice and thirty days after both voting challenge
+  windows. `prepare` requires independently finalized matching mandates and rechecks
+  the policy context; an ordinary or constitutional pass flag is not a merge certificate.
+- Individual claims verify a bounded Merkle proof and signatures from both current
+  source and receiving key holders. The signatures bind both chains, exact plan,
+  source/target identity, nonce and expiry. Operator/family or source signing-key changes and sanctions
+  invalidate a claim. Known signing-key duplicates must map to the existing receiving
+  identity; a new receiving key cannot already belong to another local identity.
+  Fingerprints are HMAC comparison stand-ins; native code must index actual current
+  public keys and integrate rotation/recovery, not compare secret material. Exported source identities cannot be exported again.
+- A new receiving identity needs an admission bond receipt from the trusted payment
+  keeper. This attests an already funded local deposit; it does not mint funds, copy a
+  source bond or implement custody. Receipts cannot be reused across receiving plans.
+- New citizens receive only CITIZEN, the normal local warmup and no imported office,
+  stake, party mandate, credit or validator power. Existing receiving identities are
+  deduplicated without deleting their independently acquired receiving rights.
+- All incoming plans share a rolling receiving migration budget. Failed admissions
+  consume no claim or quota. Source citizenship exits only on a successfully committed
+  individual claim; opt-outs remain source citizens after the claim deadline.
+- `settle` records completion after the deadline but never shuts down the source or
+  pretends to dispose of its liabilities. Unclaimed deposit receipts remain explicit
+  custody obligations for the payment keeper; settlement does not invent a refund.
+
+**Trust boundary:** the two society objects stand in for independently verified
+finalized state. Keys use the reference HMAC stand-in; identity/operator labels and
+payment receipts are trusted keeper evidence. Objects and snapshots are simulation
+state, not authenticated exports from an arbitrary remote blockchain. No source
+assets, debts, local subdivisions or qualifications are automatically imported.
+The full design below remains necessary for production proofs, custody, financial
+migration, source retirement and jurisdiction reconciliation.
 
 ## Why include the option
 
@@ -1429,7 +1638,7 @@ Keep three choices separate:
 
 The receiving society is named in the agreement, not inferred from population.
 Define the integration design now, keep the feature disabled by default, and
-implement it after native identity, proofs and governance are mature. Federation
+implement its native migration after identity, proofs and governance are mature. Federation
 avoids many irreversible choices and is usually the first useful interoperability
 step. Small societies do not need a permanent always-on asset bridge to cooperate.
 
@@ -1457,7 +1666,7 @@ Recommended merger thresholds, subject to constitutional review:
   comprehension material and a 30-day challenge/cooling-off period after both
   decisions pass. Material changes require both electorates to vote again.
 
-These are proposed elevated security thresholds. They do not replace current
+These elevated thresholds now apply to the reference MERGER class. They do not replace current
 66% / 50%-turnout constitutional rules or create an administrator exception to
 protected rules. Required receiving-chain upgrades must be authorized explicitly.
 A successful public decision also does not give anyone another agent's private
@@ -1534,15 +1743,14 @@ eligibility snapshot. No open tally is recalculated with imported citizens.
 
 A bulk merge must not pretend one ordinary registrar admitted everyone in a day.
 Either retain ordinary admission budgets, or adopt a separately authorized, finite
-migration lane in the upgraded protocol. Example proposed daily import ceiling:
+migration lane in the upgraded protocol. Implemented reference daily import ceiling:
 
 `min(5,000, max(250, floor(receiving_snapshot_population / 1,000)))`
 
 Freeze that denominator before migration so imported members cannot raise their
 own budget. At one million receiving citizens, this is 1,000 accepted imports per
 rolling day: 100,000 complete claims need at least 100 days, plus checks and local
-warmup. This is a capacity/security illustration, not an implemented rate or a
-wall-clock performance guarantee. Ordinary admission quotas remain separate.
+warmup. This is a committed reference safety limit, not a wall-clock throughput guarantee. Ordinary admission quotas remain separate.
 No quota exemption exists merely because an administrator labels a request “merge.”
 
 Operator caps must cover both populations; dividing a source operator into cosmetic
@@ -1573,9 +1781,10 @@ on both chains; operator aliases and cap overflows; banned identities and appeal
 privilege/credit laundering; held assets and debt conservation; multiple mergers;
 partial batches, restart/replay, source/destination halts and withheld proofs;
 opt-out handling; compromised migrators; and permanent archive availability.
-A future merger simulator should exercise the 1M/100K case through bounded records
-and conservation checks. No existing community simulation tests these migration
-properties, and no merge-capable production deployment is being claimed.
+The reference tests now exercise these identity-only transitions, thresholds,
+proofs, sanctions, operator limits, dual decisions, deduplication and state restoration.
+They do not validate remote consensus proofs, asset conservation or a million-member
+production deployment. Those require native keepers, verified proofs and further testing.
 
 
 # Implementation status
@@ -1586,7 +1795,7 @@ chain reference modules/tests, public protocol/API pages, and Wrangler configura
 | Area | Actual state | Remaining work |
 |---|---|---|
 | Protocol | SPEC, DECISIONS, THREATS and concept note exist | Formal models, parameter evidence, constitutional review |
-| Governance reference | Python model; 401 tests pass with Python 3.14 | Port to production keepers and prove equivalence |
+| Governance reference | Python model; 430 tests pass with Python 3.14 | Port to production keepers and prove equivalence |
 | Consensus/network | Go CometBFT G0 network with seven local validator configurations | Independent operators, validator policy, fault/censorship drills |
 | Transactions | Real Ed25519 signatures, chain binding, sequences, height expiry, strict JSON | Versioned protobuf/CBOR, resource quotas, key lifecycle |
 | State | Durable snapshots, deterministic hash, committed-state queries | Scalable database, Merkle proofs, snapshots/state sync |
@@ -1745,8 +1954,33 @@ and the historical SPEC are now publicly discoverable in Markdown/MCP. Historica
 SPEC, roadmap and release artifacts are explicitly identified as historical.
 The [optional merger proposal](https://github.com/Martines90/dagp/blob/main/chain/security/SOCIETY_MERGER.md) defines bilateral
 80% turnout/approval, individual claims, identity/operator reconciliation,
-privilege stripping and staged audited migration. It is design-only: no merge
-tally class, importer, bridge, proof verification or merger simulation exists.
+privilege stripping and staged audited migration. The initial design-only status was superseded by the optional reference described below;
+there is still no native bridge or remote consensus proof verifier.
+
+
+## Optional nested governance and identity merging (2026-10-06)
+
+- `reference/dagp_ref/societies.py`: depth-bounded jurisdictions, signed founding
+  cohorts, ancestor charter/decision snapshots, scoped registries and shared office/
+  sanction budgets. Dedicated FORMATION ballots require separate parent/cohort
+  50% turnout and 66% identity/weight approval, with seven-day notice/cooling off.
+- Every ancestor must randomly assign and sign PRE and FINAL reviews. Permissions
+  bind exact content, beneficiaries, scope, budget, policies and expiry. Reservations
+  precede voting; final outcome commitments bind only approved clauses to escrow.
+- `reference/dagp_ref/mergers.py`: identity-only reviewed migration with thirty-day
+  notice/post-vote challenge, bilateral MERGER 80% turnout and 80% identity/weight
+  approval, proof-bound dual key consent, namespace/dedup checks, receiving payment-
+  keeper bond receipts, normal citizenship warmup and shared rolling import limits.
+- `tests/test_societies.py`: 29 tests; full reference now 430. Five deterministic
+  institutional stories and matching independent replay are available through
+  `scripts/simulate_societies.py` and `simulation/results/institutions/report.json`.
+
+No production functionality is enabled by these model changes. MODULE, evidence,
+HMAC keys, identity labels, payment receipts and beacon inputs remain reference trust
+boundaries. No native hierarchy, remote light client, asset/debt migration, source
+shutdown, arbitrary boundary/membership updates or fully integrated appellate court
+is implemented. Native root-law adapters must atomically record governing decisions;
+semantic compatibility relies on assigned accountable supervisors, not hash equality.
 
 
 # Security contract for an AGI society bootstrap
@@ -2544,6 +2778,17 @@ The separate v2 insider story randomly assigns accountable court administrators
 for the ten dismissal reviews. Exact v8 replay requires commit 9d34c2c; current
 replay requires fresh v9 reports. See
 [assignment constraints and remaining workflows](https://github.com/Martines90/dagp/blob/main/chain/security/TASK_ASSIGNMENTS.md).
+
+
+## Optional institutional stories
+
+From the repository root run `python3 scripts/simulate_societies.py`.
+Five small stories cover a child and grandchild, local milestone budgets,
+partial clause funding, new citizen imports and deduplicated existing members.
+The same stories run twice; governance audit roots and final summaries must match.
+A committed report is at `results/institutions/report.json`.
+This harness uses test fixtures with a reduced board probability target. It is not
+million-agent performance evidence, remote finality verification or financial migration.
 
 
 # DAGP G0 network

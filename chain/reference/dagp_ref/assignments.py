@@ -9,6 +9,7 @@ from .sortition import panel_size
 from .treasury import RuleViolation
 
 KINDS={
+    'hierarchy_review':(Role.VOTE_SUPERVISOR,'SUPERVISE_VOTE',3),
     'review':(Role.VOTE_SUPERVISOR,'SUPERVISE_VOTE',2),
     'certification':(Role.EXAMINER,'GRADE',None),
     'admission':(Role.REGISTRAR,'REGISTRAR_ACT',1),

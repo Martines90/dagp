@@ -181,3 +181,14 @@ The separate v2 insider story randomly assigns accountable court administrators
 for the ten dismissal reviews. Exact v8 replay requires commit 9d34c2c; current
 replay requires fresh v9 reports. See
 [assignment constraints and remaining workflows](../security/TASK_ASSIGNMENTS.md).
+
+
+## Optional institutional stories
+
+From the repository root run `python3 scripts/simulate_societies.py`.
+Five small stories cover a child and grandchild, local milestone budgets,
+partial clause funding, new citizen imports and deduplicated existing members.
+The same stories run twice; governance audit roots and final summaries must match.
+A committed report is at `results/institutions/report.json`.
+This harness uses test fixtures with a reduced board probability target. It is not
+million-agent performance evidence, remote finality verification or financial migration.

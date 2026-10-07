@@ -42,10 +42,12 @@ class ShardSummary:
     no_w: int
     abstain_n: int
     root: bytes
+    yes_n: int = 0
+    abstain_w: int = 0
 
 
 def summarize_shard(shard: int, shards: int, ballots: Iterable[Ballot], p: Params) -> ShardSummary:
-    seen, y, n, a, leaves = set(), 0, 0, 0, []
+    seen, y, n, a, leaves, yn, aw = set(), 0, 0, 0, [], 0, 0
     mw = min_weight(p)
     for b in sorted(ballots, key=lambda x: x.voter):
         if shard_of(b.voter, shards) != shard:
@@ -58,11 +60,13 @@ def summarize_shard(shard: int, shards: int, ballots: Iterable[Ballot], p: Param
         leaves.append(ballot_leaf(b))
         if b.choice == YES:
             y += b.weight
+            yn += 1
         elif b.choice == NO:
             n += b.weight
         else:
             a += 1
-    return ShardSummary(shard, len(leaves), y, n, a, merkle_root(leaves))
+            aw += b.weight
+    return ShardSummary(shard, len(leaves), y, n, a, merkle_root(leaves), yn, aw)
 
 
 def audit_shard(summary: ShardSummary, shards: int, ballots: Iterable[Ballot], p: Params) -> bool:
@@ -83,12 +87,16 @@ def tally_sharded(summaries: list[ShardSummary], shards: int, electorate: int, k
                 or s.abstain_n > s.count or not isinstance(s.root, bytes) or len(s.root) != 32
                 or not (s.count-s.abstain_n)*min_weight(p) <= s.yes_w+s.no_w <= (s.count-s.abstain_n)*max_weight(p)):
             return TallyResult(Outcome.INVALID, 0, 0, 0, 0, False), b""
+        if kind in (Kind.FORMATION,Kind.MERGER) and decide(s.yes_w,s.no_w,s.abstain_n,s.count,
+                max(1,s.count),kind,p,yes_n=s.yes_n,abstain_w=s.abstain_w).outcome is Outcome.INVALID:
+            return TallyResult(Outcome.INVALID,0,0,0,0,False),b''
     part = sum(s.count for s in summaries)
     if part > electorate or electorate <= 0:
         return TallyResult(Outcome.INVALID, 0, 0, 0, 0, False), b""
     ordered = sorted(summaries, key=lambda s: s.shard)
     res = decide(sum(s.yes_w for s in ordered), sum(s.no_w for s in ordered),
-                 sum(s.abstain_n for s in ordered), part, electorate, kind, p)
+                 sum(s.abstain_n for s in ordered), part, electorate, kind, p,
+                 yes_n=sum(s.yes_n for s in ordered), abstain_w=sum(s.abstain_w for s in ordered))
     return res, merkle_root([s.root for s in ordered])
 
 

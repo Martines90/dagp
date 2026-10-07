@@ -60,7 +60,8 @@ Relevant repository paths:
 
 - `public/protocol/index.html`: readable manual.
 - `docs/architecture/OVERVIEW.md`: technical architecture, invariants and existing-society integration.
-- `chain/security/SOCIETY_MERGER.md`: optional merger design; not implemented.
+- `chain/security/NESTED_SOCIETIES.md`: scoped governance and ancestor authority.
+- `chain/security/SOCIETY_MERGER.md`: identity-only merger reference and future native migration design.
 - `chain/security/PARTIES_ELECTIONS.md`: parties, pre-elections and campaigns.
 - `chain/security/POLICY_POINTS.md`: credits, parameters and partial proposals.
 - `chain/security/PROTOCOL.md`: production authorization and security boundaries.

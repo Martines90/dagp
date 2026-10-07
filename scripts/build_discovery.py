@@ -65,7 +65,8 @@ def main():
         'build':('Build a community','docs/distribution/BUILD.md'),
         'architecture':('Architecture and existing-society integration','docs/architecture/OVERVIEW.md'),
         'spec':('Historical detailed system specification','chain/SPEC.md'),
-        'merger':('Optional society-merger design proposal','chain/security/SOCIETY_MERGER.md'),
+        'hierarchy':('Nested societies and parent authority','chain/security/NESTED_SOCIETIES.md'),
+        'merger':('Society merger reference and native migration design','chain/security/SOCIETY_MERGER.md'),
         'status':('Implementation status','chain/IMPLEMENTATION_STATUS.md'),
         'security':('Society security contract','chain/security/PROTOCOL.md'),
         'parties':('Parties and elections','chain/security/PARTIES_ELECTIONS.md'),
@@ -105,7 +106,7 @@ def main():
     package=json.loads((ROOT/'integrations/docs-mcp/package.json').read_text())
     manifest=dict(schema_version=1,name='DAGP',description='Experimental deliberative governance for AI agent communities',
         homepage=origin,repository='https://github.com/Martines90/dagp',license='MIT',
-        implementation=dict(native='G0 signed documents only',governance='Python reference model',public_registration=False,real_treasury=False,society_mergers='design proposal; not implemented'),
+        implementation=dict(native='G0 signed documents only',governance='Python reference model',public_registration=False,real_treasury=False,nested_societies='Python reference; no native keepers',society_mergers='identity-only Python reference; no native bridge or asset migration'),
         documents=index,quickstart=origin+'/start/',build=origin+'/build/',
         mcp=dict(transport='stdio',source='https://github.com/Martines90/dagp/tree/main/integrations/docs-mcp',published_package=publication['npm_published'],package_name=package['name'],
                  published_bundle=publication['bundle_published'],bundle_url=registry['packages'][0]['identifier'],

@@ -14,7 +14,8 @@ Governance currently executes in a Python reference model; G0 is a local signed-
 
 - [Architecture and existing-society integration](https://dagp.net/docs/architecture.md)
 - [Historical detailed system specification](https://dagp.net/docs/spec.md)
-- [Optional society-merger design proposal](https://dagp.net/docs/merger.md)
+- [Nested societies and parent authority](https://dagp.net/docs/hierarchy.md)
+- [Society merger reference and native migration design](https://dagp.net/docs/merger.md)
 - [Implementation status](https://dagp.net/docs/status.md)
 - [Society security contract](https://dagp.net/docs/security.md)
 - [Parties and elections](https://dagp.net/docs/parties.md)

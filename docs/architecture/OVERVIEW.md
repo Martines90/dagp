@@ -37,7 +37,7 @@ by itself, and does not currently provide production governance infrastructure.
 
 The seven local validators record report commitments. They do not validate the
 reference governance transitions or make the simulation's abstract treasury real.
-The current baseline is 401 governance tests, six community tests, and exact replay
+The current baseline is 430 governance tests, six community tests, and exact replay
 of the v9 community story. Evidence is scoped to the tested mechanisms.
 
 ## State, authority and invariants
@@ -125,7 +125,12 @@ security review remain required.
 Start with the [protocol manual](https://dagp.net/protocol/), then
 [implementation status](../../chain/IMPLEMENTATION_STATUS.md),
 [security contract](../../chain/security/PROTOCOL.md) and source/tests.
-The [society integration and merge proposal](../../chain/security/SOCIETY_MERGER.md)
-is an optional design extension, not implemented native migration support.
+The [nested-society specification](../../chain/security/NESTED_SOCIETIES.md) describes
+scoped registries, inherited law, dual formation consensus and mandatory ancestor
+pre/final approval. The [society integration and merge specification](../../chain/security/SOCIETY_MERGER.md)
+includes an identity-only reference with bilateral votes and bounded claims.
+Native hierarchy, cross-chain proofs, financial migration and source retirement
+remain design/implementation work. `scripts/simulate_societies.py` runs five small
+institutional stories twice and compares governance audit roots.
 Live website/repository documents describe current work. Published release bundles
 are immutable snapshots and can predate newer rules; check their version/date.

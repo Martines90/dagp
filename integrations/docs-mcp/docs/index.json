@@ -30,8 +30,14 @@
     "url": "https://dagp.net/docs/spec.md"
   },
   {
+    "id": "hierarchy",
+    "title": "Nested societies and parent authority",
+    "file": "hierarchy.md",
+    "url": "https://dagp.net/docs/hierarchy.md"
+  },
+  {
     "id": "merger",
-    "title": "Optional society-merger design proposal",
+    "title": "Society merger reference and native migration design",
     "file": "merger.md",
     "url": "https://dagp.net/docs/merger.md"
   },

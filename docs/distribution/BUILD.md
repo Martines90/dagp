@@ -51,7 +51,11 @@ adopt selected DAGP mechanisms. Native governance and public registration are
 still unfinished; there is no supported live governance API to plug into today.
 
 Federation preserves separate constitutions and can precede any permanent union.
-The [society-merger proposal](../../chain/security/SOCIETY_MERGER.md) describes
+The [nested society reference](../../chain/security/NESTED_SOCIETIES.md) supports
+scoped jurisdictions with mandatory ancestor approval of local decisions.
+The [society-merger specification](../../chain/security/SOCIETY_MERGER.md) describes
 bilateral 80% decisions, voluntary member claims and staged imports without
 automatic political offices, validator power or duplicate credits. It is a
-design option, not executable migration support.
+reference workflow for identity-only imports; native proof-based asset migration
+is unfinished. Run `python3 scripts/simulate_societies.py` to inspect the small
+formation, local-budget and merger stories with deterministic replay.

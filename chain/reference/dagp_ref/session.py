@@ -83,12 +83,25 @@ class VoteSession:
                  attempts: AttemptRegistry, beacon: bytes, open_height: int, windows: Windows,
                  recused: frozenset = frozenset(), effects: Effects | None = None,
                  qualified_parties: list | None = None, scoreboard: Scoreboard | None = None,
-                 pool: list | None = None, approved_record_hash: str = "",point_ids: tuple = (),point_dependencies: tuple = (),parameter_changes: tuple = (),campaign: Campaign | None = None):
+                 pool: list | None = None, approved_record_hash: str = "",point_ids: tuple = (),point_dependencies: tuple = (),parameter_changes: tuple = (),campaign: Campaign | None = None, institutional=None):
         if electorate_size <= 0:
             raise RuleViolation("empty electorate")
         if kind == ELECTION and not qualified_parties:
             raise RuleViolation("election needs qualified parties")
         self.issue, self.kind, self.p = issue, kind, p
+        self.institutional = institutional
+        if kind in (Kind.FORMATION, Kind.MERGER):
+            from .societies import InstitutionalMandate
+            if type(institutional) is not InstitutionalMandate:
+                raise RuleViolation("dedicated institutional mandate required")
+            institutional.validate_open(issue, kind, registry, approved_record_hash,
+                                        electorate_root, electorate_size, open_height, windows,
+                                        effects, point_ids, parameter_changes,p)
+        elif institutional is not None:
+            raise RuleViolation("institutional mandate belongs to a structural decision")
+        if hasattr(registry, 'validate_session'):
+            registry.validate_session(issue, approved_record_hash, open_height, effects, campaign,
+                                      institutional,p)
         self.registry, self.keyring = registry, keyring
         self.campaign=campaign;self._campaign_hash=campaign.digest() if type(campaign) is Campaign else ""
         self._campaign_conflicts=frozenset(campaign.member_operators) if type(campaign) is Campaign else frozenset()
@@ -105,6 +118,7 @@ class VoteSession:
         elif campaign is not None:raise RuleViolation("campaign belongs to election only")
         from .assignments import require_assignment
         subjects=tuple(sorted(recused))
+        if institutional is not None:subjects=institutional.subjects
         if campaign:subjects=tuple(sorted(a for a in registry.ids if registry.get(a).operator in self._campaign_conflicts))
         if not subjects:subjects=tuple(sorted(registry.ids)) if kind==ELECTION else ()
         if not getattr(p,"_historical_assignments",False):
@@ -169,6 +183,8 @@ class VoteSession:
         if self.effects.treasury and self.effects.ceiling:
             self.effects.treasury.reserve(self.effects.project, self.effects.ceiling)  # D-02
 
+        if self.institutional is not None:self.institutional.bind(self)
+        if hasattr(registry,'_sessions'):registry._sessions[issue]=self
         if kind==ELECTION:campaign_registry._campaigns[campaign.pre_commitment]=(self._campaign_hash,issue,True)
 
     # ------------------------------------------------------------- eligibility & exam
@@ -181,6 +197,8 @@ class VoteSession:
         return hx("vote-effects",e.project,e.ceiling,e.tranches,e.proposer_party,e.milestones,e.credit_month,e.point_budgets,e.point_tranches,e.point_milestones,self.point_ids,self.point_dependencies,self.parameter_changes)
 
     def _check_review_effects(self):
+        if self.institutional is not None:self.institutional.check(self)
+        if hasattr(self.registry, "check_session"):self.registry.check_session(self)
         if self.kind==ELECTION:
             if type(self.campaign) is not Campaign or self.campaign.digest()!=self._campaign_hash:
                 raise RuleViolation("campaign changed during election")
@@ -189,6 +207,7 @@ class VoteSession:
             raise RuleViolation("reviewed vote effects changed")
 
     def _check_open(self, height: int) -> None:
+        if hasattr(self.registry,'check_session'):self.registry.check_session(self,height)
         self._check_review_effects()
         if self.bank.record_hash() != self.record_hash:
             raise RuleViolation("examination record changed after vote opened")
@@ -381,6 +400,7 @@ class VoteSession:
         return f"{r.outcome.value}:{r.yes_w}:{r.no_w}:{r.abstain_n}:{r.participation}"
 
     def close(self, height: int) -> None:
+        if hasattr(self.registry,'check_session'):self.registry.check_session(self,height)
         self._check_review_effects()
         if self.phase is not Phase.VOTING:
             raise RuleViolation("already closed")
@@ -489,6 +509,7 @@ class VoteSession:
         self.w.challenge_end += delta
 
     def finalize(self, height: int) -> Outcome | str:
+        if hasattr(self.registry,'check_session'):self.registry.check_session(self,height)
         self._check_review_effects()
         if self.phase is not Phase.CHALLENGE:
             raise RuleViolation("not in challenge phase")

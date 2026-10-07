@@ -23,6 +23,8 @@ class Outcome(str, Enum):
 
 
 class Kind(str, Enum):
+    FORMATION = "FORMATION"
+    MERGER = "MERGER"
     PARAMETER = "PARAMETER"
     ORDINARY = "ORDINARY"
     CONSTITUTIONAL = "CONSTITUTIONAL"
@@ -78,11 +80,27 @@ def _threshold(kind: Kind, p: Params) -> tuple[tuple[int, int], bool]:
 
 
 def decide(yes_w: int, no_w: int, abst: int, part: int, electorate: int, kind: Kind,
-           p: Params) -> TallyResult:
+           p: Params, *, yes_n: int | None = None, abstain_w: int | None = None) -> TallyResult:
     if (any(type(n) is not int or n < 0 for n in (yes_w, no_w, abst, part, electorate))
             or electorate <= 0 or part > electorate or abst > part
             or not (part - abst) * min_weight(p) <= yes_w + no_w <= (part - abst) * max_weight(p)):
         return TallyResult(Outcome.INVALID, 0, 0, 0, 0, False)
+    if kind in (Kind.FORMATION, Kind.MERGER):
+        if (type(yes_n) is not int or type(abstain_w) is not int or not 0 <= yes_n <= part-abst
+                or not yes_n*min_weight(p) <= yes_w <= yes_n*max_weight(p)
+                or not (part-abst-yes_n)*min_weight(p) <= no_w <= (part-abst-yes_n)*max_weight(p)
+                or not abst*min_weight(p) <= abstain_w <= abst*max_weight(p)):
+            return TallyResult(Outcome.INVALID, 0, 0, 0, 0, False)
+        quorum = max(p.quorum_bps, 8000 if kind is Kind.MERGER else max(5000,p.constitutional_quorum_bps))
+        approval = max(8000 if kind is Kind.MERGER else 6600, p.constitutional_approval_bps)
+        if part*BPS < quorum*electorate:
+            outcome = Outcome.NO_QUORUM
+        elif not part:
+            outcome = Outcome.NO_DECISIVE_VOTES
+        else:
+            outcome = Outcome.PASSED if (yes_n*BPS >= approval*part and
+                        yes_w*BPS >= approval*(yes_w+no_w+abstain_w)) else Outcome.FAILED
+        return TallyResult(outcome, part, yes_w, no_w, abst, part > 0 and abst*BPS > p.abstain_review_bps*part)
     flag = part > 0 and abst * BPS > p.abstain_review_bps * part
     quorum=max(p.quorum_bps,p.constitutional_quorum_bps) if kind in (Kind.CONSTITUTIONAL,Kind.CORE) else p.quorum_bps
     if part * BPS < quorum * electorate:
@@ -106,7 +124,9 @@ def tally(ballots: list[Ballot], electorate: int, kind: Kind, p: Params) -> Tall
     yes_w = sum(b.weight for b in ballots if b.choice == YES)
     no_w = sum(b.weight for b in ballots if b.choice == NO)
     abst = sum(1 for b in ballots if b.choice == ABSTAIN)
-    return decide(yes_w, no_w, abst, len(ballots), electorate, kind, p)
+    return decide(yes_w, no_w, abst, len(ballots), electorate, kind, p,
+                  yes_n=sum(b.choice == YES for b in ballots),
+                  abstain_w=sum(b.weight for b in ballots if b.choice == ABSTAIN))
 
 
 @dataclass(frozen=True)

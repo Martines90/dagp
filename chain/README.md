@@ -12,7 +12,7 @@ signed-document devnet, not the complete governance state machine.
 | `SPEC.md` | Historical detailed design specification; current guides take precedence. Part I: architecture, roles, identity, constitution tiers, voting, elections, treasury, courts, consensus, bootstrap, invariants. **Part II (v0.2): examiner-run voting process, role and node lifecycle, scale by design, test map** |
 | `DECISIONS.md` | Every open question settled (D-01…D-18, N-01…N-06) with rationale and the code/test that enforces it |
 | `THREATS.md` | Threat register (50 threats), critique of my own design, defects found in the DAGP sources, what the tests proved and did not |
-| `reference/` | Executable reference model (Python, stdlib only): **401 tests**, fuzzing, a 1,000,000-voter tally |
+| `reference/` | Executable reference model (Python, stdlib only): **430 tests**, fuzzing, a 1,000,000-voter tally |
 | `node/` | Runnable G0 CometBFT network: seven local validators, Ed25519 document transactions, persistent state and network smoke check |
 | `IMPLEMENTATION_STATUS.md` | Current implementation, verification results and remaining delivery gates |
 | `simulation/` | Seeded community story: admissions, roles, signed 5/3 pre-elections, mandatory campaign exams, two elections, monthly party credits, ten proposals and a parameter referendum, exams, audits, escrow and outcomes; reports committed to the G0 chain |
@@ -28,7 +28,7 @@ Read order: [current architecture/integration guide](../docs/architecture/OVERVI
 → canonical security documents → historical `SPEC.md`, `DECISIONS.md` and `THREATS.md`.
 
 Reference modules: `tally` · `election` · `treasury` · `proposal` · `roles` · `keys` · `comprehension` ·
-`session` · `scale` · `sortition` · `emergency` · `ledger` · `crypto_sim` · `params`.
+`session` · `societies` · `mergers` · `scale` · `sortition` · `emergency` · `ledger` · `crypto_sim` · `params`.
 
 Current defaults and bounded update rules are documented in [POLICY_POINTS.md](security/POLICY_POINTS.md). Earlier specification examples retain historical thresholds; current defaults use 20% quorum, independent clauses, strict 5% credit steps and calendar-month renewal. Native G0 enforcement remains pending.
 
@@ -36,5 +36,7 @@ Current defaults and bounded update rules are documented in [POLICY_POINTS.md](s
 
 [Independent task assignments](security/TASK_ASSIGNMENTS.md) specifies frozen role
 pools, future-beacon selection and enforced consumers.
-[Society merging](security/SOCIETY_MERGER.md) is an optional design proposal; no
-merge ballot, importer, bridge or migration simulator is implemented.
+[Nested societies](security/NESTED_SOCIETIES.md) and
+[society merging](security/SOCIETY_MERGER.md) have optional Python reference workflows. No
+native merge transaction, remote proof verifier or asset bridge is implemented.
+Run `python3 ../scripts/simulate_societies.py` from this directory for five replayed stories.

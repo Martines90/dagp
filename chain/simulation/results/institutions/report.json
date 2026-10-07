@@ -1,0 +1,125 @@
+{
+  "schema_version": 1,
+  "implementation": "Python reference, small synthetic fixtures",
+  "production_claim": false,
+  "replay_equal": true,
+  "stories": [
+    {
+      "story": "test_dual_consensus_creates_child_and_grandchild",
+      "state": {
+        "chain": "A",
+        "jurisdictions": [
+          "district",
+          "root",
+          "town"
+        ],
+        "active_citizens": 140,
+        "treasury_free": 1000,
+        "reserved": 0,
+        "escrow": 0,
+        "audit_events": 395,
+        "audit_head": "7b5bf45f8dd6d879839341cd63b5950e44fd8a051c4e35da931e0e29b89e273d"
+      }
+    },
+    {
+      "story": "test_real_local_review_vote_final_parent_checks_and_milestone_escrow",
+      "state": {
+        "chain": "A",
+        "jurisdictions": [
+          "root",
+          "town"
+        ],
+        "active_citizens": 140,
+        "treasury_free": 900,
+        "reserved": 0,
+        "escrow": 100,
+        "audit_events": 401,
+        "audit_head": "b3d79c9299d15bfe2cbc4655a0e0e1a1b0f779f30e5cc50aa86393960bba8d48"
+      }
+    },
+    {
+      "story": "test_partial_local_bill_reserves_whole_ceiling_and_only_funds_approved_points",
+      "state": {
+        "chain": "A",
+        "jurisdictions": [
+          "root",
+          "town"
+        ],
+        "active_citizens": 140,
+        "treasury_free": 940,
+        "reserved": 0,
+        "escrow": 60,
+        "audit_events": 401,
+        "audit_head": "c42281c5a36371b102a9b60d3fac407e3da7a6e4ed70c5bbabfcf906bc813beb"
+      }
+    },
+    {
+      "story": "test_bilateral_vote_optin_preserves_history_without_offices",
+      "source": {
+        "chain": "A",
+        "jurisdictions": [
+          "root"
+        ],
+        "active_citizens": 139,
+        "treasury_free": 1000,
+        "reserved": 0,
+        "escrow": 0,
+        "audit_events": 361,
+        "audit_head": "e677a63fad6135a326ecc940244fa18241cb745a275824c6157fc92b4d8410d5"
+      },
+      "destination": {
+        "chain": "B",
+        "jurisdictions": [
+          "root"
+        ],
+        "active_citizens": 141,
+        "treasury_free": 1000,
+        "reserved": 0,
+        "escrow": 0,
+        "audit_events": 364,
+        "audit_head": "aa7863ceda6517e7ba6bc809a508dfb9daf1324ec92ac09881ea584d0dbfb29f"
+      },
+      "merger_state": "CLAIMING",
+      "claims": {
+        "c001": "merge:80621a1b6387446e52407b1b92cee8e8bd86685b981e76a7e287dcb462cd965e"
+      }
+    },
+    {
+      "story": "test_existing_members_deduplicate_and_keep_only_receiving_authority",
+      "source": {
+        "chain": "X",
+        "jurisdictions": [
+          "root"
+        ],
+        "active_citizens": 139,
+        "treasury_free": 1000,
+        "reserved": 0,
+        "escrow": 0,
+        "audit_events": 361,
+        "audit_head": "b244a03c009f1d33841500e7ffcf45d95501f38b7a46a6e779cb9f7f59ddafbb"
+      },
+      "destination": {
+        "chain": "Y",
+        "jurisdictions": [
+          "root"
+        ],
+        "active_citizens": 140,
+        "treasury_free": 1000,
+        "reserved": 0,
+        "escrow": 0,
+        "audit_events": 361,
+        "audit_head": "f48c4642e0cf3c583e862bbc5a6f3f14c4149a5d2d38a96e0fffdd894beda3fe"
+      },
+      "merger_state": "CLAIMING",
+      "claims": {
+        "c041": "c041"
+      }
+    }
+  ],
+  "limits": [
+    "HMAC simulation keys",
+    "trusted keeper/identity/beacon/payment inputs",
+    "reduced small-fixture board probability target",
+    "no remote consensus proofs, asset bridge or production throughput claim"
+  ]
+}
