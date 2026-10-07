@@ -96,11 +96,16 @@ def main():
     llms+='\n'.join(f'- [{x["title"]}]({x["url"]})' for x in index[3:])+'\n\n## Source and integration\n\n- [Repository](https://github.com/Martines90/dagp): fork, source, issues and releases.\n- [Read-only MCP setup](https://github.com/Martines90/dagp/blob/main/integrations/docs-mcp/README.md): local documentation resources and search.\n'
     (public/'llms.txt').write_text(llms)
     (public/'llms-full.txt').write_text('\n\n'.join((bundle/x['file']).read_text() for x in index))
+    publication=json.loads((ROOT/'integrations/docs-mcp/publication.json').read_text())
+    registry=json.loads((ROOT/'integrations/docs-mcp/server.json').read_text())
+    package=json.loads((ROOT/'integrations/docs-mcp/package.json').read_text())
     manifest=dict(schema_version=1,name='DAGP',description='Experimental deliberative governance for AI agent communities',
         homepage=origin,repository='https://github.com/Martines90/dagp',license='MIT',
         implementation=dict(native='G0 signed documents only',governance='Python reference model',public_registration=False,real_treasury=False),
         documents=index,quickstart=origin+'/start/',build=origin+'/build/',
-        mcp=dict(transport='stdio',source='https://github.com/Martines90/dagp/tree/main/integrations/docs-mcp',published_package=False),a2a_service=None)
+        mcp=dict(transport='stdio',source='https://github.com/Martines90/dagp/tree/main/integrations/docs-mcp',published_package=publication['npm_published'],package_name=package['name'],
+                 published_bundle=publication['bundle_published'],bundle_url=registry['packages'][0]['identifier'],
+                 published_registry=publication['registry_published'],registry_name=registry['name']),a2a_service=None)
     (public/'dagp.json').write_text(json.dumps(manifest,indent=2)+'\n')
     (public/'robots.txt').write_text('User-agent: *\nAllow: /\n\nSitemap: '+origin+'/sitemap.xml\n')
     routes=['/','/start/','/build/','/protocol/','/about-dagp/','/api/','/education/','/the-creator/']

@@ -32,12 +32,18 @@ example society, downloadable documentation MCP package and SHA-256 checksums.
 Check the release page for confirmation and attachments:
 https://github.com/Martines90/dagp/releases/tag/v0.1.0-seed.1
 
-## Pending account authentication
+## MCP distribution
 
-The npm package and official MCP Registry entry are prepared and validated but
-are not published. npm scope ownership and publishing authentication are required;
-registry namespace authentication follows successful package publication.
-The website correctly marks `published_package` as false.
+The standalone `dagp-docs-mcp-0.1.0.mcpb` bundle is published in the seed release;
+its public download matches registry SHA-256 metadata. The official MCP Registry
+entry `io.github.Martines90/dagp-docs`, version 0.1.0, is published with verified
+GitHub namespace ownership. The bundle manifest passes the official validator,
+and a fresh extraction successfully initializes and reads the quickstart.
+
+The optional npm package `@marcipan9019/dagp-docs-mcp` is not published: npm
+rejected publication because two-factor publishing authorization is required.
+Registry discovery uses the published MCPB artifact, independently of npm.
+The discovery manifest distinguishes bundle, registry and npm publication flags.
 
 ## Evidence
 

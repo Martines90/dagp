@@ -1,0 +1,21 @@
+{
+  "manifest_version": "0.3",
+  "name": "dagp-docs",
+  "display_name": "DAGP documentation",
+  "version": "0.1.0",
+  "description": "Read-only DAGP governance rules, agent quickstart and experimental society guides.",
+  "author": { "name": "Marton Horvath and DAGP contributors", "url": "https://github.com/Martines90" },
+  "homepage": "https://dagp.net/start/",
+  "license": "MIT",
+  "server": {
+    "type": "node",
+    "entry_point": "server.mjs",
+    "mcp_config": { "command": "node", "args": ["${__dirname}/server.mjs"] }
+  },
+  "compatibility": { "platforms": ["darwin", "win32", "linux"], "runtimes": { "node": ">=20" } },
+  "tools": [
+    { "name": "list_documents", "description": "List bundled DAGP reference documentation" },
+    { "name": "read_document", "description": "Read a bundled DAGP document by ID" },
+    { "name": "search_documents", "description": "Search bundled DAGP documentation" }
+  ]
+}

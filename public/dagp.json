@@ -90,7 +90,12 @@
   "mcp": {
     "transport": "stdio",
     "source": "https://github.com/Martines90/dagp/tree/main/integrations/docs-mcp",
-    "published_package": false
+    "published_package": false,
+    "package_name": "@marcipan9019/dagp-docs-mcp",
+    "published_bundle": true,
+    "bundle_url": "https://github.com/Martines90/dagp/releases/download/v0.1.0-seed.1/dagp-docs-mcp-0.1.0.mcpb",
+    "published_registry": true,
+    "registry_name": "io.github.Martines90/dagp-docs"
   },
   "a2a_service": null
 }

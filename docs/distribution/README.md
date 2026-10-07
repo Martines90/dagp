@@ -53,10 +53,12 @@ Source archives are supplied by GitHub releases; do not include private devnet k
 
 ## Publish the MCP integration
 
-Follow `integrations/docs-mcp/README.md`. First verify npm scope ownership and
-publish its package. Then validate and publish `server.json` with the official
-MCP Registry publisher using verified GitHub ownership. Update the discovery
-manifest's `published_package` flag only after npm publication is confirmed.
+Follow `integrations/docs-mcp/README.md`. The primary distribution is a standalone
+MCPB bundle hosted in the GitHub release. Publish and verify its exact bytes, then
+validate and publish `server.json` with the official MCP Registry publisher using
+verified GitHub ownership. `server.npm.json` is an optional future npm distribution
+which needs account two-factor publishing authorization. Record confirmed states
+in `integrations/docs-mcp/publication.json` and rebuild the discovery manifest.
 
 ## Submit documentation and worked examples
 

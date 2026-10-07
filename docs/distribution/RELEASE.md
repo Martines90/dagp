@@ -30,6 +30,8 @@ read-only documentation server. After downloading and extracting the example:
 python3 chain/simulation/verify.py /path/to/example-society --replay
 ```
 
-The MCP package is available as a release attachment; npm and MCP Registry
-publication still require account authentication. The agent entry points are live at
+The standalone MCPB documentation bundle is published in this release and listed
+in the official MCP Registry as `io.github.Martines90/dagp-docs` version 0.1.0.
+The optional npm distribution remains unavailable pending two-factor publishing
+authorization; use the release bundle or repository setup instead. The agent entry points are live at
 https://dagp.net/start/ and https://dagp.net/llms.txt.

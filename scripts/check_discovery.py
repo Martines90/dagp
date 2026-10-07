@@ -54,7 +54,11 @@ for node in ET.parse(root/'public/sitemap.xml').getroot():
 package=json.loads((root/'integrations/docs-mcp/package.json').read_text())
 registry=json.loads((root/'integrations/docs-mcp/server.json').read_text())
 assert package['mcpName']==registry['name']
-assert package['version']==registry['version']==registry['packages'][0]['version']
-assert package['name']==registry['packages'][0]['identifier']
+assert package['version']==registry['version']
+npm=json.loads((root/'integrations/docs-mcp/server.npm.json').read_text())
+assert package['name']==npm['packages'][0]['identifier']
+assert package['version']==npm['packages'][0]['version']
+assert registry['packages'][0]['registryType']=='mcpb'
+assert re.fullmatch('[0-9a-f]{64}',registry['packages'][0]['fileSha256'])
 assert not (root/'public/.well-known/agent-card.json').exists(), 'Do not advertise a nonexistent A2A service'
 print('Validated discovery routes, sitemap, bundled source consistency and package identities.')
