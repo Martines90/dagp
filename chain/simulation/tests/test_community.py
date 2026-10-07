@@ -32,6 +32,15 @@ class CommunityStory(unittest.TestCase):
         self.assertEqual(r['model_parameters']['credit_step_bps'],400)
         events=[json.loads(line) for line in self.events.splitlines()]
         self.assertEqual([e['data']['month'] for e in events if e['kind']=='monthly-credit-reset'],[[2026,1],[2026,2],[2026,3]])
+        pre=[e['data'] for e in events if e['kind']=='pre-election']
+        self.assertTrue(all(e['point_values']==[5,3] for e in pre))
+        self.assertTrue(all(sum(e['points'].values())==e['total_points'] for e in pre))
+        campaigns=[e['data'] for e in events if e['kind']=='campaign-published']
+        self.assertEqual(len(campaigns),2)
+        self.assertTrue(all(len(c['mandatory_documents'])==2*len(c['programs']) for c in campaigns))
+        sanctions=[e['data'] for e in events if e['kind']=='party-member-sanction']
+        self.assertEqual({e['action'] for e in sanctions},{'BAN','SUSPEND'})
+        self.assertTrue(all(e['citizenship_preserved'] and 2*e['approvals']>=e['roster'] for e in sanctions))
         self.assertEqual(r['treasury']['conserved_total'],100000)
         self.assertFalse(r['treasury']['reserved'])
     def test_reproducibility(self):

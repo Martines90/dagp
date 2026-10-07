@@ -148,7 +148,7 @@ def election_from_shards(shards: list[ElectionShard], qualified: list[str], p: P
                 or s.invalid > s.count or len(s.points) != len(qualified)
                 or {q for q, _ in s.points} != set(qualified)
                 or any(type(v) is not int or v < 0 for _, v in s.points)
-                or sum(v for _, v in s.points) != (s.count-s.invalid)*sum(p.ballot_picks)):
+                or sum(v for _, v in s.points) != (s.count-s.invalid)*sum(p.ballot_picks[:min(len(p.ballot_picks),len(qualified))])):
             return ElectionResult(False, "MALFORMED_SHARD", {}, 0, {}, 0)
         bad += s.invalid
         for q, v in s.points:
@@ -157,5 +157,5 @@ def election_from_shards(shards: list[ElectionShard], qualified: list[str], p: P
     if total == 0:
         return ElectionResult(False, "NO_VALID_BALLOTS", points, 0, {}, bad)
     # Delegate the points->credits step to the one implementation: synthesize equivalent input.
-    from .election import allocate_credits
-    return ElectionResult(True, "OK", points, total, allocate_credits(points, total, p), bad)
+    from .election import result_from_points
+    return result_from_points(points,total,bad,p)

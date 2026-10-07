@@ -26,6 +26,7 @@ class CreditLedger:
     balance: dict = field(default_factory=dict)
     debt: dict = field(default_factory=dict)
     month: tuple | None = None
+    eligible_parties: frozenset | None = None
 
     def grant(self, party: str, n: int) -> None:
         _integer(n)
@@ -33,10 +34,13 @@ class CreditLedger:
         owed = self.debt.get(party, 0)
         pay = min(owed, n)
         self.debt[party] = owed - pay
-        self.balance[party] = self.balance.get(party, 0) + n - pay
+        allowed=self.eligible_parties is None or party in self.eligible_parties
+        self.balance[party] = self.balance.get(party, 0) + (n-pay if allowed else 0)
 
     def spend(self, party: str, n: int) -> None:
         _integer(n, 1)
+        if self.eligible_parties is not None and party not in self.eligible_parties:
+            raise RuleViolation("party is not in the current parliament")
         if self.balance.get(party, 0) < n:
             raise RuleViolation("insufficient credits")
         self.balance[party] -= n

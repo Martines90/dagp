@@ -20,6 +20,8 @@ from dagp_ref.crypto_sim import SimKeyring, H, hx
 from dagp_ref.election import endorsement_requirement, qualify_parties, run_election
 from dagp_ref.emergency import Emergency
 from dagp_ref.params import Params
+from dagp_ref.parties import PartyRegistry,PreElection
+from dagp_ref.campaign import Campaign,Program,article_id,source_hash
 from dagp_ref.policy import MonthlyCredits, ParameterGovernance
 from dagp_ref.proposal import Envelope, FilingRegistry, Proposal, amendment_is_refinement
 from dagp_ref.roles import Actor, Role, RoleRegistry, Status
@@ -59,6 +61,7 @@ class Community:
         self.progress=progress
         self.p = Params(weight_mode=mode, shard_target=256)
         self.reg, self.kr = RoleRegistry(self.p), SimKeyring()
+        self.parties=PartyRegistry("dagp-reference",self.reg,self.kr)
         self.attempts=AttemptRegistry(self.p)
         self.tr, self.cr, self.filings = Treasury(free=100000), CreditLedger(), FilingRegistry(self.p.resubmit_cooldown)
         self.monthly=MonthlyCredits(self.cr,self.reg);self.governance=ParameterGovernance(self.reg)
@@ -122,8 +125,13 @@ class Community:
         ref='bootstrap-validator-set'; self.reg.register_ratification(MODULE,ref,'VALIDATOR_SET',','.join(sorted(validators)))
         self.reg.set_validators(Actor('VOTE',ref),validators,self.height)
         for i,a in enumerate(self.leaders):
-            p=PARTIES[i//20] if i<95 else 'Micro'
-            self.members[p].add(a);self.reg.grant(MODULE,a,Role.PARTY_MEMBER,self.height)
+            p=PARTIES[i//18] if i<90 else 'Micro'
+            self.members[p].add(a)
+        for p in PARTIES:
+            founders=tuple(sorted(self.members[p]));nonce='formation:'+p
+            message=self.parties.formation_message(p,founders,nonce)
+            self.parties.form(p,founders,nonce,self.height,{a:self.kr.sign(a,message) for a in founders})
+        self.party_sanctions_story()
         self.event('community-founded',citizens=len(self.citizens),leaders=100,examiners=len(self.examiners),
                    hostile_examiners=len(self.hostile),roles=dict(Counter(r.value for i in self.reg.ids.values() for r in i.roles)),
                    admission='pre-vetted synthetic identities; HTTP challenges not exercised',
@@ -134,17 +142,33 @@ class Community:
         # The cap is population-dependent, and grows slightly while identities enter.
         while admitted < self.reg.operator_cap():
             a=f'sybil-{admitted}';self.reg.register(a,'sybil-operator','family-2',10,self.height)
-            self.reg.approve(MODULE,a,self.height);admitted+=1
+            self.reg.approve(MODULE,a,self.height);self.kr.register(a);admitted+=1
         a=f'sybil-{admitted}';self.reg.register(a,'sybil-operator','family-2',10,self.height)
         self.refused('operator population cap blocks excess identities',lambda:self.reg.approve(MODULE,a,self.height))
         self.reg.reject(MODULE,a,self.height,'OPERATOR_CAP')
         self.event('sybil-probe',accepted=admitted,blocked=1,limitation='operator declarations are assumed truthful')
 
+    def party_sanctions_story(self):
+        members=sorted(self.members['Stewards']);target=members[-1];proposer=members[0]
+        for action,target,duration in [('BAN',target,0),('SUSPEND',members[-2],100)]:
+            evidence=hx('party-evidence',action,target);nonce='case:'+action
+            message=self.parties.sanction_message(proposer,'Stewards',target,action,duration,evidence,nonce)
+            case=self.parties.open_case(proposer,'Stewards',target,action,duration,evidence,nonce,self.height,self.kr.sign(proposer,message))
+            threshold=(len(self.parties.case(case).roster)+1)//2
+            for n,agent in enumerate(members[:threshold]):
+                applied=self.parties.approve(agent,case,self.height,self.kr.sign(agent,self.parties.approval_message(case)))
+                self.check('party sanction requires full half roster '+action+str(n),applied==(n+1==threshold))
+            self.check('party sanction preserves public citizenship '+action,self.reg.can(target,'VOTE',self.height)[0])
+            self.check('party sanction blocks party privileges '+action,not self.reg.can(target,'SUBMIT_PROPOSAL',self.height)[0])
+            self.event('party-member-sanction',party='Stewards',target=target,action=action,approvals=threshold,
+                roster=len(self.parties.case(case).roster),citizenship_preserved=True)
+        self.members={p:set(self.parties.members(p,self.height,True)) for p in PARTIES}
+
     def require_can(self,a,action):
         ok,reason=self.reg.can(a,action,self.height)
         if not ok:raise RuleViolation(reason)
 
-    def bank(self,issue):
+    def bank(self,issue,qualified=None):
         texts=[('What authorizes a budget release?',['A passing finalized tally and milestone attestations','A party leader','A validator','An examiner alone'],0),
                ('How is quorum measured?',['Weighted yes votes','Participating identities divided by frozen electorate','Party credits','Number of documents'],1),
                ('What remains fixed during refinement?',['Objective, result and resource ceilings','All implementation details','Every sentence','Nothing'],0),
@@ -162,22 +186,35 @@ class Community:
                 keys[qid]=(answer,salt);qs.append(Question(qid,article,4,commit_key(answer,salt)))
                 display[qid]=dict(prompt=f'Which constraint is recorded in the {article} brief?',
                     options=['Respect the original ceiling','Publish independently verified evidence','Let proposers self-attest','Skip outcome review'],answer=answer)
-        bank=QuestionBank(issue,qs,CLUSTERS);bank.load_keys(keys)
+        clusters=dict(CLUSTERS)
+        for party in qualified or ():
+            for section in ('program','vision'):
+                article=article_id(party,section);clusters[article]=article
+                for j in range(self.p.campaign_questions_per_document):
+                    qid=f'{issue}:{article}:{j}';salt=hx(self.seed,qid,'salt');keys[qid]=(0,salt)
+                    qs.append(Question(qid,article,4,commit_key(0,salt)))
+                    source=PLATFORMS[party]+(' with transparent execution and independent verification' if section=='vision' else '')
+                    display[qid]=dict(prompt=f'Which commitment appears in {party} {section}?',
+                        options=[source,'Let politicians bypass verification','Issue unlimited money','Skip accountability'],answer=0)
+        qs=[replace(q,prompt=display[q.qid]['prompt'],choices=tuple(display[q.qid]['options']),
+            source_hash=source_hash(display[q.qid]['options'][0]) if q.article_id.startswith('campaign:') else '') for q in qs]
+        bank=QuestionBank(issue,qs,clusters);bank.load_keys(keys)
         self.documents.append(dict(issue=issue,question_bank_root=bank.root,questions=display))
         return bank,keys
 
-    def open(self,issue,kind=Kind.ORDINARY,party=None,amount=0,qualified=None,review=None):
+    def open(self,issue,kind=Kind.ORDINARY,party=None,amount=0,qualified=None,review=None,campaign=None,campaign_bank=None):
         self.height+=1
         # Continuing active agents renew; deliberately dormant agents stay dormant.
         for a,i in self.reg.ids.items():
             if i.status is Status.ACTIVE:self.reg.renew_liveness(a,self.height)
         beacon=H('synthetic-beacon',self.seed,issue)
         board_size=panel_size(self.p.assumed_bad_bps,self.p.board_fail_den)
-        available=[a for a in self.examiners if self.reg.can(a,'GRADE',self.height)[0]]
+        conflicts=frozenset(campaign.member_operators) if campaign else frozenset()
+        available=[a for a in self.examiners if self.reg.can(a,'GRADE',self.height,{'operators_involved':conflicts})[0]]
         recused=frozenset(self.members.get(party,set()))
         board=Board('board-'+issue,tuple(draw(beacon,available,board_size,exclude=recused)),issue)
         el=snapshot_electorate(self.reg,self.height,set(recused)|set(board.members))
-        bank,keys=self.bank(issue)
+        bank,keys=campaign_bank if campaign_bank is not None else self.bank(issue)
         effects=Effects(self.tr,self.cr,issue,amount,[amount//2,amount-amount//2],party) if amount else Effects()
         windows=Windows(self.height+100,self.height+120,self.height+320)
         if review is not None:
@@ -186,7 +223,7 @@ class Community:
             el=s.electorate
         else:
             s=VoteSession(issue,kind,self.p,self.reg,self.kr,el.root,el.size,board,bank,self.attempts,
-                beacon,self.height,windows,recused=recused,effects=effects,qualified_parties=qualified,pool=available)
+                beacon,self.height,windows,recused=recused,effects=effects,qualified_parties=qualified,pool=available,campaign=campaign)
         s.electorate=el;s.keys=keys
         self.event('vote-opened',issue=issue,electorate=el.size,electorate_root=el.root.hex(),
                    rules_hash=s.rules_hash,board=list(board.members),recused=len(recused),reserved=amount)
@@ -196,7 +233,7 @@ class Community:
 
     def cast(self,s,voter,choice,stats,force_fraud=False):
         profile=self.profiles.get(voter,self.profiles[self.citizens[0]])
-        declared=tuple(a for a in ARTICLES if self.u(s.issue,voter,a,'read')<profile.diligence)
+        declared=s.campaign.articles if s.campaign else tuple(a for a in ARTICLES if self.u(s.issue,voter,a,'read')<profile.diligence)
         for retry in range(self.p.exam_max_attempts):
             secret=hx(self.seed,s.issue,voter,retry)
             att=s.request_exam(voter,secret,self.height)
@@ -263,25 +300,36 @@ class Community:
         return outcome
 
     def election(self,cycle):
-        population=len(snapshot_electorate(self.reg,self.height).ids);required=endorsement_requirement(population,self.p)
-        endorsements={p:set() for p in PARTIES}
-        for a in self.citizens:
-            if self.reg.can(a,'ENDORSE',self.height)[0]:
-                priority=self.profiles[a].priority
-                endorsements[priority].add(a)
-                # Multiple endorsements are permitted, but at most two per identity.
-                second=PARTIES[(PARTIES.index(priority)+1)%5];endorsements[second].add(a)
-        # Integrity probes: one member on two lists, one citizen endorsing all candidates.
-        memberships={p:set(v) for p,v in self.members.items()}
-        memberships['Stewards'].add(self.leaders[0])
-        for p in PARTIES:endorsements[p].add(self.citizens[5])
-        qualified,problems=qualify_parties(memberships,endorsements,required,self.p,eligible=set(snapshot_electorate(self.reg,self.height).ids))
-        self.check('five candidates qualify '+str(cycle),len(qualified)==5 and 'Micro' not in qualified)
-        self.event('pre-election',cycle=cycle,candidate_programmes=PLATFORMS,
-                   candidate_rosters={p:sorted(v) for p,v in memberships.items()},
-                   threshold=required,population=population,qualified=qualified,excluded=['Micro'],
-                   integrity_findings=problems,endorsements={p:len(v) for p,v in endorsements.items()})
-        s=self.open(f'election-{cycle}',ELECTION,qualified=qualified);stats=Counter();truths={}
+        self.height+=1;start=self.height
+        for a,i in self.reg.ids.items():
+            if i.status is Status.ACTIVE:self.reg.renew_liveness(a,self.height)
+        pre=PreElection(self.parties,f'cycle-{cycle}',start,start+40,start+700)
+        for a in pre.electorate.ids:
+            profile=self.profiles.get(a,self.profiles[self.citizens[0]])
+            if self.u(cycle,a,'pre-turnout')>.85:continue
+            primary=profile.priority;secondary=PARTIES[(PARTIES.index(primary)+1)%5]
+            picks=(primary,secondary)
+            pre.cast(a,picks,pre.electorate.proof(a),self.height,self.kr.sign(a,pre.ballot_message(a,picks)))
+        duplicate=next(iter(pre._ballots));duplicate_picks=pre._ballots[duplicate]
+        self.refused('pre-election double vote blocked '+str(cycle),lambda:pre.cast(duplicate,duplicate_picks,pre.electorate.proof(duplicate),self.height,self.kr.sign(duplicate,pre.ballot_message(duplicate,duplicate_picks))))
+        self.height=pre.close_height;result=pre.close(self.height);qualified=list(result.qualified)
+        self.check('five candidates pass 5 percent points '+str(cycle),len(qualified)==5 and 'Micro' not in qualified)
+        self.event('pre-election',cycle=cycle,candidate_programmes=PLATFORMS,candidate_rosters=dict(pre.members),
+            electorate=result.electorate_size,participation=result.participation,points=dict(result.points),total_points=result.total_points,
+            point_values=self.p.pre_ballot_points,threshold_bps=self.p.pre_threshold_bps,qualified=qualified,excluded=['Micro'],
+            commitment=result.commitment)
+        issue=f'election-{cycle}';bank,keys=self.bank(issue,qualified)
+        programs=[]
+        for party in qualified:
+            author=next(a for a in sorted(self.members[party]) if self.reg.can(a,'SUBMIT_PROPOSAL',self.height)[0])
+            program=Program(party,author,PLATFORMS[party],PLATFORMS[party]+' with transparent execution and independent verification','cycle:'+str(cycle))
+            programs.append(replace(program,signature=self.kr.sign(author,program.message(self.parties.chain,result.commitment))))
+        campaign=Campaign.publish(pre,issue,tuple(programs),bank,self.height,self.height+20)
+        self.event('campaign-published',cycle=cycle,campaign_hash=campaign.digest(),programs=[asdict(p) for p in campaign.programs],
+            mandatory_documents=campaign.articles,start=campaign.start_height,end=campaign.end_height)
+        self.height=campaign.end_height
+        s=self.open(issue,ELECTION,qualified=qualified,campaign=campaign,campaign_bank=(bank,keys));stats=Counter();truths={}
+
         for a in self.electorate_voters(s):
             profile=self.profiles.get(a,self.profiles[self.citizens[0]])
             if self.u(cycle,a,'turnout')>profile.reliability:stats['absent']+=1;continue
@@ -301,9 +349,9 @@ class Community:
         self.monthly.record_election(s,timestamp);self.monthly.tick(timestamp)
         self.event("monthly-credit-reset",month=self.cr.month,balances=dict(self.cr.balance),debt=dict(self.cr.debt))
         self.reg.activate_family_cap(MODULE,self.height)
-        ordered=sorted(s.result.points,key=lambda p:(-s.result.points[p],p))
+        ordered=sorted(s.result.governing_parties,key=lambda p:(-s.result.points[p],p))
         record=dict(cycle=cycle,points=s.result.points,credits=credits,agenda_order=ordered,
-                    zero_credit_parties=[p for p,n in credits.items() if n==0],invalid_ballots=s.result.invalid_ballots)
+                    zero_credit_parties=[p for p,n in credits.items() if n==0],invalid_ballots=s.result.invalid_ballots,governing_parties=s.result.governing_parties)
         self.elections.append(record);self.event('election-credits-granted',**record)
         # Scenario policy: winning party nominates a registrar, ratified by the certified election.
         # Office slate allocation is an adapter assumption, not an existing reference election rule.
@@ -503,9 +551,10 @@ def markdown(report):
     for r in report['runs']:
         lines.append(f"| {r['seed']} / {r['mode']} | {r['population']} | {r['checks_passed']} | {sum(s['exam_attempts'] for s in r['sessions'])} | {sum(s['ballots'] for s in r['sessions'])} | {r['treasury']['conserved_total']} |")
     for r in report['runs']:
-        lines+=['',f"## Seed {r['seed']} — {r['mode']}",'','| Election | Party | Points | Credits |','|---|---|---:|---:|']
+        lines+=['',f"## Seed {r['seed']} — {r['mode']}",'','| Election | Party | Points | Credits | Parliament |','|---|---|---:|---:|---|']
         for e in r['elections']:
-            for p in e['agenda_order']:lines.append(f"| {e['cycle']} | {p} | {e['points'][p]} | {e['credits'][p]} |")
+            for p in sorted(e['points'],key=lambda p:(-e['points'][p],p)):
+                lines.append(f"| {e['cycle']} | {p} | {e['points'][p]} | {e['credits'][p]} | {'YES' if p in e['governing_parties'] else 'NO'} |")
         lines+=['','| Project | Party | Outcome | Project state | Ballots / electorate |','|---|---|---|---|---|']
         for s in r['sessions']:
             if 'title' in s:lines.append(f"| {s['title']} | {s['party']} | {s['outcome']} | {s['project_state']} | {s['ballots']} / {s['electorate']} |")
@@ -534,7 +583,7 @@ def main():
             differences=[dict(issue=a['issue'],weighted=a['outcome'],flat=b['outcome'])
                 for a,b in zip(pair['WEIGHTED']['sessions'],pair['FLAT']['sessions']) if a['outcome']!=b['outcome']]
             comparisons.append(dict(seed=seed,outcome_differences=differences))
-    report=dict(format='dagp-community-simulation-v6',execution='reference-governance-with-optional-G0-result-anchoring',
+    report=dict(format='dagp-community-simulation-v7',execution='reference-governance-with-optional-G0-result-anchoring',
         limitations=['Synthetic policies, not AGI or LLM agents','Reference signatures are HMAC stand-ins',
         'HTTP challenge admission is not implemented','Court semantics and milestone evidence are scripted',
         'G0 chain records result commitment, does not enforce governance','Seven validators share one host'],

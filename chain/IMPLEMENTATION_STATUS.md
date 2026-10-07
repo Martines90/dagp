@@ -6,7 +6,7 @@ chain reference modules/tests, public protocol/API pages, and Wrangler configura
 | Area | Actual state | Remaining work |
 |---|---|---|
 | Protocol | SPEC, DECISIONS, THREATS and concept note exist | Formal models, parameter evidence, constitutional review |
-| Governance reference | Python model; 328 tests pass with Python 3.14 | Port to production keepers and prove equivalence |
+| Governance reference | Python model; 358 tests pass with Python 3.14 | Port to production keepers and prove equivalence |
 | Consensus/network | Go CometBFT G0 network with seven local validator configurations | Independent operators, validator policy, fault/censorship drills |
 | Transactions | Real Ed25519 signatures, chain binding, sequences, height expiry, strict JSON | Versioned protobuf/CBOR, resource quotas, key lifecycle |
 | State | Durable snapshots, deterministic hash, committed-state queries | Scalable database, Merkle proofs, snapshots/state sync |
@@ -124,3 +124,13 @@ Verification: 326 reference tests and six simulation tests pass. Paired seed-7 r
 Constitutional clarification: `Kind.CONSTITUTIONAL` requires at least 66.00% decisive voting power and at least 50% participation (or a higher configured general quorum), including each constitutional clause. The parameter referendum cannot lower these protected thresholds.
 
 Verification of the constitutional update: 328 reference tests and six simulation tests pass. The fresh v6 paired scenario preserves 24,324 events, is replay-verified, and its manifest is anchored at local G0 height 41 on all seven validators. Native governance enforcement remains pending.
+
+## Party and campaign flow (2026-10-06)
+
+`PartyRegistry` now enforces ten consenting citizen founders, one current party per citizen, signed membership changes and 50%-of-frozen-roster internal bans/suspensions. Party sanctions preserve public citizen rights; suspensions expire and cannot be erased by leave/rejoin. `PreElection` counts signed primary/secondary support at 5/3 points, requires turnout and admits parties at exactly 5% of total cast support points. Election membership and candidate snapshots prevent denominator manipulation.
+
+Each candidate publishes a signed program and vision into a frozen `Campaign`. Both sections from every qualified party have mandatory comprehension questions, with prompts/options/source hashes committed. Failing a required campaign answer prevents a token. Cycles authorize one campaign and election. Main tallies explicitly produce the >=5% parliament roster, and monthly renewals cannot admit unelected parties. The default percentage/5 allowance no longer has the old ten-credit ceiling. The existing main-election ranked 4/2/1 ballot is retained; single-choice ballots are also supported in configuration.
+
+These are reference transitions, awaiting native keepers. Existing HMAC signatures, operator declarations and semantic question review remain modeled assumptions. Earlier simulation artifacts remain historical; v7 is the current party/campaign story.
+
+Verification: 358 reference tests and six simulation tests pass. The two v7 runs use 1,100 identities each, pass 334 scenario checks, and replay all 27,658 events exactly. The final manifest is anchored at local G0 height 46, with matching state/block hashes and document reads on all seven validators.

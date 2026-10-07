@@ -59,7 +59,7 @@ class ParameterGovernance:
 
 class MonthlyCredits:
     def __init__(self,ledger,registry):
-        self.ledger,self.registry=ledger,registry;self.points=None;self.total=0;self.used=set();self.time=0
+        self.ledger,self.registry=ledger,registry;self.points=None;self.total=0;self.governing=();self.used=set();self.time=0
     def record_election(self,session,timestamp):
         month_at(timestamp)
         if (timestamp<self.time or session.registry is not self.registry or session.kind!=ELECTION
@@ -69,6 +69,12 @@ class MonthlyCredits:
         points=dict(session.result.points);total=session.result.total_points
         if total<=0 or any(type(n) is not int or n<0 for n in points.values()) or sum(points.values())!=total:
             raise RuleViolation('invalid election totals')
+        governing=tuple(sorted(q for q,n in points.items() if n*10000>=total*session.p.party_threshold_bps))
+        if tuple(session.result.governing_parties)!=governing:raise RuleViolation("invalid frozen parliament roster")
+        self.governing=governing
+        self.ledger.eligible_parties=frozenset(governing)
+        for party in self.ledger.balance:
+            if party not in self.ledger.eligible_parties:self.ledger.balance[party]=0
         self.points,self.total=points,total;self.used.add(session.issue);self.time=timestamp
         # Subsequent elections replace the NEXT month's basis, never mint another current allowance.
         if self.ledger.month is None:return self.tick(timestamp)
@@ -79,7 +85,8 @@ class MonthlyCredits:
         if self.points is None:raise RuleViolation('election basis required')
         if self.ledger.month is not None and month<self.ledger.month:raise RuleViolation('month reversal')
         if self.ledger.month==month:self.time=timestamp;return False
-        allowances=allocate_credits(self.points,self.total,self.registry.p)
+        allowances=allocate_credits(self.points,self.total,replace(self.registry.p,party_threshold_bps=0))
+        allowances={party:amount if party in self.governing else 0 for party,amount in allowances.items()}
         # Replace unused balances, preserve debt. Skipped months never accumulate credits.
         self.ledger.balance={};self.ledger.month=month
         for party,amount in allowances.items():self.ledger.grant(party,amount)

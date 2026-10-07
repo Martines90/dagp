@@ -51,7 +51,7 @@ def qualify_parties(members: dict[str, set], endorsements: dict[str, set], requi
 
 def valid_ballot(picks: tuple, qualified: list[str], p: Params) -> bool:
     return (isinstance(picks, (tuple, list)) and all(isinstance(x, str) for x in picks)
-            and len(picks) == len(p.ballot_picks)
+            and len(picks) == min(len(p.ballot_picks),len(qualified))
             and len(set(picks)) == len(picks)
             and all(x in qualified for x in picks))
 
@@ -64,6 +64,7 @@ class ElectionResult:
     total_points: int
     credits: dict
     invalid_ballots: int
+    governing_parties: tuple = ()
 
 
 def allocate_credits(points: dict, total: int, p: Params) -> dict:
@@ -97,5 +98,11 @@ def run_election(ballots: list[tuple], qualified: list[str], p: Params) -> Elect
     if total == 0:
         return ElectionResult(False, "NO_VALID_BALLOTS", points, 0, {}, bad)
 
-    credits = allocate_credits(points, total, p)
-    return ElectionResult(True, "OK", points, total, credits, bad)
+    return result_from_points(points,total,bad,p)
+
+
+def result_from_points(points,total,bad,p):
+    """Parliament eligibility is separate from receiving a positive credit allowance."""
+    governing=tuple(sorted(q for q,n in points.items() if n*BPS>=total*p.party_threshold_bps))
+    credits=allocate_credits(points,total,p)
+    return ElectionResult(bool(governing),'OK' if governing else 'NO_PARLIAMENT_PARTIES',points,total,credits,bad,governing)

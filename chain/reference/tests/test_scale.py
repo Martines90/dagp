@@ -272,7 +272,7 @@ class ShardedElection(unittest.TestCase):
 
     def test_edge_results(self):
         p = Params()
-        self.assertEqual(election_from_shards([], ["A", "B"], p).reason, "TOO_FEW_PARTIES")
+        self.assertEqual(election_from_shards([], ["A", "B"], Params(min_qualified_parties=3)).reason, "TOO_FEW_PARTIES")
         sh = summarize_election_shard({"v": ("A", "A", "B")}, ["A", "B", "C"], p)
         self.assertEqual(election_from_shards([sh], ["A", "B", "C"], p).reason, "NO_VALID_BALLOTS")
 

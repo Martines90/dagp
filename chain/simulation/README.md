@@ -16,10 +16,10 @@ Use Python 3.10 or newer:
 
 ```sh
 python3 -m unittest discover -s chain/simulation/tests -v
-python3 chain/simulation/community.py --seeds 7 19 43 --output chain/simulation/results/constitutional-quorum
-python3 chain/simulation/verify.py chain/simulation/results/constitutional-quorum --replay
-python3 chain/simulation/community.py --citizens 10000 --seeds 7 --output chain/simulation/results/large-v6
-python3 chain/simulation/verify.py chain/simulation/results/large-v6
+python3 chain/simulation/community.py --seeds 7 19 43 --output chain/simulation/results/party-campaign
+python3 chain/simulation/verify.py chain/simulation/results/party-campaign --replay
+python3 chain/simulation/community.py --citizens 10000 --seeds 7 --output chain/simulation/results/large-v7
+python3 chain/simulation/verify.py chain/simulation/results/large-v7
 ```
 
 Each seed runs WEIGHTED and FLAT modes, using the same keyed random draws for
@@ -34,8 +34,8 @@ exist. Then publish a report manifest:
 ```sh
 cd chain/node
 python3 scripts/devnet.py anchor \
-  --document ../simulation/results/constitutional-quorum/manifest.json \
-  --receipt ../simulation/results/constitutional-quorum/anchor-receipt.json
+  --document ../simulation/results/party-campaign/manifest.json \
+  --receipt ../simulation/results/party-campaign/anchor-receipt.json
 ```
 
 The command starts the seven existing validators, publishes the signed manifest,
@@ -155,6 +155,8 @@ Run the current scenario into `results/review-budget` and see
 [review and budget rules](../security/REVIEW_BUDGET.md) for signed comment threads,
 fresh supervisor approval of edits and finalized milestone escrow.
 
-## Current v6 policy scenario
+## Current v7 party/campaign scenario
 
-Current exports use v6 with explicit constitutional approval and quorum constants. Historical v5 requires `a38aea0` for replay. Historical v4 requires `56ce3b9` for replay; artifact hashes can still be checked without replay. The current run includes ten project proposals and a reviewed parameter referendum, with January, February and March credit allowances. A five-clause proposal approves exactly three clauses and funds/releases only their 1,800 units. A successful parameter referendum changes the credit step to 4% at the March boundary, while keeping the original referendum snapshot and 20% minimum turnout. See [POLICY_POINTS.md](../security/POLICY_POINTS.md) for defaults and safeguards.
+Current exports use v7 with signed party formation, internal sanctions, 5/3 pre-elections, committed all-party campaign exams and explicit parliament eligibility. Historical v6 requires `adf6e63` for replay. Historical v5 requires `a38aea0` for replay. Historical v4 requires `56ce3b9` for replay; artifact hashes can still be checked without replay. The current run includes ten project proposals and a reviewed parameter referendum, with January, February and March credit allowances. A five-clause proposal approves exactly three clauses and funds/releases only their 1,800 units. A successful parameter referendum changes the credit step to 4% at the March boundary, while keeping the original referendum snapshot and 20% minimum turnout. See [POLICY_POINTS.md](../security/POLICY_POINTS.md) for defaults and safeguards.
+
+The current v7 run forms six parties with ten or more consenting founders, exercises a local ban and suspension by half of party members, conducts two signed 5/3 pre-elections, excludes the unsupported party, publishes program/vision records for every main-election candidate, and requires all campaign sections to pass comprehension. The 5% parliament gate controls both governing eligibility and monthly credit renewal. See [PARTIES_ELECTIONS.md](../security/PARTIES_ELECTIONS.md).

@@ -36,13 +36,24 @@ class Question:
     article_id: str       # PROPOSAL_ARTICLE for topic questions
     options: int
     key_commit: str
+    prompt: str = ""
+    choices: tuple = ()
+    source_hash: str = ""
+
+    def __post_init__(self):
+        if (type(self.options) is not int or not 2<=self.options<=32
+                or type(self.source_hash) is not str or (self.source_hash and (len(self.source_hash)!=64 or any(c not in "0123456789abcdef" for c in self.source_hash)))
+                or type(self.prompt) is not str or len(self.prompt)>4096 or type(self.choices) is not tuple
+                or (self.choices and (len(self.choices)!=self.options or any(type(c) is not str or not 0<len(c)<=4096 for c in self.choices)))):
+            raise RuleViolation('invalid committed question text/options')
 
     def leaf(self) -> bytes:
-        return H(self.qid, self.article_id, self.options, self.key_commit)
+        return H(self.qid, self.article_id, self.options, self.key_commit,self.prompt,self.choices,self.source_hash)
 
 
 class QuestionBank:
     def __init__(self, issue_id: str, questions: list[Question], article_cluster: dict[str, str]):
+        if len({q.qid for q in questions})!=len(questions):raise RuleViolation('duplicate question ID')
         self.issue_id = issue_id
         self.questions = {q.qid: q for q in questions}
         self.order = sorted(self.questions)
@@ -126,6 +137,7 @@ class ExamPlan:
     proposal_qs: tuple
     sampled: tuple     # ((article_id, Question), ...) articles chosen for spot-check
     declared: tuple    # distinct clusters after dedup, capped at R_max
+    all_articles_required: bool = False
 
 
 def plan_exam(bank: QuestionBank, seed: bytes, ticket: str, declared: tuple, p: Params) -> ExamPlan:
@@ -188,8 +200,10 @@ def evaluate(plan: ExamPlan, item_result: dict[str, bool], p: Params) -> Verdict
     if k == 0:
         return Verdict(True, 0, False)  # nothing declared -> R = 0
     passed = sum(1 for _, q in plan.sampled if item_result.get(q.qid))
+    if plan.all_articles_required and passed!=k:
+        return Verdict(False,0,False)
     if passed == k:
-        return Verdict(True, rd, False)
+        return Verdict(True, min(rd,p.max_articles_counted), False)
     return Verdict(True, passed * rd // k, True)
 
 

@@ -9,7 +9,7 @@ from dagp_ref.session import Effects, VoteSession, Windows, snapshot_electorate
 from dagp_ref.tally import Kind
 
 MODULE = Actor("MODULE", "test")
-P = Params(quorum_bps=5000,min_citizen_age=10, exam_items=3, sample_articles=2, challenge_window=20, exam_panel=3)
+P = Params(quorum_bps=5000,credit_ceiling_bps=5000,min_citizen_age=10, exam_items=3, sample_articles=2, challenge_window=20, exam_panel=3)
 ARTICLES = ("a1", "a2", "a3", "a4")
 CLUSTERS = {"a1": "c1", "a2": "c2", "a3": "c3", "a4": "c3"}   # a3/a4 are near-duplicates
 
@@ -53,6 +53,26 @@ class Society:
         board = Board(f"board-{issue}", members, issue)
         el = snapshot_electorate(self.reg, height, set(recused) | set(members))
         bank, keys = build_bank(issue)
+        if kind=="ELECTION" and kw.get('qualified_parties'):
+            from dagp_ref.campaign import Campaign,Program,article_id,source_hash
+            parties=kw['qualified_parties'];questions=list(bank.questions.values());clusters=dict(bank.article_cluster)
+            for party in parties:
+                for section in ('program','vision'):
+                    article=article_id(party,section);clusters[article]=article
+                    for j in range(self.p.campaign_questions_per_document):
+                        qid=article+str(j);salt='campaign-salt-'+qid;keys[qid]=(0,salt)
+                        questions.append(Question(qid,article,4,commit_key(0,salt),'Identify the '+section+' of '+party,
+                            ('Committed statement','Unrelated statement','Bypass review','Unlimited budget'),
+                            source_hash(('Programme ' if section=='program' else 'Vision ')+party)))
+            bank=QuestionBank(issue,questions,clusters);bank.load_keys(keys)
+            # Isolated session fixture; complete party/pre-election integration has dedicated tests.
+            kw['campaign']=Campaign('test',issue,tuple(Program(p,'c0','Programme '+p,'Vision '+p,'fixture') for p in sorted(parties)),
+                bank.record_hash(),hx('fixture-pre-election',issue),tuple(sorted(parties)),height-10,height-1,
+                height+vote_len+certify_len+chal_len+self.p.challenge_resolution_grace,())
+            from dagp_ref.parties import PartyRegistry
+            pr=getattr(self.reg,'party_registry',None)
+            if pr is None:pr=PartyRegistry('test',self.reg,self.kr)
+            pr._campaigns[kw['campaign'].pre_commitment]=(kw['campaign'].digest(),issue,False)  # trusted fixture bootstrap
         w = Windows(height + vote_len, height + vote_len + certify_len,
                     height + vote_len + certify_len + chal_len)
         s = VoteSession(issue, kind, self.p, self.reg, self.kr, el.root, el.size, board, bank,
@@ -73,6 +93,7 @@ class Society:
 
     def get_token(self, s, voter, declared=("a1", "a2"), height=55, ok_prop=True, ok_art=True,
                   secret="sec", hostile=0):
+        if s.campaign:declared=s.campaign.articles
         att = s.request_exam(voter, secret, height)
         plan = s.plan(att, declared)
         sub = Submission(att.ticket, declared, self.answers(s, plan, ok_prop, ok_art))

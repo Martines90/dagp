@@ -9,7 +9,7 @@ from dagp_ref.tally import (ABSTAIN, NO, YES, Ballot, Kind, Outcome, tally, tall
                             weight)
 from dagp_ref.treasury import CreditLedger, RuleViolation, Treasury
 
-P = Params(quorum_bps=5000,bill_mode="PACKAGE",min_total_credits=3)
+P = Params(quorum_bps=5000,bill_mode="PACKAGE",min_total_credits=3,min_qualified_parties=3,credit_ceiling_bps=5000)
 
 
 def bs(y=0, n=0, a=0, w=3):

@@ -123,6 +123,7 @@ class RoleRegistry:
         self.protection_events: list[tuple] = []
         self.protection_height = 0
         self.admin_holds: dict[str,int] = {}
+        self.party_holds: dict[str,int] = {}
 
     # ------------------------------------------------------------- audit log
     def _log(self, height: int, actor: Actor, action: str, target: str, detail: str = "") -> None:
@@ -210,6 +211,7 @@ class RoleRegistry:
         if i.status is Status.PROBATION:
             return set()  # no powers until approved
         roles = ({Role.CITIZEN} & i.roles) if i.status is Status.SUSPENDED else set(i.roles)
+        if height < self.party_holds.get(agent,0):roles.discard(Role.PARTY_MEMBER)
         if height < self.admin_holds.get(agent, 0):
             roles -= {Role.VOTE_SUPERVISOR, Role.ADMIN, Role.REGISTRAR, Role.SAFETY_COUNCIL, Role.EXAMINER,
                       Role.VERIFIER, Role.REVIEWER, Role.JUROR, Role.EXECUTOR}

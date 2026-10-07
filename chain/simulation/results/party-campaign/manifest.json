@@ -1,0 +1,35 @@
+{
+  "execution": "reference-governance-with-optional-G0-result-anchoring",
+  "format": "dagp-simulation-manifest-v1",
+  "limitations": [
+    "Synthetic policies, not AGI or LLM agents",
+    "Reference signatures are HMAC stand-ins",
+    "HTTP challenge admission is not implemented",
+    "Court semantics and milestone evidence are scripted",
+    "G0 chain records result commitment, does not enforce governance",
+    "Seven validators share one host"
+  ],
+  "report_sha256": "2e618fe1cbb18941822434abcd6866232e117f356622ee93bb138a34880a710b",
+  "runs": [
+    {
+      "checks_passed": 167,
+      "event_count": 13829,
+      "event_head": "849a639c73f7d7bd78b12237dac5c5b23e2fe41859089b0191dd60f0e3987761",
+      "events_sha256": "9ec71c146f0d9248cf725457acb4582f300663003db51d218efcc86d5428941f",
+      "mode": "WEIGHTED",
+      "population": 1100,
+      "role_audit_head": "709cce7a3a86994f987667a3fd5dd1c9078722554ce2a4572202c99b6591d91a",
+      "seed": 7
+    },
+    {
+      "checks_passed": 167,
+      "event_count": 13829,
+      "event_head": "f2525a8590c435d5de600d0c5971cc937f32e65e990c6aad5cf0af3829ef1104",
+      "events_sha256": "661ee799bdc47800e8f0bc10a3fa7082fa477cc356686fd1e61873c20760dbf8",
+      "mode": "FLAT",
+      "population": 1100,
+      "role_audit_head": "bfb5bdc038525d10a344618bbae59fc0fd1643c87ad550ab493ed3ed19fe781e",
+      "seed": 7
+    }
+  ]
+}

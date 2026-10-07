@@ -19,6 +19,7 @@ from .comprehension import (AttemptRegistry, Board, QuestionBank, Scoreboard, Su
 from .crypto_sim import H, SimKeyring, hx, verify_proof
 from .election import ElectionResult
 from .params import Params
+from .campaign import Campaign
 from .roles import Actor, Role, RoleRegistry, Status
 from .sortition import audit_sample_size, draw
 from .scale import (Electorate, ElectionShard, ShardSummary, election_from_shards, shard_count,
@@ -82,18 +83,33 @@ class VoteSession:
                  attempts: AttemptRegistry, beacon: bytes, open_height: int, windows: Windows,
                  recused: frozenset = frozenset(), effects: Effects | None = None,
                  qualified_parties: list | None = None, scoreboard: Scoreboard | None = None,
-                 pool: list | None = None, approved_record_hash: str = "",point_ids: tuple = (),point_dependencies: tuple = (),parameter_changes: tuple = ()):
+                 pool: list | None = None, approved_record_hash: str = "",point_ids: tuple = (),point_dependencies: tuple = (),parameter_changes: tuple = (),campaign: Campaign | None = None):
         if electorate_size <= 0:
             raise RuleViolation("empty electorate")
         if kind == ELECTION and not qualified_parties:
             raise RuleViolation("election needs qualified parties")
         self.issue, self.kind, self.p = issue, kind, p
         self.registry, self.keyring = registry, keyring
+        self.campaign=campaign;self._campaign_hash=campaign.digest() if type(campaign) is Campaign else ""
+        self._campaign_conflicts=frozenset(campaign.member_operators) if type(campaign) is Campaign else frozenset()
+        if kind==ELECTION:
+            if type(campaign) is not Campaign:raise RuleViolation("election requires a finalized campaign record")
+            campaign.check(bank,qualified_parties,p)
+            if any(not registry.can(a,"GRADE",open_height,{"operators_involved":self._campaign_conflicts})[0] for a in board.members):
+                raise RuleViolation("independent eligible election certification board required")
+            campaign_registry=getattr(registry,"party_registry",None)
+            if campaign_registry is None or campaign_registry._campaigns.get(campaign.pre_commitment)!=(self._campaign_hash,issue,False):
+                raise RuleViolation("registered unused campaign authorization required")
+            if open_height<campaign.end_height or windows.challenge_end+p.challenge_resolution_grace>campaign.election_deadline:
+                raise RuleViolation("election outside frozen campaign cycle")
+        elif campaign is not None:raise RuleViolation("campaign belongs to election only")
         self.root, self.size = electorate_root, electorate_size
         self.board, self.bank, self.attempts, self.beacon = board, bank, attempts, beacon
         self.open_height, self.w = open_height, windows
         self.recused = recused
         self.effects = replace(effects, tranches=list(effects.tranches)) if effects else Effects()
+        if kind==ELECTION and (self.effects.treasury is not None or self.effects.credits is not None or self.effects.ceiling):
+            raise RuleViolation("elections cannot carry proposal budget effects")
         self.point_ids=tuple(point_ids);self.point_dependencies=tuple(point_dependencies)
         if self.point_ids and (not approved_record_hash or kind==ELECTION or len(self.point_ids)>p.max_bill_points
                                or len(set(self.point_ids))!=len(self.point_ids)
@@ -111,7 +127,7 @@ class VoteSession:
         if not (open_height < windows.vote_end < windows.certify_end < windows.challenge_end):
             raise RuleViolation("invalid voting windows")
         self.w = replace(windows)
-        self.qualified = qualified_parties or []
+        self.qualified = list(qualified_parties or [])
         self.scoreboard = scoreboard or Scoreboard(p)
         # Exam graders come from `pool` (never the certification board); one small panel per ticket.
         self.pool = sorted(set(pool if pool is not None else []) - set(board.members))
@@ -134,15 +150,22 @@ class VoteSession:
         if self.effects.treasury and self.effects.ceiling:
             self.effects.treasury.reserve(self.effects.project, self.effects.ceiling)  # D-02
 
+        if kind==ELECTION:campaign_registry._campaigns[campaign.pre_commitment]=(self._campaign_hash,issue,True)
+
     # ------------------------------------------------------------- eligibility & exam
     def _matter(self) -> dict:
-        return {"proposer_party_members": set(self.recused)}
+        return {"proposer_party_members": set(self.recused),
+                "operators_involved": self._campaign_conflicts}
 
     def _effect_commitment(self):
         e=self.effects
         return hx("vote-effects",e.project,e.ceiling,e.tranches,e.proposer_party,e.milestones,e.credit_month,e.point_budgets,e.point_tranches,e.point_milestones,self.point_ids,self.point_dependencies,self.parameter_changes)
 
     def _check_review_effects(self):
+        if self.kind==ELECTION:
+            if type(self.campaign) is not Campaign or self.campaign.digest()!=self._campaign_hash:
+                raise RuleViolation("campaign changed during election")
+            self.campaign.check(self.bank,self.qualified,self.p)
         if self.approved_record_hash and self._effect_commitment()!=self._effects_hash:
             raise RuleViolation("reviewed vote effects changed")
 
@@ -176,12 +199,16 @@ class VoteSession:
         # A voter-chosen secret MUST NOT select the panel. All retries keep the same panel.
         members = tuple(draw(H(b"exam-panel-v2", self.beacon, self.issue, owner), self.pool, self.p.exam_panel,
                              exclude={a for a in self.pool if a == owner or a in self.recused
-                                      or self.registry.get(a).operator == self.registry.get(owner).operator}))
+                                      or self.registry.get(a).operator == self.registry.get(owner).operator
+                                      or (self.campaign and self.registry.get(a).operator in self._campaign_conflicts)}))
         if len(members) < self.p.exam_panel:
             raise RuleViolation("examiner pool too small for a grader panel")
         return Board(f"panel-{ticket[:12]}", members, self.issue)
 
     def plan(self, attempt, declared: tuple):
+        if self.campaign:
+            seed=H(b'campaign-voter-exam',self.beacon,self.issue,attempt.voter,attempt.n)
+            return self.campaign.plan(self.bank,seed,declared,self.p)
         return plan_exam(self.bank, self.beacon, attempt.ticket, declared, self.p)
 
     def grade(self, attempt, sub: Submission, member_verdicts: dict, signers: list, height: int
@@ -202,7 +229,7 @@ class VoteSession:
             raise RuleViolation("grader lacks current independent examiner authority")
         if len(member_verdicts) < panel.threshold:
             raise RuleViolation("not enough graders")
-        plan = plan_exam(self.bank, self.beacon, attempt.ticket, sub.declared_articles, self.p)
+        plan = self.plan(attempt,sub.declared_articles)
         items = [q.qid for q in plan.proposal_qs] + [q.qid for _, q in plan.sampled]
         res = majority(member_verdicts, items)
         verdict = evaluate(plan, res, self.p)
@@ -309,6 +336,8 @@ class VoteSession:
     def certificate_message(self) -> bytes:
         if self.phase is Phase.VOTING:
             raise RuleViolation("not closed")
+        if self._campaign_hash:
+            return H(b"tally-cert-campaign",self.issue,self._campaign_hash,self.commitment,self._outcome_label())
         if self.approved_record_hash:
             return H(b"tally-cert-reviewed",self.issue,self.approved_record_hash,self._effects_hash,
                      self.commitment,self._outcome_label())
@@ -317,7 +346,7 @@ class VoteSession:
     def _outcome_label(self) -> str:
         r = self.result
         if isinstance(r, ElectionResult):
-            return f"{r.valid}:{sorted(r.credits.items())}"
+            return f"{r.valid}:{sorted(r.credits.items())}:{r.governing_parties}"
         if isinstance(r,BillResult):
             return f"{r.outcome.value}:{r.point_outcomes}:{r.passing_points}"
         return f"{r.outcome.value}:{r.yes_w}:{r.no_w}:{r.abstain_n}:{r.participation}"

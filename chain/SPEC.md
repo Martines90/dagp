@@ -1,3 +1,5 @@
+> The current party/election flow is specified in [security/PARTIES_ELECTIONS.md](security/PARTIES_ELECTIONS.md): ten consenting founders, exclusive membership, 50% internal sanctions, 5/3-point pre-elections, mandatory all-party program/vision exams and a 5% parliament gate. Historical endorsement counts and optional campaign reading below are superseded.
+
 > Current reference defaults are superseded by [security/POLICY_POINTS.md](security/POLICY_POINTS.md): 20% minimum turnout, monthly credits, 66%/50%-turnout constitutional changes, 66% parameter referendums and independent clauses with partial funding. Historical 50% and package examples below describe earlier rules. These features await native G0 enforcement.
 
 # DAGP Chain — Protocol & System Specification (draft 0.1)

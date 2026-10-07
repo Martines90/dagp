@@ -35,10 +35,17 @@ class Params:
     ballot_picks: tuple = (4, 2, 1)
     party_threshold_bps: int = 500
     credit_step_bps: int = 500
-    credit_ceiling_bps: int = 5_000
-    min_qualified_parties: int = 3
+    credit_ceiling_bps: int = 10_000
+    min_qualified_parties: int = 1
     min_party_members: int = 10
-    endorse_bps: int = 910               # frozen to an absolute number per cycle (D-05, ceil)
+    pre_ballot_points: tuple = (5,3)
+    pre_threshold_bps: int = 500
+    campaign_min_blocks: int = 5
+    campaign_questions_per_document: int = 2
+    max_election_cycle_blocks: int = 1000
+    party_suspend_max: int = 300
+    party_case_window: int = 100
+    endorse_bps: int = 910               # legacy endorsement-count helper; current PreElection uses point shares
     endorsements_per_agent: int = 2
     min_total_credits: int = 0           # strict 5% allocation; no automatic floor
     floor_credits_each: int = 1
@@ -119,7 +126,16 @@ class Params:
                 or type(self.max_bill_points) is not int or not 1<=self.max_bill_points<=100):
             raise ValueError("invalid credit or point limits")
 
-        positive = (self.protection_day_blocks,self.sanction_actor_limit,self.sanction_operator_limit,
+        if (type(self.min_party_members) is not int or self.min_party_members<10
+                or self.pre_ballot_points!=(5,3) or type(self.pre_ballot_points) is not tuple
+                or any(type(n) is not int for n in self.pre_ballot_points)
+                or type(self.pre_threshold_bps) is not int or not 500<=self.pre_threshold_bps<=BPS
+                or type(self.ballot_picks) is not tuple or not 1<=len(self.ballot_picks)<=3
+                or any(type(n) is not int or n<=0 for n in self.ballot_picks)
+                or type(self.min_qualified_parties) is not int or self.min_qualified_parties<1):
+            raise ValueError("invalid party/election rules")
+        positive = (self.campaign_min_blocks,self.campaign_questions_per_document,self.max_election_cycle_blocks,
+                    self.party_suspend_max,self.party_case_window,self.protection_day_blocks,self.sanction_actor_limit,self.sanction_operator_limit,
                     self.sanction_global_limit,self.sanction_population_floor,self.ban_global_limit,
                     self.admission_actor_limit,self.admission_global_limit,self.pause_actor_limit,
                     self.pause_global_limit,self.admin_containment_duration,self.admin_vote_window,
