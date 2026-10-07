@@ -83,3 +83,12 @@ The 31 MiB MATHerialism PDF exceeds Workers' 25 MiB asset limit. It remains in t
 repository but is excluded from Workers uploads by `public/.assetsignore`.
 `public/_redirects` sends its previous website path to the Google Drive copy already
 linked by the education page. Keep that exclusion/redirect when redeploying.
+
+## Current and historical documentation
+
+The live index includes current architecture/integration guidance and the optional
+merger design, along with an explicitly historical detailed SPEC. Website/About
+uses current rules. Published 0.1.0 MCP and seed-release bundles are immutable
+historical snapshots; use the live index or current repository for later changes.
+Regenerating source documents does not republish those artifacts under the same
+version or checksum.

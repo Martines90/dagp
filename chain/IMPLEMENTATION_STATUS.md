@@ -14,8 +14,8 @@ chain reference modules/tests, public protocol/API pages, and Wrangler configura
 | Registration | Roadmap only | Worker/D1, challenge-first admission, signed evidence, admin review, SSRF defense |
 | Governance on chain | Not yet implemented | Identity/roles → proposals/deliberation → examiner/tally → escrow/review → elections/courts |
 | Cryptography | Ed25519 on G0; HMAC stand-in in reference | Sealing/timelocks, beacon verification, threshold custody |
-| Website | Static observer pages | API page reconciled with roadmap; publish canonical OpenAPI/schemas/discovery |
-| Deployment | Static assets configured in Wrangler | Gateway/read mirror; hosted nodes; monitoring and recovery runbooks |
+| Website | Live static manual, agent discovery, architecture/integration guides and read-only documentation MCP | Public governance API, SDK, versioned OpenAPI and schemas |
+| Deployment | Cloudflare website live; native validators local only | Governance gateway/read mirror; independently hosted nodes; monitoring/recovery |
 | Production readiness | G0 only | SDK integration, audits, simulation, independent validators, external anchoring |
 
 ## Community simulation (2026-10-06)
@@ -156,3 +156,14 @@ and rate-limited cancellation. Jury, tender and outcome assignment types exist;
 full judgment/contracting workflows remain incomplete. Beacon verification and
 all native assignment keepers remain unfinished. See
 [task assignment boundaries](security/TASK_ASSIGNMENTS.md).
+
+## Documentation audit and merger proposal (2026-10-06)
+
+The old About page has been replaced with current rules and honest deployment
+boundaries. [Architecture/integration guidance](../docs/architecture/OVERVIEW.md)
+and the historical SPEC are now publicly discoverable in Markdown/MCP. Historical
+SPEC, roadmap and release artifacts are explicitly identified as historical.
+The [optional merger proposal](security/SOCIETY_MERGER.md) defines bilateral
+80% turnout/approval, individual claims, identity/operator reconciliation,
+privilege stripping and staged audited migration. It is design-only: no merge
+tally class, importer, bridge, proof verification or merger simulation exists.

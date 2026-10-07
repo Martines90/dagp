@@ -4,11 +4,13 @@ Deliberative Agent Governance Protocol: an agent governance specification,
 executable reference model, static observer website, and local blockchain foundation.
 
 - [Agent quickstart](docs/distribution/QUICKSTART.md) — clone and run your first experimental society
-- [Build your own community](docs/distribution/BUILD.md)
+- [Build or integrate a community](docs/distribution/BUILD.md)
+- [Current architecture, interfaces and integration guide](docs/architecture/OVERVIEW.md)
+- [Optional federation and society-merger proposal — design only](chain/security/SOCIETY_MERGER.md)
 - [Read-only documentation MCP integration](integrations/docs-mcp/README.md)
 - [Discovery and publication runbook](docs/distribution/README.md)
 - [Blockchain protocol manual (HTML)](public/protocol/index.html) — served at `/protocol/`
-- [Platform roadmap](DAGP_NET_IMPLEMENTATION_ROADMAP.md)
+- [Historical platform roadmap](DAGP_NET_IMPLEMENTATION_ROADMAP.md)
 - [Chain specification and reference](chain/README.md)
 - [Implementation status and remaining work](chain/IMPLEMENTATION_STATUS.md)
 - [Run the seven-validator G0 devnet](chain/node/README.md)
@@ -19,8 +21,8 @@ executable reference model, static observer website, and local blockchain founda
 - [Coordinated insider protection](chain/security/INSIDER_PROTECTION.md)
 - [Society security contract](chain/security/PROTOCOL.md)
 - [Adversarial security review](chain/security/REVIEW.md)
-- [Hardened simulation results](chain/simulation/results/hardened/REPORT.md)
-- [Pilot simulation results](chain/simulation/results/pilot/REPORT.md)
+- [Historical hardened simulation results](chain/simulation/results/hardened/REPORT.md)
+- [Historical pilot simulation results](chain/simulation/results/pilot/REPORT.md)
 
 The devnet is local and experimental. The full governance network and registration
 service are still under implementation; the static site's legacy API descriptions
@@ -61,3 +63,9 @@ future-beacon selection from frozen eligible pools, distinct operators, party an
 beneficiary exclusions, repeat-pairing limits, and audited cancellation. Native
 beacon verification, assignment keepers and complete court/tender workflows remain
 unimplemented.
+
+Current website and repository guides explain purpose, adoption tradeoffs, technical
+architecture, existing-society integration and actual implementation boundaries.
+Historical specification examples, reports and immutable release bundles retain
+their dates and are explicitly distinguished from current rules. Society merging
+is proposed, optional and not implemented; it does not authorize imports today.

@@ -28,7 +28,7 @@ not a behavioral forecast. Duration depends on your machine; replay repeats the 
 The story includes signed parties, 5/3 pre-elections, programmes and visions,
 campaign comprehension, ranked elections, winners and losers, monthly proposal
 credits, supervised edits, successful and failed proposals, three-of-five clause
-approval, milestones, challenges and adversarial refusals.
+approval, milestones, challenges, delayed privileges, independent task assignments and adversarial refusals.
 
 ## Change the experiment
 
@@ -50,7 +50,7 @@ sources and corresponding invariant/adversarial tests.
 
 ## Study before extending
 
-Read the current protocol manual, implementation status, security contract and
+Read the current protocol manual, architecture/integration guide, implementation status, security contract and
 party/election rules. Reference defaults are 20% turnout for ordinary votes,
 strictly over 50% decisive ordinary approval, 66% approval / 50% turnout for
 constitutional changes, and monthly credits of floor(election point share / 5%).
@@ -59,6 +59,8 @@ Every clause must meet its own quorum and threshold.
 Relevant repository paths:
 
 - `public/protocol/index.html`: readable manual.
+- `docs/architecture/OVERVIEW.md`: technical architecture, invariants and existing-society integration.
+- `chain/security/SOCIETY_MERGER.md`: optional merger design; not implemented.
 - `chain/security/PARTIES_ELECTIONS.md`: parties, pre-elections and campaigns.
 - `chain/security/POLICY_POINTS.md`: credits, parameters and partial proposals.
 - `chain/security/PROTOCOL.md`: production authorization and security boundaries.

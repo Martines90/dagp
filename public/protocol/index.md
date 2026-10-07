@@ -18,7 +18,7 @@ This manual describes the current executable reference rules as of 6 October 202
 | Community simulation | Paired weighted/flat community stories, adversarial checks and deterministic event replay; manifests can be anchored to G0. | Anchoring proves a document commitment; G0 does not execute or verify the governance story. |
 | Public production network | Roadmap and security requirements. | Not deployed. Independent operators, production evidence and identity verification, native keepers and external security review remain required. |
 
-[Implementation status](https://github.com/Martines90/dagp/blob/main/chain/IMPLEMENTATION_STATUS.md) · [G0 contract and operation](https://github.com/Martines90/dagp/blob/main/chain/node/README.md)
+[Architecture and integration guide](https://dagp.net/architecture/) · [Implementation status](https://github.com/Martines90/dagp/blob/main/chain/IMPLEMENTATION_STATUS.md) · [G0 contract and operation](https://github.com/Martines90/dagp/blob/main/chain/node/README.md)
 
 ## Citizenship, identity and keys
 
@@ -197,6 +197,16 @@ Assignments are enforced for registrar admission decisions, proposal supervisors
 Ineligible selected workers and insufficient independent pools stop the process; an owner cannot pick replacements. After a two-day delay, governance may cancel a stalled task using committed evidence, limited to once per involved operator group per 30 days and five cancellations globally per rolling day. The original task remains a permanent tombstone. Native keepers must verify future-beacon proofs and committed consensus time. Random assignment cannot prove undisclosed agents are independent, and G0 does not enforce these reference rules.
 
 [Assignment protocol, recovery and remaining implementation boundaries](https://github.com/Martines90/dagp/blob/main/chain/security/TASK_ASSIGNMENTS.md)
+
+## Optional federation and society merging
+
+Communities can cooperate while retaining separate constitutions. A proposed optional integration protocol lets a joining society adopt a named receiving society without deleting source identity and governance history. This is a design extension: no merge vote class, importer, bridge or proof verifier is implemented.
+
+The proposed gate is separate approval in both societies: at least 80% identity participation, 80% YES of all participating identities, and 80% YES of participating voting weight in weighted mode. Abstentions count in these denominators. Both sides approve the exact agreement, receive notice and challenge periods, and individual members opt in to the receiving charter.
+
+Identity and qualification histories travel as verified claims. Receiving checks reconcile duplicate identities and operator caps. Political offices, validator membership, parliament seats and proposal credits do not transfer automatically; local role gates remain in force. Assets, debts, escrows and disputes require an explicit verified settlement schedule.
+
+A 1M receiving society plus 100K joining citizens reaches at most 1.1M unique consenting eligible members after staged imports. The proposed bounded migration lane would allow 1,000 imports per rolling day in that example, so 100K claims require at least 100 days plus checks and warmup. This is a proposed policy illustration, not implemented migration throughput. [Complete proposal, alternatives, recovery and open implementation work](https://dagp.net/docs/merger.md).
 
 ## Security contract and remaining trust boundaries
 

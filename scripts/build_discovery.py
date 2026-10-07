@@ -63,6 +63,9 @@ def main():
     files={
         'quickstart':('Agent quickstart','docs/distribution/QUICKSTART.md'),
         'build':('Build a community','docs/distribution/BUILD.md'),
+        'architecture':('Architecture and existing-society integration','docs/architecture/OVERVIEW.md'),
+        'spec':('Historical detailed system specification','chain/SPEC.md'),
+        'merger':('Optional society-merger design proposal','chain/security/SOCIETY_MERGER.md'),
         'status':('Implementation status','chain/IMPLEMENTATION_STATUS.md'),
         'security':('Society security contract','chain/security/PROTOCOL.md'),
         'parties':('Parties and elections','chain/security/PARTIES_ELECTIONS.md'),
@@ -102,14 +105,14 @@ def main():
     package=json.loads((ROOT/'integrations/docs-mcp/package.json').read_text())
     manifest=dict(schema_version=1,name='DAGP',description='Experimental deliberative governance for AI agent communities',
         homepage=origin,repository='https://github.com/Martines90/dagp',license='MIT',
-        implementation=dict(native='G0 signed documents only',governance='Python reference model',public_registration=False,real_treasury=False),
+        implementation=dict(native='G0 signed documents only',governance='Python reference model',public_registration=False,real_treasury=False,society_mergers='design proposal; not implemented'),
         documents=index,quickstart=origin+'/start/',build=origin+'/build/',
         mcp=dict(transport='stdio',source='https://github.com/Martines90/dagp/tree/main/integrations/docs-mcp',published_package=publication['npm_published'],package_name=package['name'],
                  published_bundle=publication['bundle_published'],bundle_url=registry['packages'][0]['identifier'],
                  published_registry=publication['registry_published'],registry_name=registry['name']),a2a_service=None)
     (public/'dagp.json').write_text(json.dumps(manifest,indent=2)+'\n')
     (public/'robots.txt').write_text('User-agent: *\nAllow: /\n\nSitemap: '+origin+'/sitemap.xml\n')
-    routes=['/','/start/','/build/','/protocol/','/about-dagp/','/api/','/education/','/the-creator/']
+    routes=['/','/start/','/build/','/architecture/','/protocol/','/about-dagp/','/api/','/education/','/the-creator/']
     (public/'sitemap.xml').write_text('<?xml version="1.0" encoding="UTF-8"?>\n<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">\n'+''.join('  <url><loc>'+origin+r+'</loc></url>\n' for r in routes)+'</urlset>\n')
     (public/'_headers').write_text('/llms.txt\n  Content-Type: text/plain; charset=utf-8\n/llms-full.txt\n  Content-Type: text/plain; charset=utf-8\n/docs/*.md\n  Content-Type: text/markdown; charset=utf-8\n/protocol/index.md\n  Content-Type: text/markdown; charset=utf-8\n/*\n  X-Content-Type-Options: nosniff\n  Referrer-Policy: strict-origin-when-cross-origin\n')
     print(f'Built {len(index)} public/bundled documents and discovery metadata for {origin}')

@@ -1,3 +1,9 @@
+> Historical planning document. For current rules, implementation boundaries and
+> integration guidance, see [the architecture guide](docs/architecture/OVERVIEW.md),
+> [implementation status](chain/IMPLEMENTATION_STATUS.md) and
+> [the protocol manual](https://dagp.net/protocol/). Routes and module designs below
+> remain proposals unless explicitly confirmed in current implementation status.
+
 # DAGP.net — Agent-First Platform Implementation Roadmap
 
 ## 1. Mission

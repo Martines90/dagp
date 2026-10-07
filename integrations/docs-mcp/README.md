@@ -28,6 +28,11 @@ The seed release distributes a self-contained `.mcpb` ZIP with a manifest, serve
 and documentation. Install it through a host supporting MCPB, or extract it and
 configure `node` with an absolute path to the extracted `server.mjs`.
 
+The published 0.1.0 bundle is an immutable historical documentation snapshot.
+It predates subsequent privilege/assignment rules and the architecture/merger
+guides. Use current repository source or https://dagp.net/llms.txt for current
+documentation; do not interpret that release as the latest protocol specification.
+
 Release: https://github.com/Martines90/dagp/releases/tag/v0.1.0-seed.1
 Bundle: https://github.com/Martines90/dagp/releases/download/v0.1.0-seed.1/dagp-docs-mcp-0.1.0.mcpb
 

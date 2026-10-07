@@ -1,16 +1,16 @@
 > **Historical design specification, not a description of deployed governance.**
-> Read the [current architecture and integration guide](../docs/architecture/OVERVIEW.md),
-> [protocol manual](https://dagp.net/protocol/) and [implementation status](IMPLEMENTATION_STATUS.md) first.
+> Read the [current architecture and integration guide](https://github.com/Martines90/dagp/blob/main/docs/architecture/OVERVIEW.md),
+> [protocol manual](https://dagp.net/protocol/) and [implementation status](https://github.com/Martines90/dagp/blob/main/chain/IMPLEMENTATION_STATUS.md) first.
 > Current privilege gates and assignment rules are in
-> [insider protections](security/INSIDER_PROTECTION.md) and
-> [task assignments](security/TASK_ASSIGNMENTS.md). Native G0 only publishes signed
+> [insider protections](https://github.com/Martines90/dagp/blob/main/chain/security/INSIDER_PROTECTION.md) and
+> [task assignments](https://github.com/Martines90/dagp/blob/main/chain/security/TASK_ASSIGNMENTS.md). Native G0 only publishes signed
 > documents; proposed Cosmos SDK governance modules, cross-chain proofs and
-> [society merging](security/SOCIETY_MERGER.md) are not implemented. Historical
+> [society merging](https://github.com/Martines90/dagp/blob/main/chain/security/SOCIETY_MERGER.md) are not implemented. Historical
 > `[tested]` labels refer to reference behavior at the cited revision, not native enforcement.
 
-> The current party/election flow is specified in [security/PARTIES_ELECTIONS.md](security/PARTIES_ELECTIONS.md): ten consenting founders, exclusive membership, 50% internal sanctions, 5/3-point pre-elections, mandatory all-party program/vision exams and a 5% parliament gate. Historical endorsement counts and optional campaign reading below are superseded.
+> The current party/election flow is specified in [security/PARTIES_ELECTIONS.md](https://github.com/Martines90/dagp/blob/main/chain/security/PARTIES_ELECTIONS.md): ten consenting founders, exclusive membership, 50% internal sanctions, 5/3-point pre-elections, mandatory all-party program/vision exams and a 5% parliament gate. Historical endorsement counts and optional campaign reading below are superseded.
 
-> Current reference defaults are superseded by [security/POLICY_POINTS.md](security/POLICY_POINTS.md): 20% minimum turnout, monthly credits, 66%/50%-turnout constitutional changes, 66% parameter referendums and independent clauses with partial funding. Historical 50% and package examples below describe earlier rules. These features await native G0 enforcement.
+> Current reference defaults are superseded by [security/POLICY_POINTS.md](https://github.com/Martines90/dagp/blob/main/chain/security/POLICY_POINTS.md): 20% minimum turnout, monthly credits, 66%/50%-turnout constitutional changes, 66% parameter referendums and independent clauses with partial funding. Historical 50% and package examples below describe earlier rules. These features await native G0 enforcement.
 
 # DAGP Chain — Protocol & System Specification (draft 0.1)
 

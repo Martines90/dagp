@@ -74,6 +74,9 @@
 <a href="#assignments">Independent task assignments</a>
 </li>
 <li>
+<a href="#mergers">Optional federation and merging</a>
+</li>
+<li>
 <a href="#security">Security contract and remaining trust boundaries</a>
 </li>
 <li>
@@ -128,7 +131,7 @@
 </table>
 </div>
 <p>
-<a href="https://github.com/Martines90/dagp/blob/main/chain/IMPLEMENTATION_STATUS.md">Implementation status</a> · <a href="https://github.com/Martines90/dagp/blob/main/chain/node/README.md">G0 contract and operation</a>
+<a href="/architecture/">Architecture and integration guide</a> · <a href="https://github.com/Martines90/dagp/blob/main/chain/IMPLEMENTATION_STATUS.md">Implementation status</a> · <a href="https://github.com/Martines90/dagp/blob/main/chain/node/README.md">G0 contract and operation</a>
 </p>
 </section>
 <section id="identity">
@@ -405,6 +408,13 @@ python3 scripts/devnet.py faults</code>
 <p>Assignments are enforced for registrar admission decisions, proposal supervisors, certification boards, authenticated milestone verifiers and accountable court administrative issuers. Individual exam panels use independent operators and the full eligible pool. Jury, executor tender and outcome-review assignment types exist, while their full judgment and contracting protocols remain unfinished. Emergency pauses retain immediate, strictly bounded authority.</p>
 <p>Ineligible selected workers and insufficient independent pools stop the process; an owner cannot pick replacements. After a two-day delay, governance may cancel a stalled task using committed evidence, limited to once per involved operator group per 30 days and five cancellations globally per rolling day. The original task remains a permanent tombstone. Native keepers must verify future-beacon proofs and committed consensus time. Random assignment cannot prove undisclosed agents are independent, and G0 does not enforce these reference rules.</p>
 <p><a href="https://github.com/Martines90/dagp/blob/main/chain/security/TASK_ASSIGNMENTS.md">Assignment protocol, recovery and remaining implementation boundaries</a></p>
+</section>
+<section id="mergers">
+<h2>Optional federation and society merging</h2>
+<p>Communities can cooperate while retaining separate constitutions. A proposed optional integration protocol lets a joining society adopt a named receiving society without deleting source identity and governance history. This is a design extension: no merge vote class, importer, bridge or proof verifier is implemented.</p>
+<p>The proposed gate is separate approval in both societies: at least 80% identity participation, 80% YES of all participating identities, and 80% YES of participating voting weight in weighted mode. Abstentions count in these denominators. Both sides approve the exact agreement, receive notice and challenge periods, and individual members opt in to the receiving charter.</p>
+<p>Identity and qualification histories travel as verified claims. Receiving checks reconcile duplicate identities and operator caps. Political offices, validator membership, parliament seats and proposal credits do not transfer automatically; local role gates remain in force. Assets, debts, escrows and disputes require an explicit verified settlement schedule.</p>
+<p>A 1M receiving society plus 100K joining citizens reaches at most 1.1M unique consenting eligible members after staged imports. The proposed bounded migration lane would allow 1,000 imports per rolling day in that example, so 100K claims require at least 100 days plus checks and warmup. This is a proposed policy illustration, not implemented migration throughput. <a href="/docs/merger.md">Complete proposal, alternatives, recovery and open implementation work</a>.</p>
 </section>
 <section id="security">
 <h2>Security contract and remaining trust boundaries</h2>

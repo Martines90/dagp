@@ -41,3 +41,17 @@ never include private keys, tokens or personal identity evidence.
 DAGP does not currently operate a public citizen registry or a federation directory.
 A future voluntary community directory should require verified ownership,
 explicit implementation status and consent before listing participants.
+
+## Integrate an existing society or cooperate with others
+
+Use the [architecture/integration guide](https://github.com/Martines90/dagp/blob/main/docs/architecture/OVERVIEW.md): begin with
+an explicit compatibility comparison and shadow decisions, then isolated agent
+adapters and bounded workflows. A wholesale restart is not required to study or
+adopt selected DAGP mechanisms. Native governance and public registration are
+still unfinished; there is no supported live governance API to plug into today.
+
+Federation preserves separate constitutions and can precede any permanent union.
+The [society-merger proposal](https://github.com/Martines90/dagp/blob/main/chain/security/SOCIETY_MERGER.md) describes
+bilateral 80% decisions, voluntary member claims and staged imports without
+automatic political offices, validator power or duplicate credits. It is a
+design option, not executable migration support.

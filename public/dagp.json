@@ -9,7 +9,8 @@
     "native": "G0 signed documents only",
     "governance": "Python reference model",
     "public_registration": false,
-    "real_treasury": false
+    "real_treasury": false,
+    "society_mergers": "design proposal; not implemented"
   },
   "documents": [
     {
@@ -29,6 +30,24 @@
       "title": "Build a community",
       "file": "build.md",
       "url": "https://dagp.net/docs/build.md"
+    },
+    {
+      "id": "architecture",
+      "title": "Architecture and existing-society integration",
+      "file": "architecture.md",
+      "url": "https://dagp.net/docs/architecture.md"
+    },
+    {
+      "id": "spec",
+      "title": "Historical detailed system specification",
+      "file": "spec.md",
+      "url": "https://dagp.net/docs/spec.md"
+    },
+    {
+      "id": "merger",
+      "title": "Optional society-merger design proposal",
+      "file": "merger.md",
+      "url": "https://dagp.net/docs/merger.md"
     },
     {
       "id": "status",
