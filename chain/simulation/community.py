@@ -59,7 +59,7 @@ class Community:
             raise ValueError('At least 200 citizens and exactly 100 initial leaders required')
         self.seed, self.mode = seed, mode
         self.progress=progress
-        self.p = Params(weight_mode=mode, shard_target=256)
+        self.p = Params(weight_mode=mode, shard_target=256, protection_day_blocks=1)
         self.reg, self.kr = RoleRegistry(self.p), SimKeyring()
         self.parties=PartyRegistry("dagp-reference",self.reg,self.kr)
         self.attempts=AttemptRegistry(self.p)
@@ -103,8 +103,13 @@ class Community:
             self.reg.register(a,'operator-'+a,'family-'+str(i%5),self.p.citizen_bond,0)
             self.kr.register(a)
             self.reg.approve(MODULE,a,0)
+        self.check("new citizens cannot vote during citizenship warmup",
+                   not self.reg.can(self.citizens[0],"VOTE",self.p.citizen_activation_days-1)[0])
         self.height=250
         for a in self.citizens[:3]: self.appointed(a,Role.REGISTRAR)
+        self.check("new registrars cannot act before activation",
+                   not self.reg.can(self.citizens[0],"REGISTRAR_ACT",self.height)[0])
+        self.height += self.p.official_activation_days
         # Demonstrate an actual registrar reviewing a separate applicant.
         extra='applicant-approved';self.reg.register(extra,'operator-extra','family-0',10,self.height)
         self.kr.register(extra);self.reg.approve(Actor.agent(self.citizens[0]),extra,self.height)
@@ -120,6 +125,7 @@ class Community:
             for a in group:self.reg.grant(MODULE,a,role,self.height,stake=50)
         for a in self.citizens[3:6]: self.appointed(a,Role.SAFETY_COUNCIL)
         for a in self.citizens[6:9]: self.appointed(a,Role.VOTE_SUPERVISOR)
+        self.height += self.p.official_activation_days
         validators=self.citizens[3:10]
         for a in validators:self.appointed(a,Role.VALIDATOR)
         ref='bootstrap-validator-set'; self.reg.register_ratification(MODULE,ref,'VALIDATOR_SET',','.join(sorted(validators)))
@@ -583,7 +589,7 @@ def main():
             differences=[dict(issue=a['issue'],weighted=a['outcome'],flat=b['outcome'])
                 for a,b in zip(pair['WEIGHTED']['sessions'],pair['FLAT']['sessions']) if a['outcome']!=b['outcome']]
             comparisons.append(dict(seed=seed,outcome_differences=differences))
-    report=dict(format='dagp-community-simulation-v7',execution='reference-governance-with-optional-G0-result-anchoring',
+    report=dict(format='dagp-community-simulation-v8',execution='reference-governance-with-optional-G0-result-anchoring',
         limitations=['Synthetic policies, not AGI or LLM agents','Reference signatures are HMAC stand-ins',
         'HTTP challenge admission is not implemented','Court semantics and milestone evidence are scripted',
         'G0 chain records result commitment, does not enforce governance','Seven validators share one host'],

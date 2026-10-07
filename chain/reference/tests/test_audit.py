@@ -1,7 +1,7 @@
 import unittest
 
 from dagp_ref.comprehension import Submission, Verdict, evaluate, grade_item_verdicts, plan_exam
-from dagp_ref.params import Params
+from tests.legacy_params import Params
 from dagp_ref.sortition import audit_sample_size, draw, panel_size, threshold
 from dagp_ref.treasury import RuleViolation
 from tests.fixtures import P, Society

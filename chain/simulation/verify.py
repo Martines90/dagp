@@ -8,8 +8,8 @@ from community import Community
 def verify(directory, replay=False):
     raw=(directory/'report.json').read_bytes();report=json.loads(raw)
     manifest=json.loads((directory/'manifest.json').read_bytes())
-    if replay and report.get('format') != 'dagp-community-simulation-v7':
-        raise ValueError('Historical rules changed: v1 requires commit 6a87852; v2 requires f6bebf5. v3 requires 7140ed9; v4 requires 56ce3b9. v5 requires a38aea0. v6 requires adf6e63. Generate a fresh v7 scenario for current rules')
+    if replay and report.get('format') != 'dagp-community-simulation-v8':
+        raise ValueError('Historical rules changed: v1 requires commit 6a87852; v2 requires f6bebf5. v3 requires 7140ed9; v4 requires 56ce3b9. v5 requires a38aea0. v6 requires adf6e63. v7 requires e035533. Generate a fresh v8 scenario for current rules')
     if hashlib.sha256(raw).hexdigest()!=manifest['report_sha256']:raise ValueError('report hash mismatch')
     if len(manifest['runs'])!=len(report['runs']):raise ValueError('manifest run count mismatch')
     if 'insider_abuse_sha256' in manifest:

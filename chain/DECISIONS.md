@@ -79,3 +79,15 @@ minimum notice, before examinations/ballots. The approved budget is reserved fro
 common funds and becomes exact milestone escrow only after final successful voting.
 Acceptance descriptions are committed alongside tranche amounts. See
 `security/REVIEW_BUDGET.md`; semantic equivalence and delivery need independent evidence.
+
+## Delayed privilege activation refinement (reference)
+
+Citizenship powers mature after three elapsed days. Admin, registrar, safety-council
+and vote-supervisor appointments require 30 days of citizenship, then a two-day
+public activation delay. Their appointments share rolling limits of five per
+sponsoring admin/operator and twenty system-wide, including governance decisions
+without an individual sponsor. Appointment remains vote-authorized. Pending office
+holders cannot exercise powers or change the council denominator. Reappointment
+restarts the delay without refunding quotas. Ordinary parameter votes cannot weaken
+these protections. Reference days use model heights; native keepers must use
+committed consensus time. See `security/INSIDER_PROTECTION.md`.

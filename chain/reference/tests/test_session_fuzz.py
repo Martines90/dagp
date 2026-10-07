@@ -5,7 +5,7 @@ import copy
 import random
 import unittest
 
-from dagp_ref.params import Params
+from tests.legacy_params import Params
 from dagp_ref.roles import Actor
 from dagp_ref.session import Effects
 from dagp_ref.tally import Ballot, Kind, Outcome, tally

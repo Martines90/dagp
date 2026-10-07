@@ -18,8 +18,8 @@ Use Python 3.10 or newer:
 python3 -m unittest discover -s chain/simulation/tests -v
 python3 chain/simulation/community.py --seeds 7 19 43 --output chain/simulation/results/party-campaign
 python3 chain/simulation/verify.py chain/simulation/results/party-campaign --replay
-python3 chain/simulation/community.py --citizens 10000 --seeds 7 --output chain/simulation/results/large-v7
-python3 chain/simulation/verify.py chain/simulation/results/large-v7
+python3 chain/simulation/community.py --citizens 10000 --seeds 7 --output chain/simulation/results/large-v8
+python3 chain/simulation/verify.py chain/simulation/results/large-v8
 ```
 
 Each seed runs WEIGHTED and FLAT modes, using the same keyed random draws for
@@ -160,3 +160,13 @@ fresh supervisor approval of edits and finalized milestone escrow.
 Current exports use v7 with signed party formation, internal sanctions, 5/3 pre-elections, committed all-party campaign exams and explicit parliament eligibility. Historical v6 requires `adf6e63` for replay. Historical v5 requires `a38aea0` for replay. Historical v4 requires `56ce3b9` for replay; artifact hashes can still be checked without replay. The current run includes ten project proposals and a reviewed parameter referendum, with January, February and March credit allowances. A five-clause proposal approves exactly three clauses and funds/releases only their 1,800 units. A successful parameter referendum changes the credit step to 4% at the March boundary, while keeping the original referendum snapshot and 20% minimum turnout. See [POLICY_POINTS.md](../security/POLICY_POINTS.md) for defaults and safeguards.
 
 The current v7 run forms six parties with ten or more consenting founders, exercises a local ban and suspension by half of party members, conducts two signed 5/3 pre-elections, excludes the unsupported party, publishes program/vision records for every main-election candidate, and requires all campaign sections to pass comprehension. The 5% parliament gate controls both governing eligibility and monthly credit renewal. See [PARTIES_ELECTIONS.md](../security/PARTIES_ELECTIONS.md).
+
+## Privilege-gate timing (v8)
+
+The community and insider stories use one height per model day for the protected
+3-day citizenship, 30-day office-tenure and 2-day office-activation rules. This is
+explicit time compression, not a deployment setting. Production reference defaults
+use 14,400 heights per model day; native keepers must use committed elapsed time.
+Office activation is awaited during bootstrap. Insider appointments are spread
+over model days and all granted offices mature before the attack. Current exact
+replay requires v8 reports; replay v7 reports with commit e035533.

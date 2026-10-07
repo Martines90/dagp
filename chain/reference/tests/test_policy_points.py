@@ -1,7 +1,7 @@
 from dataclasses import replace
 from datetime import datetime,timezone
 import unittest
-from dagp_ref.params import Params
+from tests.legacy_params import Params
 from dagp_ref.roles import Actor
 from dagp_ref.election import allocate_credits
 from dagp_ref.policy import MonthlyCredits,ParameterGovernance,validate_changes

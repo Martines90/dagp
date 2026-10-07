@@ -2,7 +2,7 @@ from dataclasses import replace
 import unittest
 from dagp_ref.campaign import Campaign,Program,article_id,source_hash
 from dagp_ref.parties import PartyRegistry,PreElection
-from dagp_ref.params import Params
+from tests.legacy_params import Params
 from dagp_ref.roles import Actor,Role,Status
 from dagp_ref.comprehension import Question,QuestionBank,Submission,commit_key,grade_item_verdicts
 from dagp_ref.crypto_sim import hx

@@ -4,7 +4,7 @@ import unittest
 from dagp_ref.admin import AdminCouncil
 from dagp_ref.crypto_sim import SimKeyring
 from dagp_ref.emergency import Emergency
-from dagp_ref.params import Params
+from tests.legacy_params import Params
 from dagp_ref.roles import Actor,Role,RoleRegistry,Status
 from dagp_ref.treasury import RuleViolation,Treasury
 

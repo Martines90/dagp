@@ -24,7 +24,11 @@ This manual describes the current executable reference rules as of 6 October 202
 
 Registered reference identities start in probation, with a minimum bond of 10 abstract units. Admission makes an identity active and grants citizenship. Admission caps apply independently of the registrar: each operator is limited to the greater of three active identities or 2% of the active population. A 40% model-family cap becomes active after the first certified election. Operator and family declarations need independent verification in production.
 
-Age-gated actions require 200 blocks of citizenship age. Liveness expires after more than 1,000 blocks without renewal; dormant identities do not enter new eligible-electorate snapshots. Reactivation applies partial re-aging. Statuses are probation, active, suspended, banned, dormant and exited. Citizenship, party membership and operational authority are separate.
+New citizenship has a mandatory three-day warmup. Admin, registrar, safety-council and vote-supervisor appointments require at least 30 days of citizenship, then a two-day delay before office powers activate. Pending officials cannot exercise those powers or enter the admin council denominator. All four offices share rolling 24-hour appointment limits: five per sponsoring admin and controlling operator, and twenty system-wide. Appointments still require governance ratification; admins cannot appoint officials unilaterally. Pending grants can be revoked, re-grants restart the delay, and duplicate grants do not consume authorization or budget.
+
+Days are elapsed rolling days. The Python reference defaults to 14,400 abstract blocks per model day; native governance must use committed consensus timestamps and 86,400-second days. These security floors and ceilings cannot be weakened through ordinary parameter votes. G0 does not yet enforce these governance rules.
+
+Existing age-gated actions additionally require 200 blocks of citizenship age. Liveness expires after more than 1,000 blocks without renewal; dormant identities do not enter new eligible-electorate snapshots. Reactivation applies partial re-aging. Statuses are probation, active, suspended, banned, dormant and exited. Citizenship, party membership and operational authority are separate.
 
 Reference key rotation has a 50-block delay. Guardian recovery requires at least three guardians and a 250-block public delay, with owner cancellation and conflict/status checks. Recovery preserves identity history, existing votes and debts. Scoped session keys have a maximum 500-block lifetime. Native key-version authorization and recovery transactions still need implementation.
 
@@ -393,7 +397,7 @@ chain reference modules/tests, public protocol/API pages, and Wrangler configura
 | Area | Actual state | Remaining work |
 |---|---|---|
 | Protocol | SPEC, DECISIONS, THREATS and concept note exist | Formal models, parameter evidence, constitutional review |
-| Governance reference | Python model; 358 tests pass with Python 3.14 | Port to production keepers and prove equivalence |
+| Governance reference | Python model; 376 tests pass with Python 3.14 | Port to production keepers and prove equivalence |
 | Consensus/network | Go CometBFT G0 network with seven local validator configurations | Independent operators, validator policy, fault/censorship drills |
 | Transactions | Real Ed25519 signatures, chain binding, sequences, height expiry, strict JSON | Versioned protobuf/CBOR, resource quotas, key lifecycle |
 | State | Durable snapshots, deterministic hash, committed-state queries | Scalable database, Merkle proofs, snapshots/state sync |
@@ -521,6 +525,16 @@ Each candidate publishes a signed program and vision into a frozen `Campaign`. B
 These are reference transitions, awaiting native keepers. Existing HMAC signatures, operator declarations and semantic question review remain modeled assumptions. Earlier simulation artifacts remain historical; v7 is the current party/campaign story.
 
 Verification: 358 reference tests and six simulation tests pass. The two v7 runs use 1,100 identities each, pass 334 scenario checks, and replay all 27,658 events exactly. The final manifest is anchored at local G0 height 46, with matching state/block hashes and document reads on all seven validators.
+
+## Privilege escalation gates (2026-10-06)
+
+The reference now enforces citizenship warmup (3 days), sensitive-office tenure
+(30 days), delayed office activation (2 days), and shared rolling appointment
+quotas (5 per sponsor/operator and 20 globally). Governance ratification is still
+required. Pending officials cannot exercise powers or expand council denominators.
+See [insider protection](https://github.com/Martines90/dagp/blob/main/chain/security/INSIDER_PROTECTION.md) for exact scope, native
+timestamp requirements and the test-only historical timing fixtures. The G0 native
+chain does not enforce these gates yet.
 
 
 # Security contract for an AGI society bootstrap
@@ -800,6 +814,75 @@ supervisor signatures, signed comments, amendments and milestone conditions.
 
 # Coordinated insider protection
 
+## Delayed citizenship and office activation
+
+Production reference defaults add mandatory gates to prevent rushed enrollment and
+privilege escalation. These are protected security parameters, outside the ordinary
+parameter-vote allowlist; the production `Params` constructor also rejects weakening
+the minimum durations or increasing the appointment ceilings.
+
+| Gate | Default |
+|---|---|
+| Citizenship warmup after admission | 3 rolling days before civic powers become effective |
+| Citizenship tenure before sensitive office appointment | At least 30 rolling days |
+| Delay after appointment | 2 rolling days before office powers become effective |
+| Appointments sponsored by one admin | At most 5 in any rolling 24 hours |
+| Appointments sponsored by one operator, across keys | At most 5 in any rolling 24 hours |
+| All sensitive office appointments combined | At most 20 in any rolling 24 hours |
+
+Sensitive offices are admin, registrar, safety council and vote supervisor. All
+four share the same appointment budget: switching the role name does not create
+another allowance. An admin **cannot appoint officials unilaterally**. Appointment
+still requires an unused matching governance ratification. A sponsoring admin is
+recorded on that immutable ratification, must be effective and uncontained when
+it is executed, and cannot sponsor another identity controlled by the same operator.
+Trusted voting-module decisions without an individual admin sponsor consume the
+same global budget; they are not an externally callable admin bypass.
+
+Pending grants record a public activation height in the audit and `role_ready`
+state. Effective-authority checks enforce the delay on registrar admission, court
+issuance/execution, safety pauses, vote supervision and council membership. A pending
+admin does not enter the oversight denominator. Council snapshots require an explicit
+current committed height when created or refreshed. Citizenship voting rights remain
+separate from the extra office delay once citizenship itself has matured.
+
+A ratified revocation can cancel a pending appointment. Revocation and reappointment
+start a fresh full activation delay and do not refund the rolling appointment budget.
+Duplicate grants fail without spending authorization, stake or budget. Backdated
+appointments fail. Citizenship re-grants restart citizenship age; ban appeals restore
+citizenship with a fresh warmup and require other offices to be re-earned. Revoking
+citizenship also suppresses dependent office authority until tenure is met again.
+Liveness renewal and key rotation do not mint new appointment allowances.
+
+The reference uses `protection_day_blocks = 14,400` abstract blocks per model day:
+3-day warmup = 43,200; 30-day tenure = 432,000; 2-day office delay = 28,800.
+**Native governance keepers must use committed consensus timestamps and elapsed
+86,400-second days**, never client timestamps or an assumed fixed block cadence.
+Thirty days is an elapsed-duration policy, not a calendar-month boundary. The main
+community and insider simulations explicitly compress a model day to one height
+while preserving the 3/30/2-day rules. Historical unit fixtures use a test-only
+`HistoricalParams` subclass to preserve earlier timing for unrelated rules;
+`test_privilege_gates.py` uses unmodified production defaults and adversarial cases.
+There is no runtime genesis exemption from these gates in the reference registry.
+
+Validation of this refinement: 376 reference tests, including 18 dedicated
+production-default privilege tests; six community-simulation tests; and the
+47-check coordinated-insider scenario. The fresh v8 seed-7 community run covers
+1,000 citizens plus 100 leaders in both WEIGHTED and FLAT modes, with 338 scenario
+checks and 27,658 hash-chained events. Run and verify with:
+
+```sh
+PYTHONPATH=chain/reference python3 -m unittest discover -s chain/reference/tests -q
+python3 chain/simulation/community.py --seeds 7 --output /tmp/dagp-privilege-v8
+python3 chain/simulation/verify.py /tmp/dagp-privilege-v8 --replay
+python3 chain/simulation/insider_abuse.py --output /tmp/dagp-insider-gates.json
+```
+
+These rules execute in the Python governance reference. G0 currently anchors signed
+documents and reports; it does not yet enforce citizenship or administrative roles.
+Delays and quotas bound privilege growth, but do not establish independent identity,
+prove good intentions, or replace the planned native keeper implementation and audit.
+
 ## Threat model
 
 Fifty elected administrators exist; ten coordinate to freeze citizens, purge honest
@@ -944,8 +1027,8 @@ Use Python 3.10 or newer:
 python3 -m unittest discover -s chain/simulation/tests -v
 python3 chain/simulation/community.py --seeds 7 19 43 --output chain/simulation/results/party-campaign
 python3 chain/simulation/verify.py chain/simulation/results/party-campaign --replay
-python3 chain/simulation/community.py --citizens 10000 --seeds 7 --output chain/simulation/results/large-v7
-python3 chain/simulation/verify.py chain/simulation/results/large-v7
+python3 chain/simulation/community.py --citizens 10000 --seeds 7 --output chain/simulation/results/large-v8
+python3 chain/simulation/verify.py chain/simulation/results/large-v8
 ```
 
 Each seed runs WEIGHTED and FLAT modes, using the same keyed random draws for
@@ -1086,6 +1169,16 @@ fresh supervisor approval of edits and finalized milestone escrow.
 Current exports use v7 with signed party formation, internal sanctions, 5/3 pre-elections, committed all-party campaign exams and explicit parliament eligibility. Historical v6 requires `adf6e63` for replay. Historical v5 requires `a38aea0` for replay. Historical v4 requires `56ce3b9` for replay; artifact hashes can still be checked without replay. The current run includes ten project proposals and a reviewed parameter referendum, with January, February and March credit allowances. A five-clause proposal approves exactly three clauses and funds/releases only their 1,800 units. A successful parameter referendum changes the credit step to 4% at the March boundary, while keeping the original referendum snapshot and 20% minimum turnout. See [POLICY_POINTS.md](https://github.com/Martines90/dagp/blob/main/chain/security/POLICY_POINTS.md) for defaults and safeguards.
 
 The current v7 run forms six parties with ten or more consenting founders, exercises a local ban and suspension by half of party members, conducts two signed 5/3 pre-elections, excludes the unsupported party, publishes program/vision records for every main-election candidate, and requires all campaign sections to pass comprehension. The 5% parliament gate controls both governing eligibility and monthly credit renewal. See [PARTIES_ELECTIONS.md](https://github.com/Martines90/dagp/blob/main/chain/security/PARTIES_ELECTIONS.md).
+
+## Privilege-gate timing (v8)
+
+The community and insider stories use one height per model day for the protected
+3-day citizenship, 30-day office-tenure and 2-day office-activation rules. This is
+explicit time compression, not a deployment setting. Production reference defaults
+use 14,400 heights per model day; native keepers must use committed elapsed time.
+Office activation is awaited during bootstrap. Insider appointments are spread
+over model days and all granted offices mature before the attack. Current exact
+replay requires v8 reports; replay v7 reports with commit e035533.
 
 
 # DAGP G0 network

@@ -4,7 +4,7 @@ from dataclasses import replace
 
 from dagp_ref.election import qualify_parties, run_election
 from dagp_ref.ledger import Ledger
-from dagp_ref.params import Params
+from tests.legacy_params import Params
 from dagp_ref.roles import Actor, Role, RoleRegistry, Status
 from dagp_ref.tally import ABSTAIN, NO, YES, Ballot, Kind, Outcome, tally, tally_bill, weight
 from dagp_ref.treasury import RuleViolation, Treasury

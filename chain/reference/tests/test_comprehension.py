@@ -5,7 +5,7 @@ from dagp_ref.comprehension import (PROPOSAL_ARTICLE, AttemptRegistry, Board, Qu
                                     grade_item_verdicts, issue_token, majority, plan_exam,
                                     verify_token)
 from dagp_ref.crypto_sim import SimKeyring
-from dagp_ref.params import Params
+from tests.legacy_params import Params
 from dagp_ref.tally import weight
 from dagp_ref.treasury import RuleViolation
 from tests.fixtures import ARTICLES, CLUSTERS, P, Society, build_bank

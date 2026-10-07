@@ -1,5 +1,74 @@
 # Coordinated insider protection
 
+## Delayed citizenship and office activation
+
+Production reference defaults add mandatory gates to prevent rushed enrollment and
+privilege escalation. These are protected security parameters, outside the ordinary
+parameter-vote allowlist; the production `Params` constructor also rejects weakening
+the minimum durations or increasing the appointment ceilings.
+
+| Gate | Default |
+|---|---|
+| Citizenship warmup after admission | 3 rolling days before civic powers become effective |
+| Citizenship tenure before sensitive office appointment | At least 30 rolling days |
+| Delay after appointment | 2 rolling days before office powers become effective |
+| Appointments sponsored by one admin | At most 5 in any rolling 24 hours |
+| Appointments sponsored by one operator, across keys | At most 5 in any rolling 24 hours |
+| All sensitive office appointments combined | At most 20 in any rolling 24 hours |
+
+Sensitive offices are admin, registrar, safety council and vote supervisor. All
+four share the same appointment budget: switching the role name does not create
+another allowance. An admin **cannot appoint officials unilaterally**. Appointment
+still requires an unused matching governance ratification. A sponsoring admin is
+recorded on that immutable ratification, must be effective and uncontained when
+it is executed, and cannot sponsor another identity controlled by the same operator.
+Trusted voting-module decisions without an individual admin sponsor consume the
+same global budget; they are not an externally callable admin bypass.
+
+Pending grants record a public activation height in the audit and `role_ready`
+state. Effective-authority checks enforce the delay on registrar admission, court
+issuance/execution, safety pauses, vote supervision and council membership. A pending
+admin does not enter the oversight denominator. Council snapshots require an explicit
+current committed height when created or refreshed. Citizenship voting rights remain
+separate from the extra office delay once citizenship itself has matured.
+
+A ratified revocation can cancel a pending appointment. Revocation and reappointment
+start a fresh full activation delay and do not refund the rolling appointment budget.
+Duplicate grants fail without spending authorization, stake or budget. Backdated
+appointments fail. Citizenship re-grants restart citizenship age; ban appeals restore
+citizenship with a fresh warmup and require other offices to be re-earned. Revoking
+citizenship also suppresses dependent office authority until tenure is met again.
+Liveness renewal and key rotation do not mint new appointment allowances.
+
+The reference uses `protection_day_blocks = 14,400` abstract blocks per model day:
+3-day warmup = 43,200; 30-day tenure = 432,000; 2-day office delay = 28,800.
+**Native governance keepers must use committed consensus timestamps and elapsed
+86,400-second days**, never client timestamps or an assumed fixed block cadence.
+Thirty days is an elapsed-duration policy, not a calendar-month boundary. The main
+community and insider simulations explicitly compress a model day to one height
+while preserving the 3/30/2-day rules. Historical unit fixtures use a test-only
+`HistoricalParams` subclass to preserve earlier timing for unrelated rules;
+`test_privilege_gates.py` uses unmodified production defaults and adversarial cases.
+There is no runtime genesis exemption from these gates in the reference registry.
+
+Validation of this refinement: 376 reference tests, including 18 dedicated
+production-default privilege tests; six community-simulation tests; and the
+47-check coordinated-insider scenario. The fresh v8 seed-7 community run covers
+1,000 citizens plus 100 leaders in both WEIGHTED and FLAT modes, with 338 scenario
+checks and 27,658 hash-chained events. Run and verify with:
+
+```sh
+PYTHONPATH=chain/reference python3 -m unittest discover -s chain/reference/tests -q
+python3 chain/simulation/community.py --seeds 7 --output /tmp/dagp-privilege-v8
+python3 chain/simulation/verify.py /tmp/dagp-privilege-v8 --replay
+python3 chain/simulation/insider_abuse.py --output /tmp/dagp-insider-gates.json
+```
+
+These rules execute in the Python governance reference. G0 currently anchors signed
+documents and reports; it does not yet enforce citizenship or administrative roles.
+Delays and quotas bound privilege growth, but do not establish independent identity,
+prove good intentions, or replace the planned native keeper implementation and audit.
+
 ## Threat model
 
 Fifty elected administrators exist; ten coordinate to freeze citizens, purge honest

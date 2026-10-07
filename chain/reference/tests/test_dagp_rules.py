@@ -3,7 +3,7 @@ import unittest
 
 from dagp_ref.election import endorsement_requirement, qualify_parties, run_election
 from dagp_ref.ledger import Ledger
-from dagp_ref.params import Params
+from tests.legacy_params import Params
 from dagp_ref.proposal import Envelope, Proposal, amendment_is_refinement
 from dagp_ref.tally import (ABSTAIN, NO, YES, Ballot, Kind, Outcome, tally, tally_bill,
                             weight)
@@ -44,7 +44,7 @@ class DocExamples(unittest.TestCase):
         self.assertEqual(tally(bs(y=449, n=151), 1000, Kind.CORE, P).outcome, Outcome.FAILED)
 
     def test_flat_mode_weights_everyone_one(self):
-        from dagp_ref.params import Params as PP
+        from tests.legacy_params import Params as PP
         f = PP(weight_mode="FLAT")
         self.assertEqual(weight(9, f), 1)
         self.assertEqual(tally([Ballot("a", YES, 1), Ballot("b", NO, 1)], 2, Kind.ORDINARY, f).outcome,

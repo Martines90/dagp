@@ -11,7 +11,7 @@ from dagp_ref.treasury import RuleViolation
 
 MODULE=Actor('MODULE','insider-scenario')
 def run():
-    reg=RoleRegistry(Params(min_citizen_age=1));keys=SimKeyring();checks=[]
+    reg=RoleRegistry(Params(min_citizen_age=1, protection_day_blocks=1));keys=SimKeyring();checks=[]
     def check(name,ok):
         if not ok:raise AssertionError(name)
         checks.append(name)
@@ -23,8 +23,8 @@ def run():
             for role in (Role.ADMIN,Role.REGISTRAR,Role.SAFETY_COUNCIL):
                 ref=f'grant:{a}:{role.value}'
                 reg.register_ratification(MODULE,ref,f'GRANT:{role.value}',a)
-                reg.grant(Actor('VOTE',ref),a,role,1)
-    council=AdminCouncil('insider-scenario-chain',reg,keys)
+                reg.grant(Actor('VOTE',ref),a,role,30+n//6)
+    council=AdminCouncil('insider-scenario-chain',reg,keys,height=100)
     def case(member,target,height):
         evidence='e'*64
         return council.open(member,target,evidence,height,keys.sign(member,council.open_message(member,target,evidence,height)))

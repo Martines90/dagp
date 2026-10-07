@@ -48,3 +48,10 @@ with `python3 scripts/build_discovery.py`; publication is a separate operation.
 
 [MIT](LICENSE): fork, modify and redistribute with attribution. Dependencies retain
 their own licenses. See [contributing](CONTRIBUTING.md) for contribution pathways.
+
+Administrative privilege escalation is bounded in the governance reference by a
+3-day citizenship warmup, 30-day office tenure, 2-day office activation delay,
+and shared rolling appointment limits (5 per sponsoring admin/operator, 20 globally).
+Appointments still require governance approval. See the
+[insider protection rules](chain/security/INSIDER_PROTECTION.md). Native G0 does
+not yet implement these governance gates.

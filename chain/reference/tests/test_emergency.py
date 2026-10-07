@@ -1,7 +1,7 @@
 import unittest
 
 from dagp_ref.emergency import Emergency
-from dagp_ref.params import Params
+from tests.legacy_params import Params
 from dagp_ref.proposal import FilingRegistry
 from dagp_ref.roles import Actor, Role, RoleRegistry
 from dagp_ref.treasury import RuleViolation, Treasury

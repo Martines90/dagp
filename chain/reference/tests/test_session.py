@@ -2,7 +2,7 @@ import unittest
 from dataclasses import replace
 
 from dagp_ref.comprehension import Scoreboard
-from dagp_ref.params import Params
+from tests.legacy_params import Params
 from dagp_ref.roles import Actor, Role
 from dagp_ref.session import ELECTION, Effects, Phase
 from dagp_ref.tally import Kind, Outcome

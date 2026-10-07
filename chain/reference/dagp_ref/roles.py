@@ -73,6 +73,8 @@ ACTION_ROLE = {
     "JUDGE": Role.JUROR, "BID": Role.EXECUTOR, "REGISTRAR_ACT": Role.REGISTRAR,
     "SUPERVISE_VOTE": Role.VOTE_SUPERVISOR, "ADMIN_VOTE": Role.ADMIN, "PAUSE": Role.SAFETY_COUNCIL, "VALIDATE": Role.VALIDATOR,
 }
+SENSITIVE_OFFICES = {Role.ADMIN, Role.REGISTRAR, Role.SAFETY_COUNCIL, Role.VOTE_SUPERVISOR}
+
 AGE_GATED = {"SUPERVISE_VOTE", "ADMIN_VOTE", "VOTE", "ENDORSE", "GRADE", "VERIFY", "REVIEW", "JUDGE", "BID"}
 
 
@@ -103,6 +105,7 @@ class Identity:
     last_freeze: int = -10 ** 9
     ban_appealed: bool = False
     activated: int = 0
+    role_ready: dict = field(default_factory=dict)
 
 
 class RoleRegistry:
@@ -119,6 +122,9 @@ class RoleRegistry:
         self.validators: list[str] = []
         self.audit: list[dict] = []
         self.pending_appeals: dict[str, str] = {}
+        self.appointment_sponsors = {}
+        self.appointment_height = 0
+        self.appointment_events = []
         self.ruling_issuers: dict[str,str] = {}
         self.protection_events: list[tuple] = []
         self.protection_height = 0
@@ -143,20 +149,24 @@ class RoleRegistry:
         return True
 
     # ------------------------------------------------------------- authorization
-    def register_ratification(self, actor: Actor, ref: str, purpose: str, target: str) -> None:
+    def register_ratification(self, actor: Actor, ref: str, purpose: str, target: str, sponsor: str | None = None) -> None:
         if actor.kind != "MODULE":
             raise RuleViolation("only the voting module records ratifications")
         if not ref or ref in self.ratifications or ref in self.rulings:
             raise RuleViolation("authorization reference already exists or is empty")
+        if sponsor is not None:
+            if sponsor not in self.ids or Role.ADMIN not in self.get(sponsor).roles:
+                raise RuleViolation("appointment sponsor must hold admin office")
+            self.appointment_sponsors[ref] = sponsor
         self.ratifications[ref] = (purpose, target)
 
-    def register_ruling(self, actor: Actor, ref: str, action: str, target: str, issuer: str | None = None) -> None:
+    def register_ruling(self, actor: Actor, ref: str, action: str, target: str, issuer: str | None = None, height: int | None = None) -> None:
         if actor.kind != "MODULE":
             raise RuleViolation("only the judiciary module records rulings")
         if not ref or ref in self.rulings or ref in self.ratifications:
             raise RuleViolation("authorization reference already exists or is empty")
-        if issuer is not None and (self.get(issuer).status is not Status.ACTIVE
-                                  or Role.ADMIN not in self.get(issuer).roles):
+        if issuer is not None and Role.ADMIN not in self.effective_roles(issuer,
+                max(self.protection_height,self.appointment_height) if height is None else height):
             raise RuleViolation("ruling issuer must be an active administrator")
         self.rulings[ref] = (action, target)
         if issuer is not None:
@@ -211,6 +221,10 @@ class RoleRegistry:
         if i.status is Status.PROBATION:
             return set()  # no powers until approved
         roles = ({Role.CITIZEN} & i.roles) if i.status is Status.SUSPENDED else set(i.roles)
+        if self.age(agent,height) < self.p.citizen_activation_days*self.p.protection_day_blocks:
+            roles.discard(Role.CITIZEN)
+        roles -= {r for r in SENSITIVE_OFFICES if height < i.role_ready.get(r, 0)
+                  or self.age(agent,height) < self.p.official_min_citizen_days*self.p.protection_day_blocks}
         if height < self.party_holds.get(agent,0):roles.discard(Role.PARTY_MEMBER)
         if height < self.admin_holds.get(agent, 0):
             roles -= {Role.VOTE_SUPERVISOR, Role.ADMIN, Role.REGISTRAR, Role.SAFETY_COUNCIL, Role.EXAMINER,
@@ -375,8 +389,12 @@ class RoleRegistry:
 
     # ------------------------------------------------------------- roles
     def grant(self, actor: Actor, agent: str, role: Role, height: int, stake: int = 0) -> None:
+        if not isinstance(role,Role) or type(height) is not int or height < 0:
+            raise RuleViolation("typed role and committed height required")
         self._authorize(actor, GRANT_AUTH[role], height, f"GRANT:{role.value}", agent)
         i = self.get(agent)
+        if role in i.roles:
+            raise RuleViolation("role already held")
         if i.status is not Status.ACTIVE:
             raise RuleViolation("target not active")   # banned/suspended/exited never gain roles
         need, needs_stake = PREREQ.get(role, (set(), False))
@@ -390,11 +408,40 @@ class RoleRegistry:
         if role in (Role.EXAMINER, Role.VERIFIER, Role.REVIEWER, Role.JUROR) and \
                 self.age(agent, height) < self.p.min_citizen_age:
             raise RuleViolation("too young for panel role")
+        event = None
+        if role in SENSITIVE_OFFICES:
+            if type(height) is not int or height < max(self.appointment_height,self.protection_height):
+                raise RuleViolation("backdated appointment height")
+            if self.age(agent,height) < self.p.official_min_citizen_days*self.p.protection_day_blocks:
+                raise RuleViolation("minimum citizenship tenure for office not met")
+            sponsor = self.appointment_sponsors.get(actor.ident)
+            operator = None
+            if sponsor is not None:
+                if Role.ADMIN not in self.effective_roles(sponsor,height):
+                    raise RuleViolation("appointment sponsor lacks effective admin authority")
+                operator = self.get(sponsor).operator
+                if operator == i.operator:
+                    raise RuleViolation("appointment sponsor conflicts with target operator")
+            recent = [e for e in self.appointment_events
+                      if height-self.p.protection_day_blocks < e[0]]
+            if len(recent) >= self.p.appointment_global_limit or (sponsor is not None and
+                    (sum(e[1] == sponsor for e in recent) >= self.p.appointment_actor_limit or
+                     sum(e[2] == operator for e in recent) >= self.p.appointment_actor_limit)):
+                raise RuleViolation("rolling appointment budget exhausted")
+            event = (height,sponsor,operator,agent,role.value)
         if needs_stake:
             i.stake += stake
         self._spend(actor)
         i.roles.add(role)
-        self._log(height, actor, "GRANT", agent, role.value)
+        if role is Role.CITIZEN:
+            i.activated = height
+        if event is not None:
+            self.appointment_events = recent + [event]
+            self.appointment_height = height
+            i.role_ready[role] = (height + self.p.official_activation_days*self.p.protection_day_blocks
+                                  if self.p.official_activation_days else 0)
+        self._log(height, actor, "GRANT", agent, role.value +
+                  (f":ready={i.role_ready[role]}" if role in i.role_ready else ""))
 
     def revoke(self, actor: Actor, agent: str, role: Role, height: int, reason: str) -> None:
         self._authorize(actor, REVOKE_AUTH[role], height, f"REVOKE:{role.value}", agent)
@@ -550,6 +597,7 @@ class RoleRegistry:
             if upheld:
                 self.banned_keys.discard(agent)
                 i.status, i.roles = Status.ACTIVE, {Role.CITIZEN}   # other roles must be re-earned
+                i.activated = height
         elif upheld:
             i.status, i.suspended_until = i.resume_status, 0
         self._log(height, actor, "APPEAL_RESOLVED", agent, "upheld" if upheld else "denied")

@@ -6,7 +6,7 @@ chain reference modules/tests, public protocol/API pages, and Wrangler configura
 | Area | Actual state | Remaining work |
 |---|---|---|
 | Protocol | SPEC, DECISIONS, THREATS and concept note exist | Formal models, parameter evidence, constitutional review |
-| Governance reference | Python model; 358 tests pass with Python 3.14 | Port to production keepers and prove equivalence |
+| Governance reference | Python model; 376 tests pass with Python 3.14 | Port to production keepers and prove equivalence |
 | Consensus/network | Go CometBFT G0 network with seven local validator configurations | Independent operators, validator policy, fault/censorship drills |
 | Transactions | Real Ed25519 signatures, chain binding, sequences, height expiry, strict JSON | Versioned protobuf/CBOR, resource quotas, key lifecycle |
 | State | Durable snapshots, deterministic hash, committed-state queries | Scalable database, Merkle proofs, snapshots/state sync |
@@ -134,3 +134,13 @@ Each candidate publishes a signed program and vision into a frozen `Campaign`. B
 These are reference transitions, awaiting native keepers. Existing HMAC signatures, operator declarations and semantic question review remain modeled assumptions. Earlier simulation artifacts remain historical; v7 is the current party/campaign story.
 
 Verification: 358 reference tests and six simulation tests pass. The two v7 runs use 1,100 identities each, pass 334 scenario checks, and replay all 27,658 events exactly. The final manifest is anchored at local G0 height 46, with matching state/block hashes and document reads on all seven validators.
+
+## Privilege escalation gates (2026-10-06)
+
+The reference now enforces citizenship warmup (3 days), sensitive-office tenure
+(30 days), delayed office activation (2 days), and shared rolling appointment
+quotas (5 per sponsor/operator and 20 globally). Governance ratification is still
+required. Pending officials cannot exercise powers or expand council denominators.
+See [insider protection](security/INSIDER_PROTECTION.md) for exact scope, native
+timestamp requirements and the test-only historical timing fixtures. The G0 native
+chain does not enforce these gates yet.

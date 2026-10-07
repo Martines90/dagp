@@ -85,6 +85,11 @@ class Params:
     canary_min_samples: int = 20
     # Rolling model-day windows; native keepers must use committed consensus time.
     protection_day_blocks: int = 14_400
+    citizen_activation_days: int = 3
+    official_min_citizen_days: int = 30
+    official_activation_days: int = 2
+    appointment_actor_limit: int = 5
+    appointment_global_limit: int = 20
     sanction_actor_limit: int = 2
     sanction_operator_limit: int = 2
     sanction_global_limit: int = 20
@@ -134,7 +139,14 @@ class Params:
                 or any(type(n) is not int or n<=0 for n in self.ballot_picks)
                 or type(self.min_qualified_parties) is not int or self.min_qualified_parties<1):
             raise ValueError("invalid party/election rules")
-        positive = (self.campaign_min_blocks,self.campaign_questions_per_document,self.max_election_cycle_blocks,
+        if any(type(n) is not int or n < floor for n,floor in (
+                (self.citizen_activation_days,3),(self.official_min_citizen_days,30),
+                (self.official_activation_days,2))):
+            raise ValueError("minimum gates: 3 citizen days, 30 tenure days, 2 office activation days")
+        if (type(self.appointment_actor_limit) is not int or not 1<=self.appointment_actor_limit<=5
+                or type(self.appointment_global_limit) is not int or not 1<=self.appointment_global_limit<=20):
+            raise ValueError("appointment ceilings: 5 per sponsor/operator, 20 globally")
+        positive = (self.appointment_actor_limit,self.appointment_global_limit,self.campaign_min_blocks,self.campaign_questions_per_document,self.max_election_cycle_blocks,
                     self.party_suspend_max,self.party_case_window,self.protection_day_blocks,self.sanction_actor_limit,self.sanction_operator_limit,
                     self.sanction_global_limit,self.sanction_population_floor,self.ban_global_limit,
                     self.admission_actor_limit,self.admission_global_limit,self.pause_actor_limit,

@@ -20,15 +20,15 @@ class ContainmentCase:
     applied: bool = False
 
 class AdminCouncil:
-    def __init__(self, chain, registry, keyring):
+    def __init__(self, chain, registry, keyring, height=0):
         if not isinstance(chain,str) or not chain:raise RuleViolation('chain domain required')
         self.chain,self.reg,self.kr=chain,registry,keyring
         self._rules_hash=registry.p.snapshot_hash()
-        self._roster=self._snapshot()
-        self._version=1;self._cases={};self._last_target={};self._height=0
+        self._roster=self._snapshot(height)
+        self._version=1;self._cases={};self._last_target={};self._height=height
 
-    def _snapshot(self):
-        members=tuple(self.reg.agents_with(Role.ADMIN))
+    def _snapshot(self,height):
+        members=tuple(self.reg.agents_with(Role.ADMIN,height))
         operators={self.reg.get(a).operator for a in members}
         if len(members)<self.reg.p.admin_min_council or len(operators)!=len(members):
             raise RuleViolation('insufficient independent administrators')
@@ -108,7 +108,7 @@ class AdminCouncil:
         self._time(height)
         if any(not c.applied and height<c.expires for c in self._cases.values()):
             raise RuleViolation('cannot change roster during open cases')
-        roster=self._snapshot()
+        roster=self._snapshot(height)
         self.reg._authorize(actor,{'VOTE'},height,'ADMIN_ROSTER',','.join(roster))
         self.reg._spend(actor);self._roster=roster;self._version+=1;self._height=height
         self.reg._log(height,actor,'ADMIN_ROSTER',','.join(roster))

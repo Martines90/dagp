@@ -2,7 +2,7 @@ import unittest
 
 from dagp_ref.crypto_sim import H, SimKeyring
 from dagp_ref.keys import KeyManager
-from dagp_ref.params import Params
+from tests.legacy_params import Params
 from dagp_ref.roles import Actor, RoleRegistry
 from dagp_ref.treasury import RuleViolation
 from tests.fixtures import MODULE
