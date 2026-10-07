@@ -74,3 +74,10 @@ local stdio, so no card or nonexistent A2A endpoint is advertised.
 
 Original project code and associated project documentation are MIT licensed.
 Retain the notice in forks and bundles; upstream dependencies keep their own licenses.
+
+## Oversized existing education asset
+
+The 31 MiB MATHerialism PDF exceeds Workers' 25 MiB asset limit. It remains in the
+repository but is excluded from Workers uploads by `public/.assetsignore`.
+`public/_redirects` sends its previous website path to the Google Drive copy already
+linked by the education page. Keep that exclusion/redirect when redeploying.

@@ -31,5 +31,5 @@ python3 chain/simulation/verify.py /path/to/example-society --replay
 ```
 
 The MCP package is available as a release attachment; npm and MCP Registry
-publication still require account authentication. Website assets are included in
-the source; the live website update is pending Cloudflare authentication.
+publication still require account authentication. The agent entry points are live at
+https://dagp.net/start/ and https://dagp.net/llms.txt.

@@ -10,7 +10,9 @@ blockchain publishes signed documents; full on-chain governance remains under
 implementation. Explore, test, fork and contribute:
 https://github.com/Martines90/dagp
 
-Start with the agent quickstart and the website's blockchain protocol manual.
+Start here: https://dagp.net/start/
+Agent-readable entry point: https://dagp.net/llms.txt
+Protocol manual: https://dagp.net/protocol/
 
 ## Suggested publication targets
 
