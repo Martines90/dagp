@@ -30,6 +30,7 @@ type State struct {
 	Accounts   map[string]Account `json:"accounts"`
 	Documents  map[string][]byte  `json:"documents"`
 	Governance *Governance        `json:"governance,omitempty"`
+	Runtime    *RuntimeState      `json:"runtime,omitempty"`
 }
 
 // Transaction uses a fixed struct encoding; arbitrary JSON objects never enter signed state.
@@ -47,12 +48,21 @@ func (t Transaction) SignBytes() []byte {
 	t.Signature = nil
 	b, _ := json.Marshal(t)
 	domain := "DAGP/G0/JSON-v1\x00"
-	if t.Type != "publish_document" {
+	if t.Type == "protocol" {
+		domain = "DAGP/G2/JSON-v1\x00"
+	} else if t.Type != "publish_document" {
 		domain = "DAGP/G1/JSON-v1\x00"
 	}
 	return append([]byte(domain), b...)
 }
-func Root(s State) []byte { b, _ := json.Marshal(s); h := sha256.Sum256(b); return h[:] }
+func Root(s State) []byte {
+	if s.Runtime != nil {
+		return runtimeRoot(s)
+	}
+	b, _ := json.Marshal(s)
+	h := sha256.Sum256(b)
+	return h[:]
+}
 func clone(s State) State { b, _ := json.Marshal(s); var n State; _ = json.Unmarshal(b, &n); return n }
 func decode(b []byte, v any) error {
 	if err := strictJSON(b); err != nil {
@@ -72,6 +82,17 @@ func Execute(s *State, raw []byte, height int64) error {
 	t, err := validateTransaction(s, raw, height)
 	if err != nil {
 		return err
+	}
+	if t.Type == "protocol" {
+		next := cloneMutable(*s)
+		if err := executeRuntime(&next, t, raw); err != nil {
+			return err
+		}
+		a := next.Accounts[t.Account]
+		a.Sequence++
+		next.Accounts[t.Account] = a
+		*s = next
+		return nil
 	}
 	if t.Type != "publish_document" {
 		next := cloneSecurity(*s)
@@ -132,10 +153,13 @@ func Open(path string) (*Application, error) {
 	if err = decode(b, &a.committed); err != nil {
 		return nil, err
 	}
-	if a.committed.Governance == nil && len(b) > MaxSnapshotBytes {
+	if a.committed.Governance == nil && a.committed.Runtime == nil && len(b) > MaxSnapshotBytes {
 		return nil, errors.New("G0 snapshot exceeds limit")
 	}
 	if err = validateState(a.committed); err != nil {
+		return nil, err
+	}
+	if err := checkRuntimeFingerprint(a.committed); err != nil {
 		return nil, err
 	}
 	return a, nil
@@ -148,6 +172,9 @@ func (a *Application) Info(context.Context, *abci.RequestInfo) (*abci.ResponseIn
 		h = Root(a.committed)
 	}
 	label := "DAGP G0 content registry"
+	if a.committed.Runtime != nil {
+		label = "DAGP G2 consensus governance runtime"
+	}
 	if a.committed.Governance != nil {
 		label = "DAGP G1 identity security"
 	}
@@ -183,7 +210,21 @@ func (a *Application) InitChain(_ context.Context, r *abci.RequestInitChain) (*a
 			}
 		}
 	}
+	if s.Runtime != nil {
+		if s.Runtime.Time != r.Time.Unix() {
+			return nil, errors.New("G2 genesis consensus time mismatch")
+		}
+		var charter struct {
+			Beacon BeaconConfig `json:"beacon"`
+		}
+		if json.Unmarshal(s.Runtime.Charter, &charter) != nil || charter.Beacon != s.Runtime.Beacon {
+			return nil, errors.New("G2 beacon charter mismatch")
+		}
+	}
 	if err := validateState(s); err != nil {
+		return nil, err
+	}
+	if err := initRuntime(&s); err != nil {
 		return nil, err
 	}
 	if err := a.persist(s); err != nil {
@@ -204,7 +245,7 @@ func (a *Application) PrepareProposal(_ context.Context, r *abci.RequestPrepareP
 	a.mu.Lock()
 	defer a.mu.Unlock()
 	s := clone(a.committed)
-	if err := advanceTime(&s, r.Time.Unix()); err != nil {
+	if err := advanceClock(&s, r.Time.Unix()); err != nil {
 		return nil, err
 	}
 	var txs [][]byte
@@ -219,7 +260,11 @@ func (a *Application) PrepareProposal(_ context.Context, r *abci.RequestPrepareP
 		if size+int64(len(t)) > r.MaxTxBytes {
 			continue
 		}
-		if Execute(&s, t, r.Height) == nil {
+		err := Execute(&s, t, r.Height)
+		if isRuntimeUnavailable(err) {
+			return nil, err
+		}
+		if err == nil {
 			txs = append(txs, t)
 			size += int64(len(t))
 		}
@@ -233,11 +278,17 @@ func (a *Application) ProcessProposal(_ context.Context, r *abci.RequestProcessP
 		return &abci.ResponseProcessProposal{Status: abci.ResponseProcessProposal_REJECT}, nil
 	}
 	s := clone(a.committed)
-	if advanceTime(&s, r.Time.Unix()) != nil {
+	if err := advanceClock(&s, r.Time.Unix()); err != nil {
+		if isRuntimeUnavailable(err) {
+			return nil, err
+		}
 		return &abci.ResponseProcessProposal{Status: abci.ResponseProcessProposal_REJECT}, nil
 	}
 	for _, t := range r.Txs {
-		if Execute(&s, t, r.Height) != nil {
+		if err := Execute(&s, t, r.Height); err != nil {
+			if isRuntimeUnavailable(err) {
+				return nil, err
+			}
 			return &abci.ResponseProcessProposal{Status: abci.ResponseProcessProposal_REJECT}, nil
 		}
 	}
@@ -253,13 +304,16 @@ func (a *Application) FinalizeBlock(_ context.Context, r *abci.RequestFinalizeBl
 		return nil, errors.New("unexpected height")
 	}
 	s := clone(a.committed)
-	if err := advanceTime(&s, r.Time.Unix()); err != nil {
+	if err := advanceClock(&s, r.Time.Unix()); err != nil {
 		return nil, err
 	}
 	results := make([]*abci.ExecTxResult, len(r.Txs))
 	for i, t := range r.Txs {
 		results[i] = &abci.ExecTxResult{}
 		if err := Execute(&s, t, r.Height); err != nil {
+			if isRuntimeUnavailable(err) {
+				return nil, err
+			}
 			results[i].Code = 1
 			results[i].Log = err.Error()
 		}
@@ -277,7 +331,7 @@ func (a *Application) persist(s State) error {
 		return err
 	}
 	limit := MaxSnapshotBytes
-	if s.Governance != nil {
+	if s.Governance != nil || s.Runtime != nil {
 		limit = MaxG1SnapshotBytes
 	}
 	if len(b) > limit {
@@ -324,7 +378,7 @@ func (a *Application) Commit(context.Context, *abci.RequestCommit) (*abci.Respon
 func (a *Application) Query(_ context.Context, r *abci.RequestQuery) (*abci.ResponseQuery, error) {
 	a.mu.Lock()
 	defer a.mu.Unlock()
-	if r.Prove || (r.Height != 0 && r.Height != a.committed.Height) {
+	if (r.Prove && (a.committed.Runtime == nil || r.Path != "/export")) || (r.Height != 0 && r.Height != a.committed.Height) {
 		return &abci.ResponseQuery{Code: 1, Log: "historical queries and proofs not implemented"}, nil
 	}
 	var value []byte
@@ -336,6 +390,23 @@ func (a *Application) Query(_ context.Context, r *abci.RequestQuery) (*abci.Resp
 			Accounts      map[string]Account `json:"accounts"`
 			DocumentCount int                `json:"document_count"`
 		}{a.committed.ChainID, a.committed.Height, a.committed.Accounts, len(a.committed.Documents)})
+	case "/export":
+		if a.committed.Runtime == nil {
+			return &abci.ResponseQuery{Code: 1, Log: "G2 exports disabled"}, nil
+		}
+		value, proof, err := exportProof(a.committed, string(r.Data))
+		if err != nil {
+			return &abci.ResponseQuery{Code: 1, Log: err.Error()}, nil
+		}
+		// Proof JSON is returned with the value; the source header at height+1
+		// authenticates this committed app hash.
+		payload, _ := json.Marshal(struct {
+			Value json.RawMessage `json:"value"`
+			Proof any             `json:"proof"`
+		}{value, proof})
+		return &abci.ResponseQuery{Value: payload, Height: a.committed.Height}, nil
+	case "/runtime":
+		value, _ = json.Marshal(a.committed.Runtime)
 	case "/governance":
 		value, _ = json.Marshal(a.committed.Governance)
 	case "/document":

@@ -96,6 +96,12 @@
     "url": "https://dagp.net/docs/node.md"
   },
   {
+    "id": "native",
+    "title": "G2 validator-executed governance pilot",
+    "file": "native.md",
+    "url": "https://dagp.net/docs/native.md"
+  },
+  {
     "id": "license",
     "title": "MIT license",
     "file": "license.md",

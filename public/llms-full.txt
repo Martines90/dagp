@@ -1,6 +1,6 @@
 # DAGP Blockchain Protocol
 
-> Current reference rules; native G0 currently publishes signed documents only.
+> Current rules; G0 publishes signed documents, G1 adds identity security, and opt-in G2 executes governance as a bounded local pilot. See the native governance guide for exact coverage and unfinished work.
 
 ## Purpose and scope
 
@@ -11,12 +11,15 @@ The design separates agenda setting by elected parties, informed approval by cit
 This manual describes the current executable reference rules as of 6 October 2026. Historical examples on the About page and earlier specification sections may differ. The current security documents linked below explain those overrides.
 
 ## What is implemented
+
+Fresh chains can now opt into [G2 validator-executed governance](https://dagp.net/docs/native.md): real signed callers, verified BLS beacons, reviewed proposals, elections, common-budget escrow, courts and experimental subgroup/identity-merger workflows. It is a bounded local pilot with transparent ballots and native ledger units. Existing G0/G1 chains are not automatically upgraded. The G2 guide lists exact coverage, evidence and unfinished engineering.
+
 | Layer | Current capability | Boundary |
 | --- | --- | --- |
 | Native G0 blockchain | Seven local CometBFT validators; Ed25519-signed, SHA-256-addressed documents; sequences, expiry, committed state and restart recovery. | Document publication only. No native governance, identity admission, elections, treasury or public registration service. |
 | Executable governance reference | Python models for identities, roles, parties, elections, comprehension, review, voting, credits, budgets, payments, containment and recovery. | Reference signatures use HMAC stand-ins. Trusted module, court and consensus inputs model capabilities that native authenticated keepers must enforce. |
 | Community simulation | Paired weighted/flat community stories, adversarial checks and deterministic event replay; manifests can be anchored to G0. | Anchoring proves a document commitment; G0 does not execute or verify the governance story. |
-| Public production network | Roadmap and security requirements. | Not deployed. Independent operators, production evidence and identity verification, native keepers and external security review remain required. |
+| Public production network | Roadmap and security requirements. | Not deployed. Independent operators, identity evidence, scalable storage, secret-ballot/custody engineering and external security review remain required. |
 
 [Architecture and integration guide](https://dagp.net/architecture/) · [Implementation status](https://github.com/Martines90/dagp/blob/main/chain/IMPLEMENTATION_STATUS.md) · [G0 contract and operation](https://github.com/Martines90/dagp/blob/main/chain/node/README.md)
 
@@ -277,6 +280,10 @@ This starter uses synthetic citizens and the Python reference model. It does not
 create autonomous LLM agents or move real funds. The native G0 chain currently
 publishes signed documents rather than enforcing governance.
 
+For real signed governance transitions on local validators, use the opt-in
+[G2 native pilot](https://github.com/Martines90/dagp/blob/main/chain/native/README.md). It remains experimental and
+bounded, with transparent ballots and no external asset custody.
+
 ## Run your first society
 
 Requirements: Git and Python 3.10+. No account, API key, paid service, Docker or
@@ -394,8 +401,9 @@ financial or identity network.
    minority protections, replay and bounded emergency authority.
 5. Build real-agent adapters using isolated observations and signed typed actions.
    Do not give each model process access to the complete simulation's secrets.
-6. Implement and review native identity, election, treasury and judicial keepers
-   before relying on blockchain enforcement of governance.
+6. Evaluate the [G2 native governance pilot](https://github.com/Martines90/dagp/blob/main/chain/native/README.md), review
+   its authenticated workflows and finish its listed production gates before
+   relying on it for real identity or financial authority.
 7. Recruit independently operated participants and validators. Seven processes on
    one machine do not establish seven independent trust domains.
 8. Begin with a capped testnet and publish evidence and unresolved assumptions.
@@ -444,10 +452,17 @@ formation, local-budget and merger stories with deterministic replay.
 
 # DAGP architecture and integration guide
 
-Status: current implementation map, 6 October 2026. This document explains the
+Status: current implementation map, 7 October 2026. This document explains the
 actual system for architects and agent integrators. The detailed historical
 [SPEC](https://github.com/Martines90/dagp/blob/main/chain/SPEC.md) contains proposed native architecture and superseded
 examples; it must be read with the current protocol manual and implementation status.
+
+Fresh G2 chains now execute authenticated governance inside validator consensus.
+Go verifies signatures/beacon/checkpoint proofs; a pinned deterministic reducer
+executes the existing state machines. Read the [G2 native contract and limits](https://github.com/Martines90/dagp/blob/main/chain/native/README.md)
+for exact interfaces, evidence and unfinished work. G0/G1 behavior remains unchanged;
+the G0-specific interfaces below do not describe G2. This bounded pilot has
+transparent ballots and native units, with no real custody or public action API.
 
 ## Purpose and suitability
 
@@ -1799,23 +1814,46 @@ production deployment. Those require native keepers, verified proofs and further
 
 # Implementation status
 
-Updated 2026-10-06. Sources reviewed: repository Markdown, the DOCX concept note,
+Updated 2026-10-07. Sources reviewed: repository Markdown, the DOCX concept note,
 chain reference modules/tests, public protocol/API pages, and Wrangler configuration.
+
+## Current native implementation
+
+Fresh chains can opt into [G2 validator-executed governance](https://github.com/Martines90/dagp/blob/main/chain/native/README.md).
+The Go host verifies real signed callers, BLS future-beacon proofs and pinned-peer
+CometBFT export proofs; a fingerprint-pinned deterministic reducer executes the
+reference rules as consensus transitions. It implements reviewed admission,
+parties/pre-elections, campaign comprehension, reviewed proposals, clause voting,
+monthly credits, policy/constitutional thresholds, common-budget escrow,
+authenticated milestone release, appointments, containment, court appeals,
+guardian/session keys, paired subgroup formation and identity-only merger
+covenants. Raw internal capabilities are not transaction endpoints.
+
+G0 and G1 retain their existing behavior. G2 is a bounded local pilot: 1,024
+accounts, 8 MiB governance graph, transparent ballots, native ledger units and
+static peer validator anchors. Million-agent storage/throughput, archival pruning,
+secret ballots/custody, validator upgrades, full tender contracting, native task
+cancellation and local-office bootstrap remain unfinished. Public HTTP admission,
+independent deployment, identity evidence and external audits are separate gates.
+The native runbook states exact tested coverage and unresolved integration work.
+
+The dated entries below are historical delivery records, including previous
+reference-only and G0-only boundaries; they do not supersede this current map.
 
 | Area | Actual state | Remaining work |
 |---|---|---|
 | Protocol | SPEC, DECISIONS, THREATS and concept note exist | Formal models, parameter evidence, constitutional review |
 | Governance reference | Python model; 430 tests pass with Python 3.14 | Port to production keepers and prove equivalence |
-| Consensus/network | Go CometBFT G0 network with seven local validator configurations | Independent operators, validator policy, fault/censorship drills |
-| Transactions | Real Ed25519 signatures, chain binding, sequences, height expiry, strict JSON, bounded quotas and opt-in delayed key rotation | Versioned protobuf/CBOR, guardian recovery and session keys |
-| State | Durable snapshots, deterministic hash, committed-state queries | Scalable database, Merkle proofs, snapshots/state sync |
+| Consensus/network | Local CometBFT networks; G0/G1 and fresh opt-in G2 | Independent operators, validator policy, broader fault/censorship drills |
+| Transactions | Real Ed25519, sequence/expiry, strict JSON, quotas; G2 guardian recovery and session scopes | Versioned protobuf/CBOR, public SDK/API |
+| State | Durable snapshots, committed-state queries; G2 named-export Merkle proofs | Scalable archival database, general state proofs, snapshots/state sync |
 | Documents | Signed SHA-256 content-addressed publishing up to 64 KiB | Availability attestations for larger documents |
-| Registration | Roadmap only | Worker/D1, challenge-first admission, signed evidence, admin review, SSRF defense |
-| Governance on chain | Opt-in native G1 identity-security keeper; broader governance remains reference-only | Identity/roles → proposals/deliberation → examiner/tally → escrow/review → elections/courts |
-| Cryptography | Ed25519 on G0; HMAC stand-in in reference | Sealing/timelocks, beacon verification, threshold custody |
+| Registration | G2 funded prior challenge and assigned registrar admission | Public HTTP gateway, external identity evidence and gateway abuse/SSRF defenses |
+| Governance on chain | G1 foundation; opt-in G2 signed consensus governance workflows | Pilot resource/archival limits, complete execution/tendering and formal equivalence |
+| Cryptography | Real Ed25519/BLS and pinned-peer checkpoint proofs in G2; HMAC only in reference simulations | Sealing/timelocks, threshold custody, peer/validator rotation |
 | Website | Live static manual, agent discovery, architecture/integration guides and read-only documentation MCP | Public governance API, SDK, versioned OpenAPI and schemas |
 | Deployment | Cloudflare website live; native validators local only | Governance gateway/read mirror; independently hosted nodes; monitoring/recovery |
-| Production readiness | G0 only | SDK integration, audits, simulation, independent validators, external anchoring |
+| Production readiness | Experimental local pilots; no production governance deployment | Scale/storage, custody/privacy, SDK integration, audits, independent validators |
 
 ## Community simulation (2026-10-06)
 
@@ -2828,6 +2866,11 @@ million-agent performance evidence, remote finality verification or financial mi
 
 # DAGP G0 network
 
+This runbook describes the unchanged G0 document network. Fresh chains can also
+opt into the [G2 validator-executed governance pilot](https://github.com/Martines90/dagp/blob/main/chain/native/README.md), with
+real transaction authentication, verified beacons and experimental institutional
+workflows. Existing devnets are not silently upgraded.
+
 An executable, local seven-validator CometBFT v0.38.21 network with a Go ABCI++
 application. This is the first network foundation, not the full DAGP governance chain.
 All validators run on one machine and therefore provide **no operator independence**.
@@ -2917,6 +2960,173 @@ privilege gates, rolling freeze quotas, frozen-roster peer containment and delay
 Ed25519 key rotation. See [keeper rules and test command](https://github.com/Martines90/dagp/blob/main/chain/node/SECURITY_KEEPER.md).
 G0 devnets are not implicitly upgraded. This implements identity-security
 transitions, not the remaining elections, comprehension or treasury keepers.
+
+
+# G2 validator-executed governance pilot
+
+G2 is an opt-in consensus runtime for fresh local chains. It executes governance
+transitions during CometBFT proposal validation and finalization, and commits the
+resulting governance state. It does not merely anchor simulation reports.
+Existing G0 and G1 networks retain their wire format and state hashing.
+
+**This is an experimental bounded pilot, not a production financial network.**
+The native ledger uses charter-issued units. No public registration gateway,
+external asset custody, independent validator deployment or external audit is
+provided by this implementation.
+
+## Authority boundary
+
+The Go application verifies the real Ed25519 transaction signature, chain,
+sequence, height expiry and delegated session scope. It supplies the authenticated
+caller and committed UTC consensus time to a pinned Python reducer. Transactions
+cannot supply a MODULE, COURT or VOTE capability, arbitrary Python method, object
+graph, code path or authority flag. Internal single-use capabilities are created
+only after the corresponding authorized workflow succeeds.
+
+The reducer reuses the reference state machines. Its `Receipts` record actions
+already authenticated by Go; they are not HMAC simulation signatures. Question
+answers require individual transactions from three of five assigned examiners.
+Question banks, role effects and exact budgets are bound to the reviewed proposal
+digest. Refinement clears prior approvals. Invalid transactions discard the entire
+write set and consume neither sequence nor quota.
+
+State serialization is canonical, bounded JSON with an explicit class allowlist,
+references and shared object identity. It uses no pickle or client-selected import.
+Validators execute the same pinned code and Python implementation/version
+(major/minor/patch); startup checks the fingerprint and
+reconstructs committed state. Runtime infrastructure failures stop validation
+rather than being treated as a locally chosen failed transaction.
+
+## Implemented transaction families
+
+Every action uses type `protocol`, with body `{"operation":"…","args":{…}}`.
+The signing domain is `DAGP/G2/JSON-v1` followed by a zero byte and the fixed Go
+transaction struct with signature null. Bodies are base64 in the outer envelope.
+The exact field sets are enforced in `dagp_native/engine.py` and `merger.py`.
+
+| Family | Native behavior |
+|---|---|
+| `wallet.transfer` | Conserved native ledger units; bounded citizen sponsorship of new accounts |
+| `identity.*` | Prefunded prior challenge, key possession, assigned registrar review, probation, three-day civic warmup, heartbeat, exit and bounded temporary freezes |
+| `beacon.publish` | Collective BLS proof verification, frozen future-round schedule and jurisdiction-specific assignments |
+| `party.*` | Ten individual founder consents, exclusive membership, internal frozen-roster sanctions |
+| `pre.*`, `campaign.*`, `election.open` | 5/3 support points, 5% qualification, committed candidate programs and visions, mandatory campaign comprehension |
+| `proposal.*` | Independent supervisors, signed party discussion, versioned refinement, fresh approval, locking, reviewed budget reservation |
+| `exam.*`, `vote.*` | Independent per-voter grading, certification-board audits, electorate/rule snapshots, weighted ballots, quorum, challenges, finalization and independent clause outcomes |
+| `role.accept`, `role.apply` | Candidate consent, finalized referendum authority, current tenure, activation delay, shared sponsoring-operator and global appointment quotas |
+| Parameter and constitutional ballots | Protected allowlist; 66% parameter approval with general quorum; 66% constitutional approval with 50% participation; next-month parameter activation |
+| Monthly agenda credits | Elected parties only; floor(vote share / governed credit step), UTC monthly replacement, existing debt/refund protections |
+| `milestone.approve`, `treasury.pause` | Actual assigned verifier approvals; exact funded tranche, deadline and conservation checks; bounded emergency pause |
+| `admin.*`, `court.*` | Frozen-roster council containment; voted roster refresh; independent jury and subsequent court-administrator assignment; quotas, sanctions and appeals |
+| `key.*` | Real new-key possession, delayed rotation, independent guardian recovery and limited expiring session keys |
+| `society.*` | Founder consent, mandatory ancestor review, paired parent/cohort formation ballots, cooling-off, inherited constraints, local political state and parent-reserved budgets |
+| `merger.*` | Bilateral 80% participation/approval mandates, notice/cooling-off, verified peer exports, voluntary source exit, identity-only import, warmup, replay protection and unclaimed-export recovery |
+
+The genesis identity/operator/family labels and prior tenure remain charter trust
+assumptions. Random assignments make declared insider coordination harder; they
+cannot detect secretly shared ownership. Human-quality comprehension, truthful
+grading and actual project delivery are not established by cryptography alone.
+
+## Randomness and remote checkpoints
+
+Randomness uses `pedersen-bls-unchained`: one charter-pinned collective G1 public
+key, a G2 BLS signature over SHA-256 of the absolute round encoded as eight
+big-endian bytes, and SHA-256(signature) as the seed. Each pool commits before its
+scheduled future round. A signed early, wrong-round or forged proof is refused.
+Jurisdictions share the authenticated external beacon, with separate local rounds.
+
+G2 application roots are CometBFT Merkle roots over metadata, governance graph,
+accounts, documents and named exports. `/export`, with the export key as request
+data, returns `{value,proof}` at committed application height H. A signed header
+and commit at H+1 authenticate that application root. Proof JSON is returned in
+the value; it is not an ABCI `ProofOps` response. Historical export queries and
+general state-sync/light-client services remain unsupported.
+
+`receipt/<account>` exports the account's latest accepted protocol result and
+transaction digest, including challenge/ticket/assignment identifiers. Clients
+must match the expected digest: the next accepted action replaces that receipt.
+
+Peer chains must be declared in genesis with their expected code hash and seven
+or more distinct Ed25519 validators. Incoming proofs require the exact chain,
+pinned current/next validator-set hashes, a real greater-than-two-thirds commit,
+the exact export Merkle leaf and its chain/code commitment. Remote validators are
+a trust anchor, not a proof that their software is honest. Validator rotation and
+dynamic peer admission require a coordinated upgrade; no user transaction can
+replace the trust anchors.
+
+Merger admission imports citizenship only. Source offices, parties, agenda
+credits, treasury assets, debts and contracts do not migrate. A source citizen
+exits before a receiving claim; the claim needs receiving-key possession and a
+funded receiving bond. Imported citizenship warms up for three days, and offices
+must be earned again. An unclaimed exit can be restored only after the receiving
+deadline has closed and an authenticated claim-tree proof establishes non-claim.
+
+## Running and verification
+
+Use Python 3.10+ with the same interpreter version on every validator, Go 1.26.8,
+and fresh genesis/state directories. Build the node tools in `chain/node`:
+
+```sh
+go build -o bin/dagpd ./cmd/dagpd
+go build -o bin/dagp-key ./cmd/dagp-key
+go build -o bin/cometbft ./cmd/cometbft
+python3 scripts/governance_devnet.py --home /tmp/dagp-g2-fresh
+```
+
+The runner refuses to overwrite its home, launches seven local validators with
+100 citizens and 50 charter admins, signs founder consents and pre-election
+ballots, rejects replay/raw authority calls, compares committed roots, and stops
+its processes. Its beacon generator key is a public test fixture. It does not
+deploy a production randomness service. Evidence is saved to
+`chain/node/test-results/g2-governance.json`; private keys remain outside Git.
+
+```sh
+PYTHONPATH=chain/native:chain/reference python3 -m unittest discover -s chain/native/tests -q
+PYTHONPATH=chain/reference python3 -m unittest discover -s chain/reference/tests -q
+cd chain/node
+go test -race -count=1 ./...
+```
+
+Native adapter stories cover elections, a five-clause 3/5 funded outcome and
+milestone release, admission gates, court/appeal separation, paired subgroup
+formation, monthly parameter activation with a live council case, suspension
+expiry and bilateral merger/failed-claim recovery. Their trusted-host inputs
+are explicit fixtures. Go tests independently use real Ed25519/BLS signatures
+and real CometBFT checkpoint verification, plus persistence/restart and
+cross-process hash agreement. Long day/month phases use advanced committed-time
+fixtures, not shortened protocol thresholds.
+
+Go's test cache cannot track external Python source changes; use `-count=1` for
+these integrated checks. The node Makefile does this automatically.
+
+## Pilot limits and unfinished engineering
+
+Accounts are capped at 1,024, object graphs at 8 MiB/50,000 nodes, exports at 1 MiB, transaction
+bodies at 64 KiB and blocks at 128 transactions/2 MiB. The reducer currently
+starts a process and serializes its graph for each invocation. Audit/receipt
+history consumes graph capacity; there is no archival database or pruning yet.
+These bounds prevent unbounded input but do not establish sustainable production
+throughput or million-member operation.
+
+New account funding requires an eligible citizen, at least bond+one unit, at most
+five new accounts per operator and forty globally per rolling day. A challenge
+consumes one unit into the common pool. Signing accounts are retained rather
+than silently reused. Reaching pilot capacity requires an explicit migration.
+
+Ballots are transparent consensus state. API phase restrictions do **not** provide
+cryptographic secrecy; committed question-answer receipts are also observable.
+Timelock encryption, secret ballots, threshold custody, large-document
+availability, formal equivalence, upgrade/validator governance, scalable indexed
+storage and state sync remain unfinished. Entrenched `CORE` votes, governed task
+cancellation and full tender/execution contracting are not exposed as native
+actions. Constitutional ballots are a distinct implemented kind.
+
+Small cohorts retain safety thresholds: formation is possible using the parent
+professional pool, but later local votes need sufficient local qualifications
+and independent officials. Offices do not flow down automatically. A cell with
+too few examiners cannot replace the 51-member board with insiders. Local-office
+bootstrap and campaign parent-permission UX need further integration work.
+Do not treat the experimental structural handlers as a production merger bridge.
 
 
 MIT License

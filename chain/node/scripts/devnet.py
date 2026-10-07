@@ -5,10 +5,10 @@ ROOT = pathlib.Path(__file__).resolve().parents[1]
 BIN, HOME = ROOT/'bin', ROOT/'.devnet'
 def command(*args):
     return subprocess.check_output([str(x) for x in args], text=True).strip()
-def rpc(i, method, params=None):
+def rpc(i, method, params=None, timeout=3):
     data=json.dumps(dict(jsonrpc='2.0', id=1, method=method, params=params or {})).encode()
     req=urllib.request.Request(f'http://127.0.0.1:{26657+i*10}', data, {'Content-Type':'application/json'})
-    with urllib.request.urlopen(req, timeout=3) as response: result=json.load(response)
+    with urllib.request.urlopen(req, timeout=timeout) as response: result=json.load(response)
     if 'error' in result: raise RuntimeError(result['error'])
     return result['result']
 def initialize():

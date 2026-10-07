@@ -174,7 +174,9 @@ class RoleRegistry:
             if service is None:raise RuleViolation('court official assignment required')
             task='court:'+ref;result=service._results.get(('admin_review',task))
             if result is None or issuer != result.members[0]:raise RuleViolation('court issuer was not randomly assigned')
-            subjects=(target,) if target in self.ids else subjects
+            if target in self.ids:
+                subjects=(target,) if subjects is None else subjects
+                if target not in subjects:raise RuleViolation('court identity target must be recused')
             if not subjects:raise RuleViolation('authoritative court case subjects required')
             require_assignment(self,service.chain,'admin_review',task,result.members,
                                height if height is not None else service._height,subjects)

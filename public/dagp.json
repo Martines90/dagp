@@ -6,12 +6,12 @@
   "repository": "https://github.com/Martines90/dagp",
   "license": "MIT",
   "implementation": {
-    "native": "G0 signed documents only",
-    "governance": "Python reference model",
+    "native": "G0 documents; G1 identity security; opt-in G2 consensus governance pilot",
+    "governance": "Python reference and pinned validator-executed reducer",
     "public_registration": false,
     "real_treasury": false,
-    "nested_societies": "Python reference; no native keepers",
-    "society_mergers": "identity-only Python reference; no native bridge or asset migration"
+    "nested_societies": "reference and experimental G2 structural handlers; local-office integration unfinished",
+    "society_mergers": "identity-only reference and experimental G2 verified-export covenants; no asset migration"
   },
   "documents": [
     {
@@ -109,6 +109,12 @@
       "title": "Native G0 runbook",
       "file": "node.md",
       "url": "https://dagp.net/docs/node.md"
+    },
+    {
+      "id": "native",
+      "title": "G2 validator-executed governance pilot",
+      "file": "native.md",
+      "url": "https://dagp.net/docs/native.md"
     },
     {
       "id": "license",

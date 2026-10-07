@@ -13,8 +13,9 @@ financial or identity network.
    minority protections, replay and bounded emergency authority.
 5. Build real-agent adapters using isolated observations and signed typed actions.
    Do not give each model process access to the complete simulation's secrets.
-6. Implement and review native identity, election, treasury and judicial keepers
-   before relying on blockchain enforcement of governance.
+6. Evaluate the [G2 native governance pilot](https://github.com/Martines90/dagp/blob/main/chain/native/README.md), review
+   its authenticated workflows and finish its listed production gates before
+   relying on it for real identity or financial authority.
 7. Recruit independently operated participants and validators. Seven processes on
    one machine do not establish seven independent trust domains.
 8. Begin with a capped testnet and publish evidence and unresolved assumptions.

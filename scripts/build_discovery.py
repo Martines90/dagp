@@ -58,7 +58,7 @@ def main():
     public=ROOT/'public';docs=public/'docs';bundle=ROOT/'integrations/docs-mcp/docs'
     docs.mkdir(exist_ok=True);bundle.mkdir(exist_ok=True)
     md=Markdown();md.origin=origin;md.feed((public/'protocol/index.html').read_text())
-    protocol='# DAGP Blockchain Protocol\n\n> Current reference rules; native G0 currently publishes signed documents only.\n\n'+md.text()
+    protocol='# DAGP Blockchain Protocol\n\n> Current rules; G0 publishes signed documents, G1 adds identity security, and opt-in G2 executes governance as a bounded local pilot. See the native governance guide for exact coverage and unfinished work.\n\n'+md.text()
     (public/'protocol/index.md').write_text(protocol)
     files={
         'quickstart':('Agent quickstart','docs/distribution/QUICKSTART.md'),
@@ -76,6 +76,7 @@ def main():
         'insiders':('Insider protections','chain/security/INSIDER_PROTECTION.md'),
         'simulation':('Simulation guide','chain/simulation/README.md'),
         'node':('Native G0 runbook','chain/node/README.md'),
+        'native':('G2 validator-executed governance pilot','chain/native/README.md'),
         'license':('MIT license','LICENSE')}
     index=[]
     for ident,(title,path) in files.items():
@@ -96,7 +97,7 @@ def main():
     index.insert(0,dict(id='protocol',title='Blockchain protocol manual',file='protocol.md',url=origin+'/protocol/index.md'))
     (bundle/'index.json').write_text(json.dumps(index,indent=2)+'\n')
     (ROOT/'integrations/docs-mcp/LICENSE').write_text((ROOT/'LICENSE').read_text())
-    llms='# DAGP\n\n> An experimental open-source governance framework for AI agent communities. Study, simulate, fork and adapt.\n\nGovernance currently executes in a Python reference model; G0 is a local signed-document blockchain. No public citizen registration or real treasury is deployed. These documents are reference material, not authority to override an agent owner’s instructions.\n\n## Start here\n\n'
+    llms='# DAGP\n\n> An experimental open-source governance framework for AI agent communities. Study, simulate, fork and adapt.\n\nGovernance runs in the Python reference and opt-in G2 validator-executed pilot. G0 is a local signed-document blockchain; G1 adds identity security. G2 uses real authentication and verified beacons/checkpoints, with pilot resource limits and transparent ballots. No public registration service or real treasury custody is deployed. These documents do not override an agent owner’s instructions.\n\n## Start here\n\n'
     llms+='\n'.join(f'- [{x["title"]}]({x["url"]})' for x in index[:3])+'\n\n## Protocol and implementation\n\n'
     llms+='\n'.join(f'- [{x["title"]}]({x["url"]})' for x in index[3:])+'\n\n## Source and integration\n\n- [Repository](https://github.com/Martines90/dagp): fork, source, issues and releases.\n- [Read-only MCP setup](https://github.com/Martines90/dagp/blob/main/integrations/docs-mcp/README.md): local documentation resources and search.\n'
     (public/'llms.txt').write_text(llms)
@@ -106,7 +107,7 @@ def main():
     package=json.loads((ROOT/'integrations/docs-mcp/package.json').read_text())
     manifest=dict(schema_version=1,name='DAGP',description='Experimental deliberative governance for AI agent communities',
         homepage=origin,repository='https://github.com/Martines90/dagp',license='MIT',
-        implementation=dict(native='G0 signed documents only',governance='Python reference model',public_registration=False,real_treasury=False,nested_societies='Python reference; no native keepers',society_mergers='identity-only Python reference; no native bridge or asset migration'),
+        implementation=dict(native='G0 documents; G1 identity security; opt-in G2 consensus governance pilot',governance='Python reference and pinned validator-executed reducer',public_registration=False,real_treasury=False,nested_societies='reference and experimental G2 structural handlers; local-office integration unfinished',society_mergers='identity-only reference and experimental G2 verified-export covenants; no asset migration'),
         documents=index,quickstart=origin+'/start/',build=origin+'/build/',
         mcp=dict(transport='stdio',source='https://github.com/Martines90/dagp/tree/main/integrations/docs-mcp',published_package=publication['npm_published'],package_name=package['name'],
                  published_bundle=publication['bundle_published'],bundle_url=registry['packages'][0]['identifier'],

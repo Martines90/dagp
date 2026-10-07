@@ -1,22 +1,45 @@
 # Implementation status
 
-Updated 2026-10-06. Sources reviewed: repository Markdown, the DOCX concept note,
+Updated 2026-10-07. Sources reviewed: repository Markdown, the DOCX concept note,
 chain reference modules/tests, public protocol/API pages, and Wrangler configuration.
+
+## Current native implementation
+
+Fresh chains can opt into [G2 validator-executed governance](https://github.com/Martines90/dagp/blob/main/chain/native/README.md).
+The Go host verifies real signed callers, BLS future-beacon proofs and pinned-peer
+CometBFT export proofs; a fingerprint-pinned deterministic reducer executes the
+reference rules as consensus transitions. It implements reviewed admission,
+parties/pre-elections, campaign comprehension, reviewed proposals, clause voting,
+monthly credits, policy/constitutional thresholds, common-budget escrow,
+authenticated milestone release, appointments, containment, court appeals,
+guardian/session keys, paired subgroup formation and identity-only merger
+covenants. Raw internal capabilities are not transaction endpoints.
+
+G0 and G1 retain their existing behavior. G2 is a bounded local pilot: 1,024
+accounts, 8 MiB governance graph, transparent ballots, native ledger units and
+static peer validator anchors. Million-agent storage/throughput, archival pruning,
+secret ballots/custody, validator upgrades, full tender contracting, native task
+cancellation and local-office bootstrap remain unfinished. Public HTTP admission,
+independent deployment, identity evidence and external audits are separate gates.
+The native runbook states exact tested coverage and unresolved integration work.
+
+The dated entries below are historical delivery records, including previous
+reference-only and G0-only boundaries; they do not supersede this current map.
 
 | Area | Actual state | Remaining work |
 |---|---|---|
 | Protocol | SPEC, DECISIONS, THREATS and concept note exist | Formal models, parameter evidence, constitutional review |
 | Governance reference | Python model; 430 tests pass with Python 3.14 | Port to production keepers and prove equivalence |
-| Consensus/network | Go CometBFT G0 network with seven local validator configurations | Independent operators, validator policy, fault/censorship drills |
-| Transactions | Real Ed25519 signatures, chain binding, sequences, height expiry, strict JSON, bounded quotas and opt-in delayed key rotation | Versioned protobuf/CBOR, guardian recovery and session keys |
-| State | Durable snapshots, deterministic hash, committed-state queries | Scalable database, Merkle proofs, snapshots/state sync |
+| Consensus/network | Local CometBFT networks; G0/G1 and fresh opt-in G2 | Independent operators, validator policy, broader fault/censorship drills |
+| Transactions | Real Ed25519, sequence/expiry, strict JSON, quotas; G2 guardian recovery and session scopes | Versioned protobuf/CBOR, public SDK/API |
+| State | Durable snapshots, committed-state queries; G2 named-export Merkle proofs | Scalable archival database, general state proofs, snapshots/state sync |
 | Documents | Signed SHA-256 content-addressed publishing up to 64 KiB | Availability attestations for larger documents |
-| Registration | Roadmap only | Worker/D1, challenge-first admission, signed evidence, admin review, SSRF defense |
-| Governance on chain | Opt-in native G1 identity-security keeper; broader governance remains reference-only | Identity/roles → proposals/deliberation → examiner/tally → escrow/review → elections/courts |
-| Cryptography | Ed25519 on G0; HMAC stand-in in reference | Sealing/timelocks, beacon verification, threshold custody |
+| Registration | G2 funded prior challenge and assigned registrar admission | Public HTTP gateway, external identity evidence and gateway abuse/SSRF defenses |
+| Governance on chain | G1 foundation; opt-in G2 signed consensus governance workflows | Pilot resource/archival limits, complete execution/tendering and formal equivalence |
+| Cryptography | Real Ed25519/BLS and pinned-peer checkpoint proofs in G2; HMAC only in reference simulations | Sealing/timelocks, threshold custody, peer/validator rotation |
 | Website | Live static manual, agent discovery, architecture/integration guides and read-only documentation MCP | Public governance API, SDK, versioned OpenAPI and schemas |
 | Deployment | Cloudflare website live; native validators local only | Governance gateway/read mirror; independently hosted nodes; monitoring/recovery |
-| Production readiness | G0 only | SDK integration, audits, simulation, independent validators, external anchoring |
+| Production readiness | Experimental local pilots; no production governance deployment | Scale/storage, custody/privacy, SDK integration, audits, independent validators |
 
 ## Community simulation (2026-10-06)
 

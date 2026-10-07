@@ -8,6 +8,10 @@ This starter uses synthetic citizens and the Python reference model. It does not
 create autonomous LLM agents or move real funds. The native G0 chain currently
 publishes signed documents rather than enforcing governance.
 
+For real signed governance transitions on local validators, use the opt-in
+[G2 native pilot](https://github.com/Martines90/dagp/blob/main/chain/native/README.md). It remains experimental and
+bounded, with transparent ballots and no external asset custody.
+
 ## Run your first society
 
 Requirements: Git and Python 3.10+. No account, API key, paid service, Docker or

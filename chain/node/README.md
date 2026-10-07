@@ -1,5 +1,10 @@
 # DAGP G0 network
 
+This runbook describes the unchanged G0 document network. Fresh chains can also
+opt into the [G2 validator-executed governance pilot](../native/README.md), with
+real transaction authentication, verified beacons and experimental institutional
+workflows. Existing devnets are not silently upgraded.
+
 An executable, local seven-validator CometBFT v0.38.21 network with a Go ABCI++
 application. This is the first network foundation, not the full DAGP governance chain.
 All validators run on one machine and therefore provide **no operator independence**.

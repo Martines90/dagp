@@ -15,6 +15,7 @@ executable reference model, static observer website, and local blockchain founda
 - [Chain specification and reference](chain/README.md)
 - [Implementation status and remaining work](chain/IMPLEMENTATION_STATUS.md)
 - [Run the seven-validator G0 devnet](chain/node/README.md)
+- [G2 native governance pilot and exact limits](chain/native/README.md)
 - [Run the community lifecycle simulation](chain/simulation/README.md)
 - [Parties, pre-elections, campaign exams and parliament](chain/security/PARTIES_ELECTIONS.md)
 - [Monthly credits, governed constants and clause voting](chain/security/POLICY_POINTS.md)
@@ -52,26 +53,27 @@ with `python3 scripts/build_discovery.py`; publication is a separate operation.
 [MIT](LICENSE): fork, modify and redistribute with attribution. Dependencies retain
 their own licenses. See [contributing](CONTRIBUTING.md) for contribution pathways.
 
-Administrative privilege escalation is bounded in the governance reference by a
+Administrative privilege escalation is bounded in the reference and opt-in G2 runtime by a
 3-day citizenship warmup, 30-day office tenure, 2-day office activation delay,
 and shared rolling appointment limits (5 per sponsoring admin/operator, 20 globally).
 Appointments still require governance approval. See the
-[insider protection rules](chain/security/INSIDER_PROTECTION.md). Native G0 does
-not yet implement these governance gates.
+[insider protection rules](chain/security/INSIDER_PROTECTION.md). G0 remains a
+document chain; fresh G2 chains execute these governance gates under consensus.
 
-The reference also enforces [independent delegated-task assignments](chain/security/TASK_ASSIGNMENTS.md):
+The reference and G2 enforce [independent delegated-task assignments](chain/security/TASK_ASSIGNMENTS.md):
 future-beacon selection from frozen eligible pools, distinct operators, party and
 beneficiary exclusions, repeat-pairing limits, and audited cancellation. Native
-beacon verification, assignment keepers and complete court/tender workflows remain
-unimplemented.
+G2 verifies collective BLS beacons and implements independent court assignments.
+Complete tender contracting and governed task cancellation remain unfinished.
 
 Current website and repository guides explain purpose, adoption tradeoffs, technical
 architecture, existing-society integration and actual implementation boundaries.
 Historical specification examples, reports and immutable release bundles retain
 their dates and are explicitly distinguished from current rules. Nested governance and identity-only merging now run in the optional Python reference.
-Native hierarchy, remote finality proofs and financial migration remain unfinished.
+G2 adds experimental hierarchy and authenticated remote export proofs.
+Financial migration remains unsupported.
 Run `python3 scripts/simulate_societies.py` for five deterministic institutional stories.
 
 Native validators now have an opt-in [G1 identity-security keeper](chain/node/SECURITY_KEEPER.md)
 for administrator gates, rolling freeze quotas, peer containment and delayed key
-rotation. Broader governance remains reference-only; G0 is not implicitly upgraded.
+rotation. Fresh G2 chains execute broader governance; G0/G1 are not implicitly upgraded.

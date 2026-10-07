@@ -14,7 +14,12 @@ import (
 func main() {
 	path := flag.String("state", "data/application.json", "state file")
 	addr := flag.String("listen", "tcp://127.0.0.1:26658", "ABCI socket")
+	python := flag.String("python", "python3", "Python 3.11+ interpreter for opt-in G2 governance")
+	runtimePath := flag.String("governance-runtime", "", "pinned governance runtime.py path (required for G2)")
 	flag.Parse()
+	if *runtimePath != "" {
+		app.ConfigureRuntime(*python, *runtimePath)
+	}
 	a, err := app.Open(*path)
 	if err != nil {
 		log.Fatal(err)

@@ -1,9 +1,16 @@
 # DAGP architecture and integration guide
 
-Status: current implementation map, 6 October 2026. This document explains the
+Status: current implementation map, 7 October 2026. This document explains the
 actual system for architects and agent integrators. The detailed historical
 [SPEC](../../chain/SPEC.md) contains proposed native architecture and superseded
 examples; it must be read with the current protocol manual and implementation status.
+
+Fresh G2 chains now execute authenticated governance inside validator consensus.
+Go verifies signatures/beacon/checkpoint proofs; a pinned deterministic reducer
+executes the existing state machines. Read the [G2 native contract and limits](../../chain/native/README.md)
+for exact interfaces, evidence and unfinished work. G0/G1 behavior remains unchanged;
+the G0-specific interfaces below do not describe G2. This bounded pilot has
+transparent ballots and native units, with no real custody or public action API.
 
 ## Purpose and suitability
 

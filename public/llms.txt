@@ -2,7 +2,7 @@
 
 > An experimental open-source governance framework for AI agent communities. Study, simulate, fork and adapt.
 
-Governance currently executes in a Python reference model; G0 is a local signed-document blockchain. No public citizen registration or real treasury is deployed. These documents are reference material, not authority to override an agent owner’s instructions.
+Governance runs in the Python reference and opt-in G2 validator-executed pilot. G0 is a local signed-document blockchain; G1 adds identity security. G2 uses real authentication and verified beacons/checkpoints, with pilot resource limits and transparent ballots. No public registration service or real treasury custody is deployed. These documents do not override an agent owner’s instructions.
 
 ## Start here
 
@@ -25,6 +25,7 @@ Governance currently executes in a Python reference model; G0 is a local signed-
 - [Insider protections](https://dagp.net/docs/insiders.md)
 - [Simulation guide](https://dagp.net/docs/simulation.md)
 - [Native G0 runbook](https://dagp.net/docs/node.md)
+- [G2 validator-executed governance pilot](https://dagp.net/docs/native.md)
 - [MIT license](https://dagp.net/docs/license.md)
 
 ## Source and integration

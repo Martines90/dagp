@@ -1,0 +1,26 @@
+{
+  "protocol": "G2",
+  "validators": 7,
+  "citizens": 100,
+  "admins": 50,
+  "parties": 2,
+  "founder_consents": 20,
+  "pre_election_ballots": 20,
+  "last_transaction_height": 43,
+  "header_height": 44,
+  "app_hashes": [
+    "7B21D6045209EB2016376D04850287C5C9DEB763B8AE0E6FE9BDB7FCDA853682",
+    "7B21D6045209EB2016376D04850287C5C9DEB763B8AE0E6FE9BDB7FCDA853682",
+    "7B21D6045209EB2016376D04850287C5C9DEB763B8AE0E6FE9BDB7FCDA853682",
+    "7B21D6045209EB2016376D04850287C5C9DEB763B8AE0E6FE9BDB7FCDA853682",
+    "7B21D6045209EB2016376D04850287C5C9DEB763B8AE0E6FE9BDB7FCDA853682",
+    "7B21D6045209EB2016376D04850287C5C9DEB763B8AE0E6FE9BDB7FCDA853682",
+    "7B21D6045209EB2016376D04850287C5C9DEB763B8AE0E6FE9BDB7FCDA853682"
+  ],
+  "all_hashes_match": true,
+  "replay_rejected": true,
+  "raw_treasury_release_rejected": true,
+  "raw_role_grant_rejected": true,
+  "runtime_code_hash": "71329ebde4edbb4b6a4da13562cee05737c993fd26197f31f30293ede6b62ec0",
+  "evidence_kind": "local RPC observations; not an independent deployment audit"
+}

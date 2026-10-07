@@ -98,6 +98,11 @@ return committed keeper state; historical queries and proof requests remain refu
 
 ## Remaining native engineering
 
+This section records the G1 boundary. A fresh-chain
+[G2 governance runtime](../native/README.md) now implements the broader signed
+workflow under validator consensus. Read its exact coverage and pilot limits;
+G1 remains unchanged and is not implicitly upgraded.
+
 This foundation does not implement randomized assignment/beacon verification,
 reviewed admission, governed role appointments, parties, campaign comprehension,
 elections, proposals, clause voting, policy changes, courts, credits, milestone

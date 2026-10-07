@@ -106,7 +106,10 @@ func validateState(s State) error {
 	if size > MaxStoreBytes {
 		return errors.New("store capacity")
 	}
-	return validateGovernance(s)
+	if err := validateGovernance(s); err != nil {
+		return err
+	}
+	return validateRuntimeState(s)
 }
 func validBlock(txs [][]byte) bool {
 	if len(txs) > MaxBlockTransactions {
@@ -146,11 +149,18 @@ func validateTransaction(s *State, raw []byte, height int64) (Transaction, error
 		}
 	}
 	a, ok := s.Accounts[t.Account]
+	if !ok {
+		a, ok = registrationAccount(s, t)
+	}
 	if !ok || len(a.Key) != ed25519.PublicKeySize || t.ChainID != s.ChainID || t.Sequence != a.Sequence || a.Sequence == math.MaxUint64 || t.ValidUntil < height || t.ValidUntil > height+1000 {
 		return t, errors.New("invalid account, domain, sequence or expiry")
 	}
-	if !ed25519.Verify(a.Key, t.SignBytes(), t.Signature) {
+	if !ed25519.Verify(a.Key, t.SignBytes(), t.Signature) && !verifySession(s, t) {
 		return t, errors.New("invalid signature")
+	}
+	if t.Type == "protocol" {
+		next := cloneMutable(*s)
+		return t, executeRuntime(&next, t, raw)
 	}
 	if t.Type != "publish_document" {
 		if len(t.Body) > 4096 {

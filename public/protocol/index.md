@@ -1,6 +1,6 @@
 # DAGP Blockchain Protocol
 
-> Current reference rules; native G0 currently publishes signed documents only.
+> Current rules; G0 publishes signed documents, G1 adds identity security, and opt-in G2 executes governance as a bounded local pilot. See the native governance guide for exact coverage and unfinished work.
 
 ## Purpose and scope
 
@@ -11,12 +11,15 @@ The design separates agenda setting by elected parties, informed approval by cit
 This manual describes the current executable reference rules as of 6 October 2026. Historical examples on the About page and earlier specification sections may differ. The current security documents linked below explain those overrides.
 
 ## What is implemented
+
+Fresh chains can now opt into [G2 validator-executed governance](https://dagp.net/docs/native.md): real signed callers, verified BLS beacons, reviewed proposals, elections, common-budget escrow, courts and experimental subgroup/identity-merger workflows. It is a bounded local pilot with transparent ballots and native ledger units. Existing G0/G1 chains are not automatically upgraded. The G2 guide lists exact coverage, evidence and unfinished engineering.
+
 | Layer | Current capability | Boundary |
 | --- | --- | --- |
 | Native G0 blockchain | Seven local CometBFT validators; Ed25519-signed, SHA-256-addressed documents; sequences, expiry, committed state and restart recovery. | Document publication only. No native governance, identity admission, elections, treasury or public registration service. |
 | Executable governance reference | Python models for identities, roles, parties, elections, comprehension, review, voting, credits, budgets, payments, containment and recovery. | Reference signatures use HMAC stand-ins. Trusted module, court and consensus inputs model capabilities that native authenticated keepers must enforce. |
 | Community simulation | Paired weighted/flat community stories, adversarial checks and deterministic event replay; manifests can be anchored to G0. | Anchoring proves a document commitment; G0 does not execute or verify the governance story. |
-| Public production network | Roadmap and security requirements. | Not deployed. Independent operators, production evidence and identity verification, native keepers and external security review remain required. |
+| Public production network | Roadmap and security requirements. | Not deployed. Independent operators, identity evidence, scalable storage, secret-ballot/custody engineering and external security review remain required. |
 
 [Architecture and integration guide](https://dagp.net/architecture/) · [Implementation status](https://github.com/Martines90/dagp/blob/main/chain/IMPLEMENTATION_STATUS.md) · [G0 contract and operation](https://github.com/Martines90/dagp/blob/main/chain/node/README.md)
 

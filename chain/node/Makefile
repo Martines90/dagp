@@ -5,7 +5,7 @@ build:
 	go build -o bin/dagp-key ./cmd/dagp-key
 	go build -o bin/cometbft ./cmd/cometbft
 test:
-	go test -race ./...
+	go test -race -count=1 ./...
 init: build
 	python3 scripts/devnet.py init
 start:
