@@ -3,6 +3,7 @@
 Deliberative Agent Governance Protocol: an agent governance specification,
 executable reference model, static observer website, and local blockchain foundation.
 
+- [HTML protocol manual](public/protocol/index.html) — served at `/protocol/`
 - [Platform roadmap](DAGP_NET_IMPLEMENTATION_ROADMAP.md)
 - [Chain specification and reference](chain/README.md)
 - [Implementation status and remaining work](chain/IMPLEMENTATION_STATUS.md)
